@@ -13,6 +13,10 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # TypeScript 7 (Go-native compiler) breaks tsup dts bundling; stay on 5.x until tsup supports it.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     labels:
       - dependencies
       - npm
