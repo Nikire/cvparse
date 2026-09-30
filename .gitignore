@@ -1,0 +1,21 @@
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+
+# Build / tooling
+*.tsbuildinfo
+*.tgz
+.vitest/
+.biome/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

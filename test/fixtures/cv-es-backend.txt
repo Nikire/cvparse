@@ -1,0 +1,43 @@
+MARÍA FERNANDA LÓPEZ GARCÍA
+Desarrolladora Backend Sr.
+CABA, Argentina · +54 9 11 5555-1234 · mfernanda.lopez@example.com
+linkedin.com/in/mflopezgarcia · github.com/mflopez
+
+PERFIL
+Desarrolladora backend con 7 años de experiencia construyendo APIs y sistemas distribuidos en Node.js y TypeScript.
+Lideré equipos de hasta 5 personas y migraciones a microservicios en fintech y e-commerce.
+
+EXPERIENCIA LABORAL
+
+Fintonic Latam — Buenos Aires (híbrido)
+Tech Lead Backend · Marzo 2021 – Actualidad
+- Diseñé la arquitectura de pagos (NestJS, PostgreSQL, Kafka) que procesa 1,2 M de transacciones mensuales.
+- Reduje el tiempo de despliegue de 40 a 8 minutos migrando a GitHub Actions y Kubernetes.
+- Mentoría de 4 desarrolladores junior.
+
+Mercado Local S.A. — Córdoba
+Desarrolladora Backend Ssr. · 06/2018 – 02/2021
+- Desarrollo de APIs REST en Express y MongoDB para el carrito y checkout.
+- Integración con Mercado Pago y AFIP para facturación electrónica.
+
+Freelance
+Desarrolladora Full Stack · 2016 – 2018
+Sitios y tiendas online para pymes con React y Node.js.
+
+FORMACIÓN ACADÉMICA
+Universidad Tecnológica Nacional (UTN) — Facultad Regional Córdoba
+Ingeniería en Sistemas de Información · 2012 – 2017
+
+CURSOS Y CERTIFICACIONES
+- AWS Certified Developer – Associate, Amazon Web Services, noviembre de 2022
+- Scrum Master Certified (SMC), SCRUMstudy, 2020
+
+HABILIDADES
+Backend: Node.js, TypeScript, NestJS, Express, PostgreSQL, MongoDB, Kafka
+DevOps: Docker, Kubernetes, GitHub Actions, AWS
+Metodologías: Scrum, Kanban
+
+IDIOMAS
+Español: nativo
+Inglés: avanzado (C1)
+Portugués: intermedio

@@ -1,0 +1,32 @@
+JORDAN AVERY
+Product Designer
+Austin, TX, United States | (512) 555-0199 | jordan.avery@example.com | jordanavery.design
+
+SUMMARY
+Product designer with 6 years of experience shipping B2B SaaS interfaces. Comfortable owning
+research, prototyping and design systems end to end.
+
+EXPERIENCE
+
+Senior Product Designer — Northwind Analytics, Austin, TX (Remote)
+Jan 2022 – Present
+- Led the redesign of the reporting dashboard, increasing weekly active users by 28%.
+- Built and maintained a Figma design system used by 4 product teams.
+
+Product Designer — Brightline Health, Chicago, IL
+Aug 2018 – Dec 2021
+- Designed onboarding flows for a telehealth app with 200k monthly users.
+- Ran 40+ usability sessions and synthesized findings into roadmap items.
+
+EDUCATION
+Bachelor of Fine Arts, Graphic Design — University of Illinois at Chicago
+2014 – 2018
+
+CERTIFICATIONS
+Google UX Design Professional Certificate, Coursera, March 2021
+
+SKILLS
+Figma, Sketch, Prototyping, User Research, Design Systems, HTML/CSS, Accessibility (WCAG 2.1)
+
+LANGUAGES
+English (native), Spanish (conversational)

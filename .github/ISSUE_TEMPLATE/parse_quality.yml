@@ -1,0 +1,107 @@
+name: Parse quality
+description: The output is wrong or incomplete for my CV (fields missing, mixed up or wrongly normalized).
+title: "[parse]: "
+labels: [parse-quality]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reports like this are how cvparse gets better on real-world CVs, especially Spanish and LATAM ones. Thank you.
+
+        > **Never paste a real CV or real personal data.** Replace every name, email, phone number, address, ID number and employer detail with fake values before sharing. Keep the structure, section headings and wording of the original as faithful as possible; that is what matters for parsing. Issues containing real personal data will be edited or deleted.
+
+  - type: input
+    id: version
+    attributes:
+      label: cvparse version
+      placeholder: "0.0.1"
+    validations:
+      required: true
+
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and model
+      placeholder: "ollama / llama3.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language of the CV
+      options:
+        - Spanish (Spain)
+        - Spanish (Latin America)
+        - English
+        - Mixed Spanish / English
+        - Other (please specify in additional context)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layout
+    attributes:
+      label: Original layout of the CV
+      description: Even though 0.0.1 takes plain text, the original layout explains a lot about how the text came out.
+      options:
+        - Single column
+        - Two columns (sidebar + main)
+        - Scanned document / image (OCR)
+        - Table-based (Word / Europass style)
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: lang_option
+    attributes:
+      label: Value passed as `language`
+      options:
+        - auto (default)
+        - es
+        - en
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Anonymized input text
+      description: The resume text you passed to cvparse, fully anonymized. Keep the original structure, section headings, date formats and wording. Trim to the part that is parsed wrong if the CV is long.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected JSON
+      description: The fields you expected, in JSON Resume shape (only the relevant part is fine).
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual JSON
+      description: What cvparse returned for that part.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Anything about the CV that might matter (regional date formats, degree names, abbreviations, job titles, and so on).
+
+  - type: checkboxes
+    id: pii
+    attributes:
+      label: Personal data check
+      options:
+        - label: I confirm the sample above contains no real personal data and I am allowed to share it.
+          required: true
+        - label: I am fine with this anonymized sample being turned into a test fixture for the project.

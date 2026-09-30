@@ -1,0 +1,80 @@
+{
+  "name": "cvparse",
+  "version": "0.0.1",
+  "description": "Turn CVs and resumes into typed, JSON Resume-compatible JSON using LLMs via the Vercel AI SDK. Multi-provider, Ollama/local-first, best-in-class Spanish CV support.",
+  "keywords": [
+    "resume",
+    "cv",
+    "parser",
+    "json-resume",
+    "llm",
+    "ai-sdk",
+    "ollama",
+    "spanish",
+    "ats",
+    "recruiting"
+  ],
+  "author": "Nikire",
+  "license": "MIT",
+  "homepage": "https://github.com/Nikire/cvparse#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nikire/cvparse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nikire/cvparse/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "cvparse": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run test && npm run build",
+    "release:check": "npm pack --dry-run"
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.61",
+    "ai": "^7.0.124",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^26.6.3",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
+  }
+}

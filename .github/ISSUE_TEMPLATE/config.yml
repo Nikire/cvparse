@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas (Discussions)
+    url: https://github.com/Nikire/cvparse/discussions
+    about: Ask a question, share how you use cvparse, or discuss an idea before opening an issue.
+  - name: Security vulnerability
+    url: https://github.com/Nikire/cvparse/security/advisories/new
+    about: Report security issues privately through GitHub Security Advisories, not as a public issue.

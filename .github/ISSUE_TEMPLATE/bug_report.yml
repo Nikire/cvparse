@@ -1,0 +1,96 @@
+name: Bug report
+description: Something crashes, throws, or misbehaves (not about the quality of a parsed CV).
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        > **Never paste a real CV or real personal data.** CVs contain names, phone numbers, emails, addresses and employment history of real people. Replace every personal detail with fake values (for example "Jane Doe", "jane@example.com", "+34 600 000 000") before sharing anything. Issues containing real personal data will be edited or deleted.
+
+        If cvparse runs fine but the JSON is wrong for your CV, please use the **Parse quality** template instead.
+
+  - type: input
+    id: version
+    attributes:
+      label: cvparse version
+      description: Run `npx cvparse --version` or check `node_modules/cvparse/package.json`.
+      placeholder: "0.0.1"
+    validations:
+      required: true
+
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version
+      description: Output of `node --version`. cvparse requires Node >= 22.
+      placeholder: "v22.12.0"
+    validations:
+      required: true
+
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and model
+      description: Which provider and model id you used.
+      placeholder: "ollama / llama3.1 - openai / gpt-4o-mini - openai-compatible (LM Studio) / qwen2.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: usage
+    attributes:
+      label: How are you using cvparse?
+      options:
+        - Library (parseResume from code)
+        - CLI (npx cvparse)
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including the full error message and stack trace if there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The command you ran or a minimal code snippet.
+      placeholder: "npx cvparse ./cv.txt --provider ollama --model llama3.1"
+      render: shell
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Anonymized input sample
+      description: The smallest piece of resume text that triggers the bug, with ALL personal data replaced by fake values. Do not attach real CVs.
+      render: text
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected JSON
+      description: What you expected the output (or the relevant part of it) to look like.
+      render: json
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual JSON / output
+      description: What you got instead.
+      render: json
+
+  - type: checkboxes
+    id: pii
+    attributes:
+      label: Personal data check
+      options:
+        - label: I confirm this issue contains no real personal data (names, emails, phone numbers, addresses, ID numbers or employer details of real people).
+          required: true
