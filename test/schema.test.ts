@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   BasicsSchema,
   EducationSchema,
+  ExtensionEducationLevelSchema,
   ExtensionLocationSchema,
   ExtensionSchema,
   ISO_DATE_REGEX,
@@ -220,6 +221,7 @@ describe("x_cvparse extension keys", () => {
       "normalizedSkills",
       "location",
       "confidenceNotes",
+      "educationLevels",
     ]);
     expect(Object.keys(ExtensionLocationSchema.shape)).toEqual([
       "countryCode",
@@ -227,5 +229,66 @@ describe("x_cvparse extension keys", () => {
       "city",
       "raw",
     ]);
+    expect(Object.keys(ExtensionEducationLevelSchema.shape)).toEqual([
+      "level",
+      "original",
+      "canonical",
+    ]);
+  });
+
+  it("educationLevels is a parallel array of level entries", () => {
+    const ok = ResumeSchema.safeParse({
+      education: [{ studyType: "Lic. en Letras" }],
+      x_cvparse: {
+        educationLevels: [
+          { level: "bachelor", original: "Lic. en Letras", canonical: "Licenciatura" },
+        ],
+      },
+    });
+    expect(ok.success).toBe(true);
+    expect(
+      ExtensionEducationLevelSchema.safeParse({ level: "unknown", original: null, canonical: null })
+        .success,
+    ).toBe(true);
+    expect(
+      ExtensionEducationLevelSchema.safeParse({ level: "phd", original: null, canonical: null })
+        .success,
+    ).toBe(false);
+    expect(ExtensionEducationLevelSchema.safeParse({ level: "master" }).success).toBe(false);
+    expect(ResumeSchema.safeParse({ x_cvparse: { educationLevels: null } }).success).toBe(true);
+  });
+
+  it("documents educationLevels in both JSON schemas", () => {
+    type Node = {
+      type?: string | string[];
+      properties?: Record<string, Node>;
+      anyOf?: Node[];
+      items?: Node;
+      enum?: string[];
+      description?: string;
+    };
+    // Nullable nodes serialize as `anyOf: [T, { type: "null" }]`; return the T branch.
+    const nonNull = (node: Node | undefined): Node | undefined =>
+      node?.anyOf ? node.anyOf.find((n) => n.type !== "null") : node;
+    const field = (schema: Record<string, unknown>) => {
+      const ext = nonNull((schema.properties as Record<string, Node>).x_cvparse);
+      return nonNull(ext?.properties?.educationLevels);
+    };
+    for (const schema of [RESUME_JSON_SCHEMA, RESUME_EXTRACTION_JSON_SCHEMA]) {
+      const levels = field(schema);
+      expect(levels?.type).toBe("array");
+      expect(levels?.description).toContain("Parallel to `education`");
+      const level = nonNull(nonNull(levels?.items)?.properties?.level);
+      expect(level?.enum).toEqual([
+        "secondary",
+        "technical",
+        "bachelor",
+        "postgraduate",
+        "master",
+        "doctorate",
+        "course",
+        "unknown",
+      ]);
+    }
   });
 });

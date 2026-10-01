@@ -202,4 +202,19 @@ describe("parseResume", () => {
     await parseResume("Ana Pérez", { model, abortSignal: controller.signal });
     expect(model.doGenerateCalls[0]?.abortSignal).toBe(controller.signal);
   });
+
+  it("forwards temperature only when given", async () => {
+    const model = mockModelWithObject({});
+    await parseResume("Ana Pérez", { model, temperature: 0 });
+    expect(model.doGenerateCalls[0]?.temperature).toBe(0);
+    const untouched = mockModelWithObject({});
+    await parseResume("Ana Pérez", { model: untouched });
+    expect(untouched.doGenerateCalls[0]?.temperature).toBeUndefined();
+  });
+
+  it("tells the model the reference date so it can resolve relative dates", async () => {
+    const model = mockModelWithObject({});
+    await parseResume("Ana Pérez", { model, referenceDate: new Date("2026-10-01T12:00:00Z") });
+    expect(systemPromptOf(model)).toContain("2026-10-01");
+  });
 });

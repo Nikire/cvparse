@@ -17,7 +17,19 @@ export {
   type TextItem,
 } from "./extract/index.js";
 export { type OrderedPage, orderTextItems, type PageSize } from "./extract/layout.js";
-export { type NormalizedDate, normalizeDate } from "./normalize/dates.js";
+export {
+  type DateOptions,
+  type DateRange,
+  type NormalizedDate,
+  normalizeDate,
+  splitDateRange,
+} from "./normalize/dates.js";
+export {
+  EDUCATION_LEVELS,
+  type EducationLevel,
+  type EducationLevelInfo,
+  normalizeStudyType,
+} from "./normalize/education.js";
 export { type DetectedLanguage, detectLanguage } from "./normalize/language.js";
 export { type NormalizeResult, normalizeResume } from "./normalize/resume.js";
 export { parseResume } from "./parse.js";
@@ -32,6 +44,8 @@ export {
   type Education,
   EducationSchema,
   type Extension,
+  type ExtensionEducationLevel,
+  ExtensionEducationLevelSchema,
   type ExtensionLocation,
   ExtensionLocationSchema,
   ExtensionSchema,

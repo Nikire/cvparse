@@ -27,9 +27,9 @@ Goal: `npx @cvparse/core ./cv.pdf` and `npx @cvparse/core ./cv.docx` work withou
 - [x] Input detection by magic bytes (file name only breaks ties); `parseResume` accepts `string | Uint8Array | { data, filename?, format? }`, and `extractText` / `detectFormat` are exported on their own.
 - [x] ~~Extraction adapters are optional peer dependencies so the core stays small.~~ Decided otherwise: `unpdf` and `mammoth` are regular dependencies loaded on demand, so `npx @cvparse/core ./cv.pdf` works without extra installs. OCR stays an adapter (0.2).
 - [x] Fixture set expanded with synthetic PDF and DOCX files (`test/fixtures/pdf`, `test/fixtures/docx`) generated deterministically by `npm run fixtures:pdf` and `npm run fixtures:docx` from the same synthetic content as the text fixtures.
-- [ ] Remaining date forms: relative dates ("hace 3 años", "3 years ago"), season names ("verano 2020"), quarter/semester notation, ranges written as a single token ("2019-21").
-- [ ] Degree and title normalization for Spain and LATAM (Licenciatura, Tecnicatura, Grado, Ingeniería, Máster, Doctorado, and their equivalents), mapped to `education[].studyType` with the original preserved.
-- [ ] Optional `temperature` pass-through in `ParseOptions` (`maxRetries` already exists since 0.0.1).
+- [x] Remaining date forms: relative dates ("hace 3 años", "3 years ago"), season names ("verano 2020"), quarter/semester notation, ranges written as a single token ("2019-21").
+- [x] Degree and title normalization for Spain and LATAM (Licenciatura, Tecnicatura, Grado, Ingeniería, Máster, Doctorado, and their equivalents), mapped to `education[].studyType` with the original preserved.
+- [x] Optional `temperature` pass-through in `ParseOptions` (`maxRetries` already exists since 0.0.1).
 
 ## 0.2 — Scanned documents
 

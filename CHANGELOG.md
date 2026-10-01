@@ -8,6 +8,12 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+### Added
+
+- `ParseOptions.temperature` (forwarded to the model) and `ParseOptions.referenceDate` ("today" for relative dates, told to the model and used by the normalizer).
+- Date normalization: relative dates ("hace 3 años", "2 years ago"), seasons ("verano 2020"), quarters/semesters/cuatrimestres ("Q1 2021", "1er semestre 2020", "2020-S2"), and ranges written as one token ("2019-21", "2019/2021", "marzo 2019 – actualidad") split into start/end.
+- Degree normalization for Spain and LATAM: `x_cvparse.educationLevels` gives a level (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course`, `unknown`) and a canonical title family per `education` entry, in order; `studyType` keeps the original text. `normalizeStudyType` is exported.
+
 ## [0.1.0] - 2026-10-01
 
 ### Added

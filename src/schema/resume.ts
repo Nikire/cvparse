@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EDUCATION_LEVELS } from "../normalize/education.js";
 
 /**
  * Regular expression for the ISO 8601 date subset used by JSON Resume:
@@ -213,6 +214,27 @@ function buildSchemas<D extends z.ZodType<string>>(date: D) {
     })
     .describe("Normalized location of the candidate.");
 
+  /** cvparse extension: normalized level of one `education[]` entry. */
+  const ExtEducationLevel = z
+    .object({
+      level: z
+        .enum(EDUCATION_LEVELS)
+        .describe(
+          "Coarse education level: 'secondary', 'technical', 'bachelor', 'postgraduate', 'master', 'doctorate', 'course' or 'unknown'.",
+        ),
+      original: z
+        .string()
+        .nullable()
+        .describe("The education[].studyType text exactly as extracted, or null when empty."),
+      canonical: z
+        .string()
+        .nullable()
+        .describe(
+          "Neutral Spanish label for the recognized title family, e.g. 'Licenciatura', 'Grado', 'Ingeniería', 'Tecnicatura', 'Técnico Superior', 'Formación Profesional', 'Especialización', 'Maestría', 'Máster', 'MBA', 'Doctorado', 'Diplomado', 'Curso', 'Certificación', 'Bootcamp', 'Bachillerato'. Null when the level is 'unknown'.",
+        ),
+    })
+    .describe("Normalized level of one education entry.");
+
   /** cvparse extension block (`x_cvparse`): normalized data that JSON Resume does not cover. */
   const Extension = z
     .object({
@@ -226,6 +248,12 @@ function buildSchemas<D extends z.ZodType<string>>(date: D) {
       confidenceNotes: textArray(
         "Short notes about ambiguous or uncertain extractions, e.g. 'End date of first job unclear'. Empty when everything was clear.",
       ),
+      educationLevels: z
+        .array(ExtEducationLevel)
+        .describe(
+          "Parallel to `education`: same length and order, one entry per education item (educationLevels[i] describes education[i]). education[].studyType keeps the original text; the normalized level lives here. Computed deterministically by cvparse after extraction, so leave it null during extraction.",
+        )
+        .nullish(),
     })
     .describe("cvparse extensions to JSON Resume.");
 
@@ -264,6 +292,7 @@ function buildSchemas<D extends z.ZodType<string>>(date: D) {
     Reference,
     Project,
     ExtLocation,
+    ExtEducationLevel,
     Extension,
     Resume,
   };
@@ -302,6 +331,8 @@ export const ReferenceSchema = strict.Reference;
 export const ProjectSchema = strict.Project;
 /** cvparse extension: `x_cvparse.location`. */
 export const ExtensionLocationSchema = strict.ExtLocation;
+/** cvparse extension: `x_cvparse.educationLevels[]` item (parallel to `education[]`). */
+export const ExtensionEducationLevelSchema = strict.ExtEducationLevel;
 /** cvparse extension block: `x_cvparse`. */
 export const ExtensionSchema = strict.Extension;
 
@@ -374,6 +405,7 @@ export type Interest = z.infer<typeof InterestSchema>;
 export type Reference = z.infer<typeof ReferenceSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type ExtensionLocation = z.infer<typeof ExtensionLocationSchema>;
+export type ExtensionEducationLevel = z.infer<typeof ExtensionEducationLevelSchema>;
 export type Extension = z.infer<typeof ExtensionSchema>;
 /** A parsed resume. Inferred from {@link ResumeSchema}. */
 export type Resume = z.infer<typeof ResumeSchema>;

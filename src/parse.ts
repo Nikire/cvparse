@@ -159,10 +159,12 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   const language = options.language ?? "auto";
   const heuristicLanguage = language === "auto" ? detectLanguage(cvText) : null;
 
+  const referenceDate = options.referenceDate ?? new Date();
   const instructions = buildSystemPrompt({
     language,
     detectedLanguage: heuristicLanguage,
     instructions: options.instructions,
+    referenceDate,
   });
 
   let raw: unknown;
@@ -188,6 +190,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
       }),
       abortSignal: options.abortSignal,
       maxRetries: options.maxRetries,
+      temperature: options.temperature,
     });
     raw = result.output;
     usage = {
@@ -202,7 +205,9 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
 
   // Only let the heuristic fill in detectedLanguage when the language is not forced; otherwise
   // it would warn about a detected language that is overridden right below.
-  const normalized = normalizeResume(raw, language === "auto" ? cvText : undefined);
+  const normalized = normalizeResume(raw, language === "auto" ? cvText : undefined, {
+    referenceDate,
+  });
   warnings.push(...normalized.warnings);
 
   if (language !== "auto") {

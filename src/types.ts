@@ -47,6 +47,17 @@ export interface ParseOptions {
    * Forwarded to the AI SDK; defaults to the SDK default (2). Set `0` to fail fast.
    */
   maxRetries?: number;
+  /**
+   * Sampling temperature forwarded to the model. Omit to use the provider default. Extraction is
+   * a copying task, so low values (`0` to `0.2`) are usually the right choice.
+   */
+  temperature?: number;
+  /**
+   * "Today" for resolving relative dates in the CV ("hace 3 años", "2 years ago"). It is told to
+   * the model and used by the deterministic date normalizer. Defaults to `new Date()`; pin it
+   * for reproducible output.
+   */
+  referenceDate?: Date;
 }
 
 /** Token usage of the extraction call. Values are `undefined` when the provider does not report them. */

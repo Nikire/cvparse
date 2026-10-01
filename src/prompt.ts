@@ -10,7 +10,10 @@ export function buildSystemPrompt(options: {
   language: ParseLanguage;
   detectedLanguage: string | null;
   instructions?: string | undefined;
+  /** Anchor for relative dates ("hace 3 años", "2 years ago"). Defaults to `new Date()`. */
+  referenceDate?: Date | undefined;
 }): string {
+  const today = (options.referenceDate ?? new Date()).toISOString().slice(0, 10);
   const languageLine =
     options.language === "auto"
       ? options.detectedLanguage
@@ -32,6 +35,8 @@ export function buildSystemPrompt(options: {
 - Output dates as ISO strings: YYYY, YYYY-MM or YYYY-MM-DD. Never pad with fake precision: "2019" stays "2019", "marzo 2019" becomes "2019-03".
 - Spanish and Portuguese month names and abbreviations must be converted: enero/ene=01, febrero/feb=02, marzo/mar=03, abril/abr=04, mayo/may=05, junio/jun=06, julio/jul=07, agosto/ago=08, septiembre/setiembre/sep/set=09, octubre/oct=10, noviembre/nov=11, diciembre/dic=12.
 - Numeric dates in Spanish-language CVs are day-first: "03/2020" is 2020-03, "15/03/2020" is 2020-03-15.
+- Today is ${today}. Resolve relative dates ("hace 3 años", "2 years ago") against this date and output ISO dates.
+- Ranges written as a single token ("2019-21", "2019/2021", "marzo 2019 – actualidad") must be split into startDate and endDate.
 - If a period is ongoing ("actualidad", "presente", "a la fecha", "hasta hoy", "en curso", "present", "current", "now"), set endDate to null.
 - If you cannot determine a date, use null and mention it in x_cvparse.confidenceNotes.`,
 

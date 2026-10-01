@@ -148,6 +148,8 @@ type ParseOptions = {
   instructions?: string;            // extra instructions appended to the extraction prompt
   abortSignal?: AbortSignal;        // forwarded to the model call
   maxRetries?: number;              // retries on retryable provider errors, default 2 (AI SDK default)
+  temperature?: number;             // sampling temperature; omit for the provider default, 0 suits copying tasks
+  referenceDate?: Date;             // "today" for relative dates ("hace 3 años"); default new Date()
 };
 ```
 
@@ -219,6 +221,7 @@ cvparse adds its own data under the `x_cvparse` key so the JSON Resume part stay
 - `normalizedSkills` — a flat, deduplicated list of skills as canonical lowercase names.
 - `location` — LATAM-friendly structured location: `countryCode` (ISO 3166-1 alpha-2), `adminRegion` (state, province, department, autonomous community), `city`, and `raw` (the location exactly as written in the CV).
 - `confidenceNotes` — short notes about ambiguous or uncertain extractions; also appended to `warnings`.
+- `educationLevels` — one entry per `education[]` item, in the same order: `level` (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course` or `unknown`), the `original` study type and a `canonical` title family ("Licenciatura", "Grado", "Ingeniería", "Tecnicatura", "Máster", "Doctorado", "Diplomado", ...). Computed by cvparse from Spanish, Portuguese and English degree names; `education[].studyType` keeps the original text.
 
 The Zod schemas (`ResumeSchema`, `BasicsSchema`, `WorkSchema`, `EducationSchema`, `SkillSchema`, `ExtensionSchema` and the rest) are exported so you can validate, extend or reuse them. The authoritative definition is in [`src/schema/resume.ts`](./src/schema/resume.ts).
 

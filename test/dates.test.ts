@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { normalizeDate } from "../src/index.js";
+import { splitDateRange } from "../src/normalize/dates.js";
+
+/** Fixed anchor so relative dates are deterministic: 1 October 2026. */
+const REF = { referenceDate: new Date(Date.UTC(2026, 9, 1)) };
 
 describe("normalizeDate", () => {
   it("keeps ISO input untouched", () => {
@@ -67,6 +71,7 @@ describe("normalizeDate", () => {
     ["2020-3-5", "2020-03-05"],
     ["2020/03/15", "2020-03-15"],
     ["2020-03-15T00:00:00Z", "2020-03-15"],
+    ["2020–03", "2020-03"],
   ])("parses numeric dates day-first: %s -> %s", (input, expected) => {
     expect(normalizeDate(input).value).toBe(expected);
   });
@@ -77,13 +82,251 @@ describe("normalizeDate", () => {
 
   it("extracts a bare year from short phrases", () => {
     expect(normalizeDate("Año 2019").value).toBe("2019");
-    expect(normalizeDate("2019 (verano)").value).toBe("2019");
+    expect(normalizeDate("2019 (aprox.)").value).toBe("2019");
     expect(normalizeDate("desde 2015").value).toBe("2015");
+    expect(normalizeDate("from 2015").value).toBe("2015");
   });
 
   it("flags unparseable input", () => {
-    for (const input of ["hace dos años", "13/2020", "32/01/2020", "Q3 2020", "1800"]) {
+    for (const input of ["hace poco", "recently", "13/2020", "32/01/2020", "1800", "trimestre"]) {
       expect(normalizeDate(input), input).toEqual({ value: null, current: false, unparsed: true });
     }
+  });
+
+  describe("relative dates", () => {
+    it.each([
+      ["hace 3 años", "2023"],
+      ["Hace 6 meses", "2026-04"],
+      ["hace un año", "2025"],
+      ["hace 1 año", "2025"],
+      ["hace dos años", "2024"],
+      ["hace 10 meses", "2025-12"],
+      ["hace 12 meses", "2025-10"],
+      ["desde hace 2 años", "2024"],
+      ["3 years ago", "2023"],
+      ["6 months ago", "2026-04"],
+      ["18 months ago", "2025-04"],
+      ["a year ago", "2025"],
+      ["one year ago", "2025"],
+      ["2 yrs ago", "2024"],
+      ["há 2 anos", "2024"],
+      ["ha 2 anos", "2024"],
+      ["2 anos atrás", "2024"],
+      ["há 3 meses", "2026-07"],
+    ])("resolves %s against the reference date -> %s", (input, expected) => {
+      const result = normalizeDate(input, REF);
+      expect(result.value).toBe(expected);
+      expect(result.current).toBe(false);
+      expect(result.unparsed).toBe(false);
+      expect(result.note).toContain("2026-10-01");
+    });
+
+    it("does month arithmetic across year boundaries in UTC", () => {
+      const ref = { referenceDate: new Date("2026-01-31T23:30:00Z") };
+      expect(normalizeDate("hace 1 mes", ref).value).toBe("2025-12");
+      expect(normalizeDate("hace 13 meses", ref).value).toBe("2024-12");
+    });
+
+    it("defaults the reference date to now", () => {
+      const now = new Date();
+      expect(normalizeDate("hace 1 año").value).toBe(String(now.getUTCFullYear() - 1));
+    });
+
+    it("rejects vague relative phrases", () => {
+      for (const input of ["hace poco", "hace mucho tiempo", "years ago", "hace años"]) {
+        expect(normalizeDate(input, REF), input).toEqual({
+          value: null,
+          current: false,
+          unparsed: true,
+        });
+      }
+    });
+
+    it("rejects relative dates that fall outside the supported year range", () => {
+      expect(normalizeDate("hace 200 años", REF).unparsed).toBe(true);
+    });
+  });
+
+  describe("seasons", () => {
+    it.each([
+      ["verano 2020", "2020-06"],
+      ["verano de 2020", "2020-06"],
+      ["Verano del 2020", "2020-06"],
+      ["invierno 2019", "2019-12"],
+      ["otoño 2021", "2021-09"],
+      ["primavera 2022", "2022-03"],
+      ["summer 2020", "2020-06"],
+      ["Summer of 2020", "2020-06"],
+      ["fall 2019", "2019-09"],
+      ["autumn 2019", "2019-09"],
+      ["spring 2021", "2021-03"],
+      ["winter 2018", "2018-12"],
+      ["verão 2020", "2020-06"],
+      ["inverno 2020", "2020-12"],
+      ["2019 (verano)", "2019-06"],
+    ])("maps %s to the Northern-hemisphere start month %s", (input, expected) => {
+      const result = normalizeDate(input);
+      expect(result.value).toBe(expected);
+      expect(result.unparsed).toBe(false);
+      expect(result.note).toMatch(/hemisphere/);
+    });
+  });
+
+  describe("quarters, semesters and cuatrimestres", () => {
+    it.each([
+      ["Q1 2021", "2021-01"],
+      ["Q2 2021", "2021-04"],
+      ["2021 Q3", "2021-07"],
+      ["Q4-2021", "2021-10"],
+      ["1T 2021", "2021-01"],
+      ["T1 2021", "2021-01"],
+      ["3T 2020", "2020-07"],
+      ["1er trimestre 2021", "2021-01"],
+      ["2do trimestre de 2021", "2021-04"],
+      ["4to trimestre 2021", "2021-10"],
+      ["1er semestre 2020", "2020-01"],
+      ["primer semestre 2020", "2020-01"],
+      ["2do semestre 2020", "2020-07"],
+      ["segundo semestre de 2020", "2020-07"],
+      ["2020-S1", "2020-01"],
+      ["2020/S2", "2020-07"],
+      ["S2 2020", "2020-07"],
+      ["1S 2020", "2020-01"],
+      ["H1 2021", "2021-01"],
+      ["H2 2021", "2021-07"],
+      ["1° cuatrimestre 2020", "2020-01"],
+      ["2° cuatrimestre 2020", "2020-05"],
+      ["3º cuatrimestre 2020", "2020-09"],
+      ["first quarter 2021", "2021-01"],
+      ["2nd quarter of 2021", "2021-04"],
+      ["second half of 2020", "2020-07"],
+      ["Q3 2020", "2020-07"],
+    ])("maps %s to the start of the period %s", (input, expected) => {
+      expect(normalizeDate(input)).toEqual({ value: expected, current: false, unparsed: false });
+    });
+
+    it("rejects periods that do not exist", () => {
+      for (const input of ["Q5 2021", "3er semestre 2020", "4to cuatrimestre 2020", "S0 2020"]) {
+        expect(normalizeDate(input).unparsed, input).toBe(true);
+      }
+    });
+  });
+
+  describe("range tokens", () => {
+    it.each([
+      "2019-21",
+      "2019–2021",
+      "2019/2021",
+      "2019 - 2021",
+      "2019 a 2021",
+      "2019 hasta 2021",
+      "mar 2019 - jun 2021",
+      "03/2019-06/2021",
+      "2019 - actualidad",
+      "2019–presente",
+      "2019 - current",
+      "2019 to 2021",
+      "de 2019 a 2021",
+    ])("does not produce a date for %s (caller should use splitDateRange)", (input) => {
+      expect(normalizeDate(input)).toEqual({ value: null, current: false, unparsed: true });
+    });
+
+    it("still reads open-ended starts as a plain date", () => {
+      expect(normalizeDate("desde 2019").value).toBe("2019");
+    });
+  });
+});
+
+describe("splitDateRange", () => {
+  it.each([
+    ["2019-21", "2019", "2021"],
+    ["2019-2021", "2019", "2021"],
+    ["2019–2021", "2019", "2021"],
+    ["2019—2021", "2019", "2021"],
+    ["2019/2021", "2019", "2021"],
+    ["2019/21", "2019", "2021"],
+    ["2019 - 2021", "2019", "2021"],
+    ["2019 -2021", "2019", "2021"],
+    ["2019 a 2021", "2019", "2021"],
+    ["2019 al 2021", "2019", "2021"],
+    ["2019 hasta 2021", "2019", "2021"],
+    ["2019 to 2021", "2019", "2021"],
+    ["2019 até 2021", "2019", "2021"],
+    ["de 2019 a 2021", "2019", "2021"],
+    ["del 2019 al 2021", "2019", "2021"],
+    ["entre 2019 y 2021", "2019", "2021"],
+    ["between 2019 and 2021", "2019", "2021"],
+    ["from 2019 to 2021", "2019", "2021"],
+    ["mar 2019 - jun 2021", "2019-03", "2021-06"],
+    ["Marzo 2019 – Junio 2021", "2019-03", "2021-06"],
+    ["marzo de 2019 a junio de 2021", "2019-03", "2021-06"],
+    ["03/2019-06/2021", "2019-03", "2021-06"],
+    ["03/2019 - 06/2021", "2019-03", "2021-06"],
+    ["15/03/2019 - 20/06/2021", "2019-03-15", "2021-06-20"],
+    ["1998-99", "1998", "1999"],
+    ["Q1 2020 - Q3 2021", "2020-01", "2021-07"],
+    ["verano 2019 - invierno 2020", "2019-06", "2020-12"],
+  ])("splits %s into %s .. %s", (input, start, end) => {
+    expect(splitDateRange(input)).toEqual({ start, end, current: false });
+  });
+
+  it.each([
+    ["2019 - actualidad", "2019"],
+    ["2019–presente", "2019"],
+    ["2019 - current", "2019"],
+    ["2019 - present", "2019"],
+    ["2019 to date", "2019"],
+    ["marzo 2019 a la fecha", "2019-03"],
+    ["2019 hasta la actualidad", "2019"],
+    ["2019 - hasta hoy", "2019"],
+    ["Mar 2019 – Present", "2019-03"],
+    ["hace 3 años - actualidad", "2023"],
+  ])("treats %s as ongoing from %s", (input, start) => {
+    expect(splitDateRange(input, REF)).toEqual({ start, end: null, current: true });
+  });
+
+  it("returns an open-ended range for 'desde' / 'from' / 'since'", () => {
+    expect(splitDateRange("desde 2019")).toEqual({ start: "2019", end: null, current: false });
+    expect(splitDateRange("from 2019")).toEqual({ start: "2019", end: null, current: false });
+    expect(splitDateRange("since March 2019")).toEqual({
+      start: "2019-03",
+      end: null,
+      current: false,
+    });
+  });
+
+  it("returns null for tokens that are not ranges", () => {
+    for (const input of [
+      null,
+      undefined,
+      "",
+      "2019-03",
+      "1998-02",
+      "2010-11",
+      "2019",
+      "marzo 2021",
+      "15-03-2020",
+      "2020-03-15",
+      "06/2018",
+      "actualidad",
+      "foo - bar",
+      "2019 - foo",
+      "2019 y 2021",
+      "Q1 2021",
+      "hace 3 años",
+    ]) {
+      expect(splitDateRange(input, REF), String(input)).toBeNull();
+    }
+  });
+
+  it("reads a two-digit end as a year only when it is after the start's last two digits", () => {
+    expect(splitDateRange("2019-21")).toEqual({ start: "2019", end: "2021", current: false });
+    expect(splitDateRange("2019 - 21")).toEqual({ start: "2019", end: "2021", current: false });
+    // Valid YYYY-MM always wins over a range reading.
+    expect(splitDateRange("2019-03")).toBeNull();
+    expect(normalizeDate("2019-03").value).toBe("2019-03");
+    // Not a valid month and not after the start: still not a range.
+    expect(splitDateRange("2019-19")).toBeNull();
+    expect(splitDateRange("2019-15")).toBeNull();
   });
 });

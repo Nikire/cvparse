@@ -1,5 +1,6 @@
 import type { Resume } from "../schema/resume.js";
-import { normalizeDate } from "./dates.js";
+import { type DateOptions, normalizeDate, splitDateRange } from "./dates.js";
+import { type EducationLevelInfo, normalizeStudyType } from "./education.js";
 import { detectLanguage } from "./language.js";
 
 /** Output of {@link normalizeResume}. */
@@ -57,6 +58,20 @@ function tidyStrings(value: unknown): unknown {
   return value;
 }
 
+/**
+ * One {@link EducationLevelInfo} per `education[]` entry, in order. `studyType` is left as the
+ * model wrote it; only the parallel `x_cvparse.educationLevels` array is produced.
+ */
+function collectEducationLevels(education: unknown): EducationLevelInfo[] | null {
+  if (!Array.isArray(education)) return null;
+  return education.map((entry) => {
+    if (!isRecord(entry)) return normalizeStudyType(null);
+    const studyType = typeof entry.studyType === "string" ? entry.studyType : null;
+    const area = typeof entry.area === "string" ? entry.area : null;
+    return normalizeStudyType(studyType, area);
+  });
+}
+
 function dedupeLowercase(items: readonly string[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -76,11 +91,17 @@ function dedupeLowercase(items: readonly string[]): string[] {
  *   "actualidad" / "present" into `null` and warning on dates it cannot understand;
  * - lowercases and dedupes `x_cvparse.normalizedSkills`;
  * - uppercases and validates ISO country codes;
- * - fills `x_cvparse.detectedLanguage` heuristically when the model left it empty.
+ * - fills `x_cvparse.detectedLanguage` heuristically when the model left it empty;
+ * - classifies every `education[].studyType` into `x_cvparse.educationLevels` (a parallel
+ *   array, same order) without touching `studyType` itself.
  *
  * Returns a new object; the input is not mutated.
  */
-export function normalizeResume(input: unknown, sourceText?: string): NormalizeResult {
+export function normalizeResume(
+  input: unknown,
+  sourceText?: string,
+  options: DateOptions = {},
+): NormalizeResult {
   const warnings: string[] = [];
   const tidied = tidyStrings(input);
   const resume: Record<string, unknown> = isRecord(tidied) ? tidied : {};
@@ -93,8 +114,17 @@ export function normalizeResume(input: unknown, sourceText?: string): NormalizeR
       warnings.push(`${path}: expected a date string, got ${typeof raw}; set to null.`);
       continue;
     }
-    const normalized = normalizeDate(raw);
+    const normalized = normalizeDate(raw, options);
     if (normalized.unparsed) {
+      // Models sometimes put a whole range in startDate ("2019-21", "marzo 2019 – actualidad")
+      // and leave endDate empty. Split it instead of discarding it.
+      const endEmpty = obj.endDate === undefined || obj.endDate === null;
+      const range = key === "startDate" && endEmpty ? splitDateRange(raw, options) : null;
+      if (range) {
+        obj.startDate = range.start;
+        obj.endDate = range.end;
+        continue;
+      }
       warnings.push(`${path}: could not normalize date "${raw}"; set to null.`);
     }
     obj[key] = normalized.value;
@@ -107,6 +137,13 @@ export function normalizeResume(input: unknown, sourceText?: string): NormalizeR
     ext.normalizedSkills = dedupeLowercase(
       ext.normalizedSkills.filter((s): s is string => typeof s === "string"),
     );
+  }
+
+  const educationLevels = collectEducationLevels(resume.education);
+  if (educationLevels) {
+    ext.educationLevels = educationLevels;
+  } else {
+    delete ext.educationLevels;
   }
 
   if (typeof ext.detectedLanguage === "string") {
