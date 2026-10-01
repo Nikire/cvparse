@@ -74,10 +74,10 @@ Exit codes:
   2  usage error (bad arguments, missing file, unsupported file type)
 
 Examples:
-  npx cvparse ./cv.txt --pretty
-  npx cvparse ./cv.txt --provider openai --model gpt-4o-mini --api-key sk-...
-  npx cvparse ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model qwen2.5
-  cat cv.txt | npx cvparse - --lang es
+  npx @cvparse/core ./cv.txt --pretty
+  npx @cvparse/core ./cv.txt --provider openai --model gpt-4o-mini --api-key sk-...
+  npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model qwen2.5
+  cat cv.txt | npx @cvparse/core - --lang es
 `;
 
 const ARG_OPTIONS = {

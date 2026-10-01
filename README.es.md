@@ -2,10 +2,10 @@
 
 Convierte CVs y currículums en JSON tipado y compatible con JSON Resume usando LLMs, con cualquier proveedor que soporte el Vercel AI SDK, incluidos modelos locales vía Ollama.
 
-[![npm version](https://img.shields.io/npm/v/cvparse.svg)](https://www.npmjs.com/package/cvparse)
+[![npm version](https://img.shields.io/npm/v/%40cvparse%2Fcore.svg)](https://www.npmjs.com/package/@cvparse/core)
 [![CI](https://img.shields.io/github/actions/workflow/status/Nikire/cvparse/ci.yml?branch=main&label=CI)](https://github.com/Nikire/cvparse/actions)
 [![License: MIT](https://img.shields.io/github/license/Nikire/cvparse.svg)](https://github.com/Nikire/cvparse/blob/main/LICENSE)
-[![Node >= 22](https://img.shields.io/node/v/cvparse.svg)](https://nodejs.org)
+[![Node >= 22](https://img.shields.io/node/v/%40cvparse%2Fcore.svg)](https://nodejs.org)
 
 > **Estado: 0.0.1 — vista previa temprana.**
 > Hoy cvparse acepta **solo texto plano**. Vos extraés el texto del PDF, DOCX o imagen y se lo pasás. La extracción de texto de PDF y DOCX integrada llega en 0.1, y un adaptador de OCR para documentos escaneados en 0.2. Ver la [hoja de ruta](#hoja-de-ruta). El schema y la API pueden cambiar antes de 0.1.
@@ -20,8 +20,10 @@ Requiere Node >= 22 y [Ollama](https://ollama.com) corriendo en tu máquina.
 
 ```bash
 ollama pull llama3.1
-npx cvparse ./cv.txt --pretty
+npx @cvparse/core ./cv.txt --pretty
 ```
+
+El paquete npm es `@cvparse/core`; el comando que instala es `cvparse` (`npm i -g @cvparse/core` y después `cvparse ./cv.txt`).
 
 `cvparse` usa por defecto Ollama en `http://localhost:11434/v1`. Nada sale de tu máquina.
 
@@ -29,10 +31,10 @@ Otros proveedores:
 
 ```bash
 # OpenAI (lee OPENAI_API_KEY del entorno si se omite --api-key)
-npx cvparse ./cv.txt --provider openai --model gpt-4o-mini --pretty
+npx @cvparse/core ./cv.txt --provider openai --model gpt-4o-mini --pretty
 
 # Cualquier endpoint compatible con OpenAI (LM Studio, vLLM, Groq, OpenRouter, ...)
-npx cvparse ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model mi-modelo
+npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model mi-modelo
 ```
 
 Todos los flags:
@@ -60,14 +62,14 @@ El CLI imprime únicamente el objeto `resume` como JSON por **stdout**; los `war
 Así se puede encadenar con pipes y scripts:
 
 ```bash
-npx cvparse ./cv.txt | jq '.basics.name'
-cat cv.txt | npx cvparse - --lang es
+npx @cvparse/core ./cv.txt | jq '.basics.name'
+cat cv.txt | npx @cvparse/core - --lang es
 ```
 
 ### Programático
 
 ```bash
-npm install cvparse @ai-sdk/openai-compatible
+npm install @cvparse/core @ai-sdk/openai-compatible
 ```
 
 `parseResume` recibe el texto del CV y cualquier modelo de lenguaje del AI SDK. Con Ollama todo corre en local:
@@ -75,7 +77,7 @@ npm install cvparse @ai-sdk/openai-compatible
 ```ts
 import { readFile } from 'node:fs/promises';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { parseResume } from 'cvparse';
+import { parseResume } from '@cvparse/core';
 
 const ollama = createOpenAICompatible({
   name: 'ollama',
@@ -101,7 +103,7 @@ O con OpenAI, a través del mismo paquete de proveedor:
 
 ```ts
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { parseResume } from 'cvparse';
+import { parseResume } from '@cvparse/core';
 
 const openai = createOpenAICompatible({
   name: 'openai',
@@ -142,7 +144,7 @@ type ParseResult = {
 `parseResume` lanza un `CvparseError` ante cualquier fallo, con el error original como `cause`:
 
 ```ts
-import { CvparseError, parseResume } from 'cvparse';
+import { CvparseError, parseResume } from '@cvparse/core';
 
 try {
   const { resume } = await parseResume(text, { model });
@@ -189,7 +191,7 @@ cvparse agrega sus propios datos bajo la clave `x_cvparse` para que la parte JSO
 Los schemas Zod (`ResumeSchema`, `BasicsSchema`, `WorkSchema`, `EducationSchema`, `SkillSchema`, `ExtensionSchema` y el resto) se exportan para que puedas validar, extender o reutilizarlos. La definición autoritativa está en [`src/schema/resume.ts`](./src/schema/resume.ts).
 
 ```ts
-import { ResumeSchema, type Resume } from 'cvparse';
+import { ResumeSchema, type Resume } from '@cvparse/core';
 
 const parsed: Resume = ResumeSchema.parse(JSON.parse(raw));
 ```
@@ -286,7 +288,7 @@ Los valores exactos dependen del modelo que uses. Los modelos locales pequeños 
 
 Resumen; el plan completo está en [docs/ROADMAP.md](./docs/ROADMAP.md).
 
-- **0.1** — Extracción de texto de PDF (incluidos layouts a dos columnas) y entrada DOCX. `npx cvparse ./cv.pdf` funciona directamente.
+- **0.1** — Extracción de texto de PDF (incluidos layouts a dos columnas) y entrada DOCX. `npx @cvparse/core ./cv.pdf` funciona directamente.
 - **0.2** — Adaptador de OCR para CVs escaneados e imágenes (intercambiable: Tesseract, AWS Textract).
 - **0.3** — Dataset de evaluación público de CVs sintéticos en español con layouts difíciles, y un benchmark publicado contra open-resume.
 - **Más adelante** — Empaquetado como agent skill y servidor MCP para usar cvparse directamente desde agentes de código y asistentes.

@@ -119,7 +119,7 @@ These are the most valuable issues we get, and also the hardest to act on withou
 2. **The expected JSON.** The `Resume` object you believe is correct for that sample, or at least the fields that came out wrong and what they should be.
 3. **The actual JSON** cvparse produced, plus the `warnings` array.
 4. **Provider and model**, e.g. `ollama / llama3.1`, `openai / gpt-4o-mini`, and the `--lang` value if you set one.
-5. **cvparse version** (`npm ls cvparse`) and Node version (`node -v`).
+5. **cvparse version** (`npm ls @cvparse/core`) and Node version (`node -v`).
 
 Use the **Parse quality** issue template. Issues that contain what looks like real personal data will be edited or deleted by a maintainer to protect the person involved; please do not make us do that.
 

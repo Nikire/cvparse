@@ -20,7 +20,7 @@ This is the plan as of the 0.0.1 release (2026-09-30). It is a statement of inte
 
 ## 0.1 — Documents in
 
-Goal: `npx cvparse ./cv.pdf` and `npx cvparse ./cv.docx` work without the user extracting text first.
+Goal: `npx @cvparse/core ./cv.pdf` and `npx @cvparse/core ./cv.docx` work without the user extracting text first.
 
 - [ ] PDF text extraction with layout awareness. Two-column and sidebar layouts (the Canva / Novorésumé style that dominates Spanish-speaking markets) must produce reading-order text, not interleaved columns.
 - [ ] DOCX text extraction, including text boxes and tables, which is where design-tool exports hide content.
@@ -56,7 +56,7 @@ Goal: numbers instead of claims.
 Unscheduled; roughly in priority order.
 
 - **Agent skill packaging.** Ship a skill definition so coding agents can invoke cvparse on files in a repository.
-- **MCP server.** `cvparse-mcp` exposing `parse_resume` as a tool, so assistants and agent frameworks can call it without glue code.
+- **MCP server.** `@cvparse/mcp` exposing `parse_resume` as a tool, so assistants and agent frameworks can call it without glue code.
 - **Portuguese.** Brazilian CVs share most of the layout problems with Spanish ones and are the next largest market.
 - **Streaming partial results** for UIs that want to render fields as they arrive.
 - **Anonymization helper**: strip `basics` PII from a parsed resume for blind-screening workflows.

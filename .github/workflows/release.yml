@@ -57,7 +57,7 @@ jobs:
         run: node dist/cli.js --version
 
       # NPM_TOKEN must be a granular access token with publish rights (and
-      # "bypass 2FA") for the "cvparse" package, stored as a repository secret.
+      # "bypass 2FA") for the "@cvparse/core" package, stored as a repository secret.
       #
       # Once the package exists on npm you can switch to npm Trusted Publishing
       # (OIDC) and drop the token entirely: add this repo + this workflow file

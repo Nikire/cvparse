@@ -61,7 +61,7 @@ representative at an online or offline event.
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement by email to the
 address published on the maintainer's GitHub profile (https://github.com/Nikire)
-or on the `cvparse` npm package page. For behaviour that happens on GitHub
+or on the `@cvparse/core` npm package page. For behaviour that happens on GitHub
 itself you can also use GitHub's "Report content" option on the comment, issue
 or pull request, which notifies both GitHub and the repository maintainers. As
 a last resort, open a private GitHub Security Advisory on

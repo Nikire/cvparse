@@ -92,7 +92,7 @@ function wrapError(error: unknown): CvparseError {
  *
  * @example
  * ```ts
- * import { parseResume } from "cvparse";
+ * import { parseResume } from "@cvparse/core";
  * import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
  *
  * const ollama = createOpenAICompatible({
