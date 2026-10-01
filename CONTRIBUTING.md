@@ -127,13 +127,20 @@ Use the **Parse quality** issue template. Issues that contain what looks like re
 
 Maintainers only. Releases follow [Semantic Versioning](https://semver.org/). While the major version is 0, minor bumps may contain breaking changes; they are always listed in `CHANGELOG.md`.
 
+The version lives only in `package.json`; `CVPARSE_VERSION` is injected at build time. To cut a release:
+
+1. Make sure the `## [Unreleased]` section of `CHANGELOG.md` lists the changes (the release script refuses to run if it is empty).
+2. Run `npm run release:check` to see the tarball contents and validate the changelog.
+3. Run `npm run release:patch`, `release:minor` or `release:major`. This runs lint, typecheck and tests, bumps `package.json`, turns the Unreleased section into a dated `## [x.y.z]` section, commits as `release: vx.y.z` and creates the `vx.y.z` tag.
+4. Run `git push --follow-tags`. The `Release` workflow publishes to npm with provenance and creates the GitHub Release.
+
 ### Repository settings checklist (maintainers)
 
 Things the files in this repository assume but GitHub does not set up on its own:
 
 - Enable **Discussions** (the issue chooser links to it).
 - Create the labels used by the issue templates and Dependabot: `bug`, `enhancement`, `parse-quality`, `dependencies`, `npm`, `github-actions`.
-- Add the `NPM_TOKEN` secret for the release workflow, or configure npm trusted publishing.
+- Configure npm Trusted Publishing for `@cvparse/core` (publisher: GitHub Actions, repo `Nikire/cvparse`, workflow `release.yml`). No `NPM_TOKEN` secret is used.
 
 ## Questions
 

@@ -8,13 +8,10 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
-### Planned
+### Changed
 
-- PDF text extraction (including two-column layouts) and DOCX input (0.1).
-- OCR adapter for scanned CVs and images (0.2).
-- Evaluation dataset and benchmark against open-resume (0.3).
-
-See [docs/ROADMAP.md](./docs/ROADMAP.md).
+- `CVPARSE_VERSION` is injected at build time from `package.json` instead of being duplicated in source.
+- Releases are cut with `npm run release:patch|minor|major`, which bumps the version, dates the Unreleased changelog section, commits and tags in one step.
 
 ## [0.0.2] - 2026-10-01
 

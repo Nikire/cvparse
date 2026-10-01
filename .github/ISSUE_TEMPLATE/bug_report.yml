@@ -17,7 +17,7 @@ body:
     attributes:
       label: cvparse version
       description: Run `npx @cvparse/core --version` or check `node_modules/@cvparse/core/package.json`.
-      placeholder: "0.0.2"
+      placeholder: "output of `npx @cvparse/core --version`"
     validations:
       required: true
 

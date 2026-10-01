@@ -14,7 +14,7 @@ body:
     id: version
     attributes:
       label: cvparse version
-      placeholder: "0.0.2"
+      placeholder: "output of `npx @cvparse/core --version`"
     validations:
       required: true
 
