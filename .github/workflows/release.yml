@@ -56,6 +56,18 @@ jobs:
       - name: Smoke test CLI
         run: node dist/cli.js --version
 
+      - name: Check whether this version is already on npm
+        id: npm-check
+        run: |
+          PKG="$(node -p "require('./package.json').name")"
+          VER="$(node -p "require('./package.json').version")"
+          if npm view "$PKG@$VER" version >/dev/null 2>&1; then
+            echo "Version $PKG@$VER is already published; skipping npm publish." >&2
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # NPM_TOKEN must be a granular access token with publish rights (and
       # "bypass 2FA") for the "@cvparse/core" package, stored as a repository secret.
       #
@@ -67,6 +79,7 @@ jobs:
       # Node 22 / 24 releases) authenticates via OIDC and generates provenance
       # on its own.
       - name: Publish to npm
+        if: steps.npm-check.outputs.published == 'false'
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
