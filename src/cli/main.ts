@@ -48,7 +48,7 @@ async function readInput(file: string, io: CliIo): Promise<string> {
   const ext = unsupportedExtension(file);
   if (ext) {
     throw new CliUsageError(
-      `${ext} files are not supported yet in cvparse 0.0.1 (coming in 0.1 — see the roadmap in README). ` +
+      `${ext} files are not supported yet in this cvparse version (coming in 0.1 — see the roadmap in README). ` +
         'Extract the text first and pass a .txt file, or pipe the text via stdin with "-".',
     );
   }

@@ -88,7 +88,7 @@ function wrapError(error: unknown): CvparseError {
  * Extracts a JSON Resume-compatible object from the plain text of a CV using any AI SDK
  * language model.
  *
- * 0.0.1 accepts text only; PDF/DOCX/OCR extraction is planned for 0.1.x.
+ * The 0.0.x preview accepts text only; PDF/DOCX/OCR extraction is planned for 0.1.x.
  *
  * @example
  * ```ts

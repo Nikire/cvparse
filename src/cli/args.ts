@@ -49,7 +49,7 @@ Turn a CV/resume text file into JSON Resume-compatible JSON using an LLM.
 
 Arguments:
   <file>                    Path to the CV as plain text (.txt, .md, ...). Use "-" for stdin.
-                            PDF/DOCX/images are not supported yet in 0.0.1 (coming in 0.1).
+                            PDF/DOCX/images are not supported yet (coming in 0.1).
 
 Options:
   --provider <name>         ollama | openai | openai-compatible   (default: ollama)
@@ -183,7 +183,7 @@ export function parseCliArgs(
   };
 }
 
-/** Extensions that 0.0.1 cannot read (binary formats). */
+/** Extensions that the 0.0.x preview cannot read (binary formats). */
 export const UNSUPPORTED_EXTENSIONS = new Set([
   ".pdf",
   ".doc",
@@ -201,7 +201,7 @@ export const UNSUPPORTED_EXTENSIONS = new Set([
   ".heic",
 ]);
 
-/** Returns the lowercase extension of `file` if it is one 0.0.1 does not support, else `null`. */
+/** Returns the lowercase extension of `file` if it is one the 0.0.x preview does not support, else `null`. */
 export function unsupportedExtension(file: string): string | null {
   const match = /\.[a-z0-9]+$/i.exec(file);
   if (!match) return null;

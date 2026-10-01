@@ -7,7 +7,7 @@ Turn CVs and resumes into typed, JSON Resume-compatible JSON using LLMs, with an
 [![License: MIT](https://img.shields.io/github/license/Nikire/cvparse.svg)](https://github.com/Nikire/cvparse/blob/main/LICENSE)
 [![Node >= 22](https://img.shields.io/node/v/%40cvparse%2Fcore.svg)](https://nodejs.org)
 
-> **Status: 0.0.1 — early preview.**
+> **Status: 0.0.x — early preview.**
 > Today cvparse accepts **plain text only**. You extract the text from the PDF, DOCX or image yourself and pass it in. Built-in PDF and DOCX text extraction land in 0.1, and an OCR adapter for scanned documents in 0.2. See the [roadmap](#roadmap). The schema and API may change before 0.1.
 
 [Versión en español](./README.es.md)
@@ -41,7 +41,7 @@ All flags:
 
 | Flag | Values | Notes |
 | --- | --- | --- |
-| `<file>` | path or `-` | Plain-text CV. `-` reads from stdin. `.pdf`, `.docx` and image files are rejected in 0.0.1 (exit 2) |
+| `<file>` | path or `-` | Plain-text CV. `-` reads from stdin. `.pdf`, `.docx` and image files are rejected in the 0.0.x preview (exit 2) |
 | `--provider` | `ollama` \| `openai` \| `openai-compatible` | Default: `ollama` |
 | `--model <id>` | any model id the provider knows | Default: `llama3.1` (ollama), `gpt-4o-mini` (openai); required for `openai-compatible` |
 | `--base-url <url>` | URL | Default: `http://localhost:11434/v1` (ollama), `https://api.openai.com/v1` (openai); required for `openai-compatible` |
@@ -279,7 +279,7 @@ Exact values depend on the model you use. Small local models will be less consis
 | Parsing without an LLM (deterministic, offline, no model at all) | A rule-based parser such as [open-resume](https://github.com/xitanggg/open-resume)'s parser. Expect lower accuracy on non-standard layouts. |
 | Something that runs in the browser | cvparse targets Node >= 22. Rule-based browser parsers exist; LLM calls from the browser expose your API keys. |
 | High-volume commercial parsing with SLAs, taxonomies and support contracts | Affinda, Textkernel, RChilli, Daxtra, HireAbility. They are ahead on volume, taxonomy coverage and edge cases, and they charge accordingly. |
-| PDF, DOCX or scanned-image input **today** | Not yet: 0.0.1 is plain text only. Extract the text yourself (e.g. `pdf-parse`, `mammoth`, Textract) and pass it in, or wait for 0.1 / 0.2. |
+| PDF, DOCX or scanned-image input **today** | Not yet: the 0.0.x preview is plain text only. Extract the text yourself (e.g. `pdf-parse`, `mammoth`, Textract) and pass it in, or wait for 0.1 / 0.2. |
 | Guaranteed, reproducible output for the same input | LLM output varies between runs and models. cvparse validates the shape, not the semantics. Pin a model and temperature and evaluate on your own data. |
 | CV-to-job matching, ranking or scoring | cvparse only extracts. Pair it with a matcher such as Resume-Matcher. |
 | Python | Several LLM-based CV parsers exist for Python. cvparse is TypeScript-only. |

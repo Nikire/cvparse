@@ -162,7 +162,7 @@ describe("parseCliArgs", () => {
 });
 
 describe("unsupportedExtension", () => {
-  it("flags binary formats that 0.0.1 cannot read", () => {
+  it("flags binary formats that the preview cannot read", () => {
     expect(unsupportedExtension("cv.pdf")).toBe(".pdf");
     expect(unsupportedExtension("./Curriculum.DOCX")).toBe(".docx");
     expect(unsupportedExtension("scan.jpeg")).toBe(".jpeg");

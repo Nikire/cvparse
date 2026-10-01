@@ -16,6 +16,13 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 See [docs/ROADMAP.md](./docs/ROADMAP.md).
 
+## [0.0.2] - 2026-10-01
+
+### Changed
+
+- Releases are now published from GitHub Actions via npm Trusted Publishing, with provenance attestations. No functional changes.
+- CLI messages and docs no longer hardcode the preview version number.
+
 ## [0.0.1] - 2026-09-30
 
 Initial preview release. Plain-text input only.
@@ -35,5 +42,6 @@ Initial preview release. Plain-text input only.
 - ESM-only package targeting Node >= 22. Runtime dependencies: `ai`, `zod`, `@ai-sdk/openai-compatible`.
 - English README with Spanish mirror (`README.es.md`), contributing guide, code of conduct (Contributor Covenant 2.1), security policy, MIT license, roadmap.
 
-[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/Nikire/cvparse/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/Nikire/cvparse/releases/tag/v0.0.1

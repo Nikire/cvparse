@@ -70,7 +70,7 @@ describe("cli main", () => {
     for (const file of ["cv.pdf", "cv.docx", "scan.png", "scan.jpg"]) {
       const io = makeIo({ parse: fakeParse });
       expect(await main([file], {}, io), file).toBe(EXIT_USAGE);
-      expect(io.err.join("")).toContain("not supported yet in cvparse 0.0.1");
+      expect(io.err.join("")).toContain("not supported yet in this cvparse version");
       expect(io.err.join("")).toContain("coming in 0.1");
     }
   });
