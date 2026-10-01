@@ -1,6 +1,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { type CliIo, EXIT_FAILURE, EXIT_OK, EXIT_USAGE, main } from "../src/cli/main.js";
 import { CvparseError, type CvparseErrorCode } from "../src/errors.js";
@@ -109,6 +110,44 @@ describe("cli main", () => {
     const io = makeIo({ parse: fakeParse });
     expect(await main([file], {}, io)).toBe(EXIT_OK);
     expect(io.err.join("")).not.toContain("info: read");
+  });
+
+  describe("--extract-only", () => {
+    const pdfDir = join(dirname(fileURLToPath(import.meta.url)), "fixtures", "pdf");
+    const neverParse: typeof parseResume = async () => {
+      throw new Error("parseResume must not be called in --extract-only mode");
+    };
+
+    it("prints the text of a plain-text file verbatim and never calls the model", async () => {
+      const file = tmpFile("cv.txt", "Ana Pérez\nDesarrolladora");
+      const io = makeIo({ parse: neverParse });
+      expect(await main([file, "--extract-only"], {}, io)).toBe(EXIT_OK);
+      expect(io.out.join("")).toBe("Ana Pérez\nDesarrolladora\n");
+      expect(io.err.join("")).toBe("");
+    });
+
+    it("prints the reading-order text of a PDF with an info line on stderr", async () => {
+      const io = makeIo({ parse: neverParse });
+      const code = await main([join(pdfDir, "two-column-es.pdf"), "--extract-only"], {}, io);
+      expect(code).toBe(EXIT_OK);
+      const text = io.out.join("");
+      expect(text).toContain("EXPERIENCIA");
+      expect(text.indexOf("EXPERIENCIA")).toBeLessThan(text.indexOf("HABILIDADES"));
+      expect(io.err.join("")).toContain("info: read pdf, 1 page(s), multi-column layout");
+    });
+
+    it("exits 2 for a PDF without a text layer", async () => {
+      const io = makeIo({ parse: neverParse });
+      expect(await main([join(pdfDir, "no-text.pdf"), "--extract-only"], {}, io)).toBe(EXIT_USAGE);
+      expect(io.err.join("")).toContain("error [NO_TEXT_LAYER]");
+    });
+
+    it("works with --provider openai and no API key", async () => {
+      const file = tmpFile("cv.txt", "Ana Pérez");
+      const io = makeIo({ parse: neverParse });
+      const code = await main([file, "--extract-only", "--provider", "openai"], {}, io);
+      expect(code).toBe(EXIT_OK);
+    });
   });
 
   it("maps input-related CvparseError codes to exit 2 and the rest to exit 1", async () => {

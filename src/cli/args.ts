@@ -33,9 +33,16 @@ export interface RunOptions {
   pretty: boolean;
 }
 
+/** Options for an `extract` command (`--extract-only`): no model involved. */
+export interface ExtractOptions {
+  /** Path to the CV (PDF, DOCX or text), or `-` for stdin. */
+  file: string;
+}
+
 export type CliCommand =
   | { kind: "help" }
   | { kind: "version" }
+  | { kind: "extract"; options: ExtractOptions }
   | { kind: "run"; options: RunOptions };
 
 /** Thrown by {@link parseCliArgs} on invalid usage. The CLI prints the message and exits 2. */
@@ -63,11 +70,14 @@ Options:
                             https://api.openai.com/v1 for openai); override it and the key goes there.
   --lang <auto|es|en>       Language of the CV (default: auto)
   --pretty                  Pretty-print the JSON output
+  --extract-only            Print the text extracted from the document and exit, without calling
+                            any model. Use it to check reading order on two-column PDFs or to
+                            attach the extracted text to a bug report. Needs no provider or key.
   -h, --help                Show this help
   -v, --version             Print the cvparse version
 
 Output:
-  JSON to stdout. Warnings, errors and help go to stderr.
+  JSON to stdout (plain text with --extract-only). Warnings, errors and help go to stderr.
 
 Exit codes:
   0  success
@@ -80,6 +90,7 @@ Examples:
   npx @cvparse/core ./cv.txt --provider openai --model gpt-4o-mini --api-key sk-...
   npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model qwen2.5
   cat cv.txt | npx @cvparse/core - --lang es
+  npx @cvparse/core ./cv.pdf --extract-only > cv.txt
 `;
 
 const ARG_OPTIONS = {
@@ -89,6 +100,7 @@ const ARG_OPTIONS = {
   "api-key": { type: "string" },
   lang: { type: "string" },
   pretty: { type: "boolean", default: false },
+  "extract-only": { type: "boolean", default: false },
   help: { type: "boolean", short: "h", default: false },
   version: { type: "boolean", short: "v", default: false },
 } as const;
@@ -125,6 +137,11 @@ export function parseCliArgs(
     throw new CliUsageError(`Expected a single <file> argument, got: ${positionals.join(", ")}`);
   }
   const file = positionals[0] as string;
+
+  // Extraction never talks to a model, so provider/model/key validation does not apply.
+  if (values["extract-only"]) {
+    return { kind: "extract", options: { file } };
+  }
 
   const providerRaw = values.provider ?? "ollama";
   if (!CLI_PROVIDERS.includes(providerRaw as CliProvider)) {

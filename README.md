@@ -50,6 +50,7 @@ All flags:
 | `--api-key <key>` | string | Sent as a Bearer token. Falls back to env `CVPARSE_API_KEY` (any provider) or `OPENAI_API_KEY` (only with `--provider openai`). The key is only sent to the configured base URL: `https://api.openai.com/v1` by default for `--provider openai`; if you override `--base-url`, the key is sent to that host instead |
 | `--lang` | `es` \| `en` \| `auto` | Language hint for the CV. Default: `auto` |
 | `--pretty` | flag | Indent the JSON output |
+| `--extract-only` | flag | Print the reading-order text extracted from the document and exit, without calling any model. Use it to check how a two-column PDF was read, or to attach the text to a bug report. Needs no provider or key |
 | `-h`, `--help` | flag | Print usage to stderr |
 | `-v`, `--version` | flag | Print the cvparse version |
 

@@ -10,6 +10,7 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ### Added
 
+- CLI `--extract-only`: print the reading-order text extracted from a PDF/DOCX/text file and exit without calling a model; needs no provider or key. Useful to check two-column reading order and for bug reports.
 - PDF input. Text is extracted with pdf.js (via `unpdf`) and put back in reading order with a recursive XY-cut: a vertical gutter is detected first (two-column and sidebar layouts, with full-width headers and footers kept in place), then horizontal bands. Known limits: three or more columns are only handled incidentally, tables may be read row by row, rotated and right-to-left text is ignored, and a short block of right-aligned dates can be read as a second column.
 - DOCX input via `mammoth`. Headings, lists and tables are kept as text: grid tables become `a | b` rows and layout tables (cells with several blocks) are read cell by cell, so two-column table CVs read left column then right. VML text boxes come from mammoth; DrawingML text boxes, which mammoth drops, are recovered from `word/document.xml` and appended at the end with a warning. Headers and footers are not extracted.
 - `parseResume` accepts the document bytes: `string | Uint8Array | { data, filename?, format? }` (`ResumeInput`). A Node `Buffer` works. The format is detected from magic bytes (`%PDF-`, ZIP with `word/` entries, UTF-8 text); `filename` only breaks ties and `format` skips detection.

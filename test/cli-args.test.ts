@@ -179,6 +179,25 @@ describe("unsupportedExtension", () => {
   });
 });
 
+describe("--extract-only", () => {
+  it("parses into an extract command and skips provider validation", () => {
+    expect(parseCliArgs(["cv.pdf", "--extract-only"])).toEqual({
+      kind: "extract",
+      options: { file: "cv.pdf" },
+    });
+    // No API key needed even with --provider openai, and no --model for openai-compatible.
+    expect(parseCliArgs(["cv.pdf", "--extract-only", "--provider", "openai"]).kind).toBe("extract");
+    expect(parseCliArgs(["-", "--extract-only", "--provider", "openai-compatible"]).kind).toBe(
+      "extract",
+    );
+  });
+
+  it("still requires a single <file>", () => {
+    expect(() => parseCliArgs(["--extract-only"])).toThrow(CliUsageError);
+    expect(() => parseCliArgs(["a.pdf", "b.pdf", "--extract-only"])).toThrow(CliUsageError);
+  });
+});
+
 describe("USAGE", () => {
   it("documents every flag", () => {
     for (const flag of [

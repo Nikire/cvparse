@@ -1,12 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { CvparseError } from "../errors.js";
-import { detectFormat } from "../extract/index.js";
+import { detectFormat, extractText } from "../extract/index.js";
 import { parseResume } from "../parse.js";
 import type { ResumeInput } from "../types.js";
 import { CVPARSE_VERSION } from "../version.js";
 import {
   CliUsageError,
+  type ExtractOptions,
   parseCliArgs,
   type RunOptions,
   USAGE,
@@ -100,6 +101,31 @@ async function run(options: RunOptions, io: CliIo): Promise<number> {
   return EXIT_OK;
 }
 
+/** `--extract-only`: print the reading-order text the model would receive, without any model. */
+async function extract(options: ExtractOptions, io: CliIo): Promise<number> {
+  const input = await readInput(options.file, io);
+  if (typeof input === "string") {
+    io.stdout(input.endsWith("\n") ? input : `${input}\n`);
+    return EXIT_OK;
+  }
+  const doc = await extractText(input);
+  if (doc.format !== "text") {
+    const pages = doc.pages === undefined ? "" : `, ${doc.pages} page(s)`;
+    io.stderr(`info: read ${doc.format}${pages}, ${doc.layout} layout\n`);
+  }
+  for (const warning of doc.warnings) {
+    io.stderr(`warning: extract: ${warning}\n`);
+  }
+  if (doc.text.trim() === "") {
+    throw new CvparseError(
+      "INVALID_INPUT",
+      `No text could be extracted from the ${doc.format.toUpperCase()}.`,
+    );
+  }
+  io.stdout(doc.text.endsWith("\n") ? doc.text : `${doc.text}\n`);
+  return EXIT_OK;
+}
+
 /** CLI entry point. Returns the exit code instead of calling `process.exit` so it is testable. */
 export async function main(
   argv: readonly string[] = process.argv.slice(2),
@@ -115,6 +141,8 @@ export async function main(
       case "version":
         io.stdout(`${CVPARSE_VERSION}\n`);
         return EXIT_OK;
+      case "extract":
+        return await extract(command.options, io);
       case "run":
         return await run(command.options, io);
     }
