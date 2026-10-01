@@ -8,8 +8,22 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+### Added
+
+- PDF input. Text is extracted with pdf.js (via `unpdf`) and put back in reading order with a recursive XY-cut: a vertical gutter is detected first (two-column and sidebar layouts, with full-width headers and footers kept in place), then horizontal bands. Known limits: three or more columns are only handled incidentally, tables may be read row by row, rotated and right-to-left text is ignored, and a short block of right-aligned dates can be read as a second column.
+- DOCX input via `mammoth`. Headings, lists and tables are kept as text: grid tables become `a | b` rows and layout tables (cells with several blocks) are read cell by cell, so two-column table CVs read left column then right. VML text boxes come from mammoth; DrawingML text boxes, which mammoth drops, are recovered from `word/document.xml` and appended at the end with a warning. Headers and footers are not extracted.
+- `parseResume` accepts the document bytes: `string | Uint8Array | { data, filename?, format? }` (`ResumeInput`). A Node `Buffer` works. The format is detected from magic bytes (`%PDF-`, ZIP with `word/` entries, UTF-8 text); `filename` only breaks ties and `format` skips detection.
+- `ParseResult.source: { format, pages?, layout }` reports what was read; `layout` is `"single-column"`, `"multi-column"` or `"unknown"`.
+- `extractText(input)` and `detectFormat(data, filename?)` exported as standalone utilities, with the types `DocumentInput`, `ExtractedDocument`, `InputFormat`, `DetectedLayout`, `DetectedFormat`, `ExtractionSource`, `ResumeInput` and `TextItem`.
+- Error codes `UNSUPPORTED_INPUT` (images, legacy `.doc`, ZIPs that are not DOCX, unrecognized bytes), `NO_TEXT_LAYER` (PDF without text: scanned or image-only) and `EXTRACTION_FAILED` (corrupt or password-protected PDF, broken DOCX).
+- CLI: `npx @cvparse/core ./cv.pdf` and `./cv.docx` work; the format is detected from the bytes, and stdin may be bytes (`cat cv.pdf | npx @cvparse/core -`). For non-text input the CLI prints `info: read pdf, 2 page(s), multi-column layout` to stderr. Exit code `2` for images, legacy office formats, empty input, unsupported bytes and `NO_TEXT_LAYER`; `1` for `EXTRACTION_FAILED` and provider errors.
+- Synthetic PDF and DOCX fixtures under `test/fixtures/pdf` and `test/fixtures/docx`, generated deterministically by `npm run fixtures:pdf` (`pdf-lib`) and `npm run fixtures:docx` (`docx`) from `scripts/fixtures/`.
+
 ### Changed
 
+- `parseResume(text, options)` is now `parseResume(input, options)` with the widened `ResumeInput` type. Passing a string behaves as before.
+- `unpdf` and `mammoth` are runtime dependencies, loaded on demand (dynamic import) so that passing a string never loads them. `npx @cvparse/core ./cv.pdf` must work out of the box; OCR stays an adapter.
+- Extraction warnings are added to `ParseResult.warnings` with an `extract:` prefix.
 - `CVPARSE_VERSION` is injected at build time from `package.json` instead of being duplicated in source.
 - Releases are cut with `npm run release:patch|minor|major`, which bumps the version, dates the Unreleased changelog section, commits and tags in one step.
 

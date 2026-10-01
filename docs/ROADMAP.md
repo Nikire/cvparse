@@ -1,13 +1,13 @@
 # Roadmap
 
-This is the plan as of the 0.0.1 release (2026-09-30). It is a statement of intent, not a promise: order and scope will shift based on real issues. Anything here can be picked up by a contributor; open an issue first so we can agree on the approach.
+This is the plan as of the 0.0.1 release (2026-09-30), updated as items land. It is a statement of intent, not a promise: order and scope will shift based on real issues. Anything here can be picked up by a contributor; open an issue first so we can agree on the approach.
 
 ## Guiding principles
 
 - **The hard part is not the LLM call.** With Zod and structured outputs, "extract a CV" is a few dozen lines. The value has to be in what is difficult: two-column PDFs, scanned documents, DOCX files exported from design tools, Spanish date and degree normalization, and an evaluation dataset that proves any of it works.
 - **Local-first stays non-negotiable.** Every feature must work with Ollama on localhost. Cloud providers are an option, never a requirement.
 - **JSON Resume compatibility stays.** Extensions live under `x_cvparse`; the core shape does not drift.
-- **Few dependencies.** Heavy inputs (PDF, OCR) are added as optional peer dependencies or pluggable adapters, not as hard dependencies of the core package.
+- **Few dependencies, but `npx` must work out of the box.** PDF and DOCX extraction are built in (`unpdf`, `mammoth`), loaded on demand so that callers who pass a string never load them. OCR and vision models stay pluggable adapters, never hard dependencies of the core package.
 
 ## 0.0.1 — Preview (released 2026-09-30)
 
@@ -22,14 +22,14 @@ This is the plan as of the 0.0.1 release (2026-09-30). It is a statement of inte
 
 Goal: `npx @cvparse/core ./cv.pdf` and `npx @cvparse/core ./cv.docx` work without the user extracting text first.
 
-- [ ] PDF text extraction with layout awareness. Two-column and sidebar layouts (the Canva / Novorésumé style that dominates Spanish-speaking markets) must produce reading-order text, not interleaved columns.
-- [ ] DOCX text extraction, including text boxes and tables, which is where design-tool exports hide content.
-- [ ] Input detection by extension and magic bytes; `parseResume` gains an overload or companion function that accepts a `Buffer` / file path.
-- [ ] Extraction adapters are optional peer dependencies so the core stays small.
-- [ ] Fixture set expanded with synthetic PDF and DOCX files generated from the same synthetic content as the text fixtures.
+- [x] PDF text extraction with layout awareness. Two-column and sidebar layouts (the Canva / Novorésumé style that dominates Spanish-speaking markets) produce reading-order text, not interleaved columns, via a recursive XY-cut (`src/extract/layout.ts`). Known limits: 3+ columns only incidental, tables may read row-wise, rotated/RTL text ignored, a short block of right-aligned dates can read as a second column.
+- [x] DOCX text extraction, including text boxes (VML via mammoth, DrawingML via a built-in fallback) and tables (grid tables as rows, layout tables cell by cell). Headers and footers are not extracted.
+- [x] Input detection by magic bytes (file name only breaks ties); `parseResume` accepts `string | Uint8Array | { data, filename?, format? }`, and `extractText` / `detectFormat` are exported on their own.
+- [x] ~~Extraction adapters are optional peer dependencies so the core stays small.~~ Decided otherwise: `unpdf` and `mammoth` are regular dependencies loaded on demand, so `npx @cvparse/core ./cv.pdf` works without extra installs. OCR stays an adapter (0.2).
+- [x] Fixture set expanded with synthetic PDF and DOCX files (`test/fixtures/pdf`, `test/fixtures/docx`) generated deterministically by `npm run fixtures:pdf` and `npm run fixtures:docx` from the same synthetic content as the text fixtures.
 - [ ] Remaining date forms: relative dates ("hace 3 años", "3 years ago"), season names ("verano 2020"), quarter/semester notation, ranges written as a single token ("2019-21").
 - [ ] Degree and title normalization for Spain and LATAM (Licenciatura, Tecnicatura, Grado, Ingeniería, Máster, Doctorado, and their equivalents), mapped to `education[].studyType` with the original preserved.
-- [ ] Optional `temperature` / `maxRetries` pass-through in `ParseOptions`.
+- [ ] Optional `temperature` pass-through in `ParseOptions` (`maxRetries` already exists since 0.0.1).
 
 ## 0.2 — Scanned documents
 

@@ -162,14 +162,16 @@ describe("parseCliArgs", () => {
 });
 
 describe("unsupportedExtension", () => {
-  it("flags binary formats that the preview cannot read", () => {
-    expect(unsupportedExtension("cv.pdf")).toBe(".pdf");
-    expect(unsupportedExtension("./Curriculum.DOCX")).toBe(".docx");
+  it("flags images and legacy office formats", () => {
     expect(unsupportedExtension("scan.jpeg")).toBe(".jpeg");
     expect(unsupportedExtension("scan.png")).toBe(".png");
+    expect(unsupportedExtension("./old.DOC")).toBe(".doc");
+    expect(unsupportedExtension("cv.odt")).toBe(".odt");
   });
 
-  it("allows text-like files and files without extension", () => {
+  it("allows PDF, DOCX, text-like files and files without extension", () => {
+    expect(unsupportedExtension("cv.pdf")).toBeNull();
+    expect(unsupportedExtension("./Curriculum.DOCX")).toBeNull();
     expect(unsupportedExtension("cv.txt")).toBeNull();
     expect(unsupportedExtension("cv.md")).toBeNull();
     expect(unsupportedExtension("cv")).toBeNull();

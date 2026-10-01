@@ -68,16 +68,22 @@
     "release:major": "npm version major -m \"release: v%s\"",
     "preversion": "npm run lint && npm run typecheck && npm test",
     "version": "node scripts/release-changelog.mjs && git add CHANGELOG.md",
-    "postversion": "echo Now run: git push --follow-tags"
+    "postversion": "echo Now run: git push --follow-tags",
+    "fixtures:docx": "node scripts/fixtures/make-docx-fixtures.mjs",
+    "fixtures:pdf": "node scripts/fixtures/make-pdf-fixtures.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.61",
     "ai": "^7.0.124",
+    "mammoth": "^1.13.0",
+    "unpdf": "^1.8.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@types/node": "^26.6.3",
+    "docx": "^9.8.1",
+    "pdf-lib": "^1.17.1",
     "tsup": "^8.5.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",

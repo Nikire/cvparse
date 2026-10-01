@@ -1,6 +1,9 @@
 import { readFile } from "node:fs/promises";
+import { basename } from "node:path";
 import { CvparseError } from "../errors.js";
+import { detectFormat } from "../extract/index.js";
 import { parseResume } from "../parse.js";
+import type { ResumeInput } from "../types.js";
 import { CVPARSE_VERSION } from "../version.js";
 import {
   CliUsageError,
@@ -8,6 +11,7 @@ import {
   type RunOptions,
   USAGE,
   unsupportedExtension,
+  unsupportedExtensionMessage,
 } from "./args.js";
 import { createCliModel } from "./provider.js";
 
@@ -19,17 +23,18 @@ export const EXIT_USAGE = 2;
 export interface CliIo {
   stdout: (text: string) => void;
   stderr: (text: string) => void;
-  readStdin: () => Promise<string>;
+  /** Raw stdin. Bytes are format-detected like a file; a string is taken as CV text. */
+  readStdin: () => Promise<string | Uint8Array>;
   /** Overridable for tests; defaults to `parseResume`. */
   parse?: typeof parseResume;
 }
 
-async function readProcessStdin(): Promise<string> {
+async function readProcessStdin(): Promise<Uint8Array> {
   const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {
     chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
   }
-  return Buffer.concat(chunks).toString("utf8");
+  return Buffer.concat(chunks);
 }
 
 const defaultIo: CliIo = {
@@ -42,37 +47,49 @@ const defaultIo: CliIo = {
   readStdin: readProcessStdin,
 };
 
-async function readInput(file: string, io: CliIo): Promise<string> {
-  if (file === "-") return io.readStdin();
+/** Empty string, empty bytes, or text bytes that are only whitespace. */
+function isEmptyInput(input: string | Uint8Array, filename?: string): boolean {
+  if (typeof input === "string") return input.trim() === "";
+  if (input.length === 0) return true;
+  return detectFormat(input, filename) === "text" && new TextDecoder().decode(input).trim() === "";
+}
+
+async function readInput(file: string, io: CliIo): Promise<ResumeInput> {
+  if (file === "-") {
+    const stdin = await io.readStdin();
+    if (isEmptyInput(stdin)) throw new CliUsageError("Input is empty: stdin contains no data.");
+    return typeof stdin === "string" ? stdin : { data: stdin, filename: undefined };
+  }
 
   const ext = unsupportedExtension(file);
-  if (ext) {
-    throw new CliUsageError(
-      `${ext} files are not supported yet in this cvparse version (coming in 0.1 — see the roadmap in README). ` +
-        'Extract the text first and pass a .txt file, or pipe the text via stdin with "-".',
-    );
-  }
+  if (ext) throw new CliUsageError(unsupportedExtensionMessage(ext));
+
+  let data: Uint8Array;
   try {
-    return await readFile(file, "utf8");
+    data = await readFile(file);
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
     if (code === "ENOENT") throw new CliUsageError(`File not found: ${file}`);
     if (code === "EISDIR") throw new CliUsageError(`Expected a file, got a directory: ${file}`);
     throw new CliUsageError(`Could not read ${file}: ${(error as Error).message}`);
   }
+  if (isEmptyInput(data, file))
+    throw new CliUsageError(`Input is empty: ${file} contains no data.`);
+  // Format is detected from the bytes; the name only breaks ties (e.g. a ZIP named .docx).
+  return { data, filename: basename(file) };
 }
 
 async function run(options: RunOptions, io: CliIo): Promise<number> {
-  const text = await readInput(options.file, io);
-  if (text.trim() === "") {
-    const source = options.file === "-" ? "stdin" : options.file;
-    throw new CliUsageError(`Input is empty: ${source} contains no text.`);
-  }
+  const input = await readInput(options.file, io);
   const model = createCliModel(options);
   const parse = io.parse ?? parseResume;
   // No retries in the CLI: a missing local Ollama should fail immediately instead of after ~7s.
-  const result = await parse(text, { model, language: options.language, maxRetries: 0 });
+  const result = await parse(input, { model, language: options.language, maxRetries: 0 });
 
+  if (result.source.format !== "text") {
+    const pages = result.source.pages === undefined ? "" : `, ${result.source.pages} page(s)`;
+    io.stderr(`info: read ${result.source.format}${pages}, ${result.source.layout} layout\n`);
+  }
   for (const warning of result.warnings) {
     io.stderr(`warning: ${warning}\n`);
   }
@@ -108,6 +125,14 @@ export async function main(
     }
     if (error instanceof CvparseError) {
       io.stderr(`error [${error.code}]: ${error.message}\n`);
+      // Problems with the input itself are usage errors, like a missing file or bad flag.
+      if (
+        error.code === "INVALID_INPUT" ||
+        error.code === "UNSUPPORTED_INPUT" ||
+        error.code === "NO_TEXT_LAYER"
+      ) {
+        return EXIT_USAGE;
+      }
       if (
         error.code === "PROVIDER_ERROR" &&
         /ECONNREFUSED|fetch failed|Cannot connect/i.test(error.message)

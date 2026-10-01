@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { type CliIo, EXIT_FAILURE, EXIT_OK, EXIT_USAGE, main } from "../src/cli/main.js";
-import { CvparseError } from "../src/errors.js";
+import { CvparseError, type CvparseErrorCode } from "../src/errors.js";
 import type { parseResume } from "../src/parse.js";
 import { CVPARSE_VERSION } from "../src/version.js";
 import { fixture } from "./helpers.js";
@@ -29,14 +29,31 @@ function makeIo(overrides: Partial<CliIo> = {}): Captured {
   return io;
 }
 
-const fakeParse: typeof parseResume = async (text, options) => ({
-  resume: {
-    basics: { name: text.split("\n")[0] ?? null },
-    x_cvparse: { detectedLanguage: options.language === "auto" ? "es" : options.language },
-  },
-  usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
-  warnings: ['work[0].endDate: could not normalize date "hace poco"; set to null.'],
-});
+/** Mirrors what the real parseResume accepts; binary input is decoded as UTF-8 for the fake. */
+const fakeParse: typeof parseResume = async (input, options) => {
+  let text: string;
+  let filename: string | undefined;
+  if (typeof input === "string") {
+    text = input;
+  } else if (input instanceof Uint8Array) {
+    text = new TextDecoder().decode(input);
+  } else {
+    text = new TextDecoder().decode(input.data);
+    filename = input.filename;
+  }
+  const isPdf = filename?.toLowerCase().endsWith(".pdf") ?? false;
+  return {
+    resume: {
+      basics: { name: text.split("\n")[0] ?? null },
+      x_cvparse: { detectedLanguage: options.language === "auto" ? "es" : options.language },
+    },
+    usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+    warnings: ['work[0].endDate: could not normalize date "hace poco"; set to null.'],
+    source: isPdf
+      ? { format: "pdf", pages: 2, layout: "multi-column" }
+      : { format: "text", layout: "unknown" },
+  };
+};
 
 function tmpFile(name: string, content: string): string {
   const dir = mkdtempSync(join(tmpdir(), "cvparse-test-"));
@@ -66,12 +83,50 @@ describe("cli main", () => {
     expect(io.err.join("")).toContain("Usage: cvparse");
   });
 
-  it("exits 2 for PDF/DOCX/images with a roadmap message", async () => {
-    for (const file of ["cv.pdf", "cv.docx", "scan.png", "scan.jpg"]) {
+  it("exits 2 for images with an OCR message and for legacy office formats", async () => {
+    for (const file of ["scan.png", "scan.jpg", "scan.tiff"]) {
       const io = makeIo({ parse: fakeParse });
       expect(await main([file], {}, io), file).toBe(EXIT_USAGE);
-      expect(io.err.join("")).toContain("not supported yet in this cvparse version");
-      expect(io.err.join("")).toContain("coming in 0.1");
+      expect(io.err.join("")).toContain("need OCR");
+    }
+    for (const file of ["cv.doc", "cv.odt", "cv.rtf"]) {
+      const io = makeIo({ parse: fakeParse });
+      expect(await main([file], {}, io), file).toBe(EXIT_USAGE);
+      expect(io.err.join("")).toContain("Save the CV as .docx or PDF");
+    }
+  });
+
+  it("passes files to parseResume as bytes with the file name and reports the source", async () => {
+    const file = tmpFile("cv.pdf", "María López\nBackend");
+    const io = makeIo({ parse: fakeParse });
+    expect(await main([file], {}, io)).toBe(EXIT_OK);
+    expect(JSON.parse(io.out.join("")).basics.name).toBe("María López");
+    expect(io.err.join("")).toContain("info: read pdf, 2 page(s), multi-column layout");
+  });
+
+  it("does not print an info line for plain text input", async () => {
+    const file = tmpFile("cv.txt", "Ana Pérez\nDesarrolladora");
+    const io = makeIo({ parse: fakeParse });
+    expect(await main([file], {}, io)).toBe(EXIT_OK);
+    expect(io.err.join("")).not.toContain("info: read");
+  });
+
+  it("maps input-related CvparseError codes to exit 2 and the rest to exit 1", async () => {
+    const codes: Array<[CvparseErrorCode, number]> = [
+      ["UNSUPPORTED_INPUT", EXIT_USAGE],
+      ["NO_TEXT_LAYER", EXIT_USAGE],
+      ["INVALID_INPUT", EXIT_USAGE],
+      ["EXTRACTION_FAILED", EXIT_FAILURE],
+      ["PROVIDER_ERROR", EXIT_FAILURE],
+    ];
+    for (const [code, exit] of codes) {
+      const file = tmpFile("cv.txt", "Ana Pérez");
+      const throwing: typeof parseResume = async () => {
+        throw new CvparseError(code, `boom ${code}`);
+      };
+      const io = makeIo({ parse: throwing });
+      expect(await main([file], {}, io), code).toBe(exit);
+      expect(io.err.join("")).toContain(`error [${code}]: boom ${code}`);
     }
   });
 

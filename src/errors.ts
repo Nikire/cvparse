@@ -7,7 +7,13 @@ export type CvparseErrorCode =
   /** The provider / network call failed (auth, connection refused, rate limit, ...). */
   | "PROVIDER_ERROR"
   /** The normalized result did not pass the strict resume schema. */
-  | "VALIDATION_ERROR";
+  | "VALIDATION_ERROR"
+  /** The bytes are not a format cvparse can read (not PDF/DOCX/text, or an image). */
+  | "UNSUPPORTED_INPUT"
+  /** The PDF has no extractable text layer (scanned/image-only). OCR lands in 0.2. */
+  | "NO_TEXT_LAYER"
+  /** The document could not be parsed (corrupt file, encrypted PDF, broken DOCX). */
+  | "EXTRACTION_FAILED";
 
 /**
  * Error thrown by `parseResume`. Wraps provider and AI SDK errors so callers can

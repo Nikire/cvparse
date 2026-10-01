@@ -1,5 +1,23 @@
 import type { LanguageModel } from "ai";
+import type { DocumentInput } from "./extract/index.js";
+import type { DetectedLayout, InputFormat } from "./extract/types.js";
 import type { Resume } from "./schema/resume.js";
+
+/**
+ * What `parseResume` accepts: the CV as plain text, or the raw bytes of a PDF, DOCX or text file
+ * (a Node `Buffer` works), optionally wrapped with a file name / format hint.
+ */
+export type ResumeInput = string | Uint8Array | DocumentInput;
+
+/** Where the text came from. */
+export interface ExtractionSource {
+  /** Format the input was read as. `"text"` for string input. */
+  format: InputFormat;
+  /** Page count for PDFs. */
+  pages?: number;
+  /** Page layout detected for PDFs; `"unknown"` otherwise. */
+  layout: DetectedLayout;
+}
 
 /** Language hint for the CV text. `auto` lets the model (and a small heuristic) detect it. */
 export type ParseLanguage = "auto" | "es" | "en";
@@ -49,4 +67,6 @@ export interface ParseResult {
    * not be normalized, heuristic fallbacks, and the model's own `confidenceNotes`.
    */
   warnings: string[];
+  /** How the input was read (format, pages, detected layout). */
+  source: ExtractionSource;
 }

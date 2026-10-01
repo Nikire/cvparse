@@ -31,25 +31,37 @@ npm ci
 | `npm run lint:fix` | Apply Biome's safe fixes. |
 | `npm run format` | Format with Biome. |
 | `npm run release:check` | `npm pack --dry-run`, to see exactly what would be published. |
+| `npm run fixtures:pdf` | Regenerate the PDF fixtures in `test/fixtures/pdf/` with `pdf-lib` (`scripts/fixtures/make-pdf-fixtures.mjs`). |
+| `npm run fixtures:docx` | Regenerate the DOCX fixtures in `test/fixtures/docx/` with `docx` (`scripts/fixtures/make-docx-fixtures.mjs`). |
 
 Before opening a PR, run `npm run lint && npm run typecheck && npm test`. `prepublishOnly` runs the same checks plus the build.
 
 To try the CLI from source without building, use `tsx`:
 
 ```bash
-npx tsx src/cli.ts ./path/to/cv.txt --pretty
+npx tsx src/cli.ts ./path/to/cv.pdf --pretty
 ```
+
+### Fixtures
+
+The PDF and DOCX files under `test/fixtures/` are committed, but they are generated, not hand-made: every one of them comes from a script in `scripts/fixtures/` that builds it from synthetic content. If you change a script, run `npm run fixtures:pdf` or `npm run fixtures:docx` and commit the result. The scripts pin metadata dates, zip timestamps and shape ids so the output is byte-for-byte deterministic; running them twice must produce no diff. Keep it that way, and never replace a generated fixture with a file exported from a real document.
 
 ## Project layout
 
 ```
 src/
-  index.ts            public API: parseResume, schemas, types, errors, CVPARSE_VERSION
-  parse.ts            parseResume: prompt, AI SDK call, normalization, validation
+  index.ts            public API: parseResume, extractText, schemas, types, errors, CVPARSE_VERSION
+  parse.ts            parseResume: extraction, prompt, AI SDK call, normalization, validation
   prompt.ts           system / user prompt builders
   errors.ts           CvparseError and its error codes
-  types.ts            ParseOptions, ParseResult, ParseUsage, ParseLanguage
+  types.ts            ResumeInput, ParseOptions, ParseResult, ExtractionSource, ParseLanguage
   version.ts          CVPARSE_VERSION
+  extract/
+    index.ts          extractText, detectFormat (magic bytes), DocumentInput; lazy-loads pdf/docx
+    types.ts          ExtractedDocument, InputFormat, DetectedLayout, TextItem
+    pdf.ts            pdf.js (unpdf) text items -> reading-order text
+    layout.ts         recursive XY-cut: gutter / band detection, pure and unit-tested
+    docx.ts           mammoth HTML -> text, minimal zip reader, DrawingML text-box fallback
   schema/
     index.ts          re-exports
     resume.ts         Zod schemas (JSON Resume + x_cvparse extensions) and derived JSON Schema
@@ -65,7 +77,9 @@ src/
 test/
   *.test.ts           Vitest suites (unit, CLI, fake HTTP server end-to-end)
   helpers.ts          fixture loader and sample extractions
-  fixtures/           synthetic CVs used by tests (see below)
+  fixtures/           synthetic CVs used by tests (see below); pdf/ and docx/ are generated
+scripts/
+  fixtures/           generators for the PDF and DOCX fixtures (npm run fixtures:pdf|docx)
 docs/
   ROADMAP.md
 ```
@@ -78,7 +92,7 @@ Fixtures are how cvparse gets better at real-world layouts, and they are also th
 2. **Make it plausible.** A fixture is useful only if it looks like something a candidate would actually send: realistic section headings, realistic messiness. Copy the *structure* of the hard cases you see in practice, not the content.
 3. **Name the difficulty.** Fixtures live flat in `test/fixtures/` as `cv-<lang>-<case>.txt`, where `<lang>` is the ISO 639-1 code of the CV's main language: `cv-es-backend.txt`, `cv-es-two-column-canva.txt`, `cv-en-functional.txt`.
 4. **Pair it with a test.** Nothing loads a fixture automatically. Load it with `fixture("cv-es-....txt")` from `test/helpers.ts` inside the test that needs it, and assert on the fields that matter for the case you are adding (use `toMatchObject` for a subset). A fixture-driven harness with `.expected.json` files and a scoring script is planned for 0.3 (see the roadmap); until then, expectations live in the test code.
-5. **Text only, for now.** Until 0.1 ships PDF/DOCX extraction, fixtures are `.txt`. When binary fixtures arrive, the same rules apply, and every PDF or DOCX must be generated from synthetic content (not exported from a real document with fields replaced; metadata leaks).
+5. **Binary fixtures are generated.** PDF and DOCX fixtures live in `test/fixtures/pdf/` and `test/fixtures/docx/` and are produced by the scripts in `scripts/fixtures/` (see [Fixtures](#fixtures)). Add a new case to the script, not a file exported from a real document with fields replaced: metadata leaks, and the output must stay byte-deterministic.
 6. **Spanish is welcome and needed.** Fixtures in Spanish (Spain and every LATAM variant), Portuguese, and mixed Spanish/English are the ones most likely to expose bugs. Please add them.
 
 If you are unsure whether something counts as personal data, it does. Ask in the PR before committing it.
@@ -90,7 +104,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 feat(schema): add x_cvparse.location.region
 fix(cli): exit with code 2 on missing input file
-docs: clarify plain-text-only status in README
+docs: document PDF and DOCX input in README
 test(fixtures): add cv-es-two-column-canva
 chore: bump ai to 7.0.130
 ```
@@ -106,7 +120,7 @@ Do not add attribution trailers or "generated by" lines to commits.
 - [ ] New behaviour has a test. Schema changes have a fixture that exercises them.
 - [ ] Fixtures are synthetic (see above).
 - [ ] Public API or schema changes are reflected in `README.md`, `README.es.md` and `CHANGELOG.md` under **Unreleased**.
-- [ ] No new runtime dependencies without discussing it in an issue first. The runtime dependency list is deliberately short: `ai`, `zod`, `@ai-sdk/openai-compatible`.
+- [ ] No new runtime dependencies without discussing it in an issue first. The runtime dependency list is deliberately short: `ai`, `zod`, `@ai-sdk/openai-compatible`, plus `unpdf` and `mammoth`, which are loaded on demand.
 - [ ] Commit messages follow Conventional Commits.
 
 Small PRs get reviewed quickly. Large PRs get reviewed eventually. If you are planning something big, open an issue first so we can agree on the approach.
@@ -115,7 +129,7 @@ Small PRs get reviewed quickly. Large PRs get reviewed eventually. If you are pl
 
 These are the most valuable issues we get, and also the hardest to act on without the right information. Please include:
 
-1. **An anonymized, reproducible sample.** Do not paste the real CV. Rewrite it with invented names, contacts and employers, but keep the exact structure that breaks: the same section order, the same date formats, the same weird bullet characters, the same column layout (as text, until PDF support ships). If the problem is a PDF or DOCX, describe how it was produced (Canva, Word, LaTeX, scanned) and, if you can, attach a synthetic file built the same way.
+1. **An anonymized, reproducible sample.** Do not paste the real CV. Rewrite it with invented names, contacts and employers, but keep the exact structure that breaks: the same section order, the same date formats, the same weird bullet characters, the same column layout. If the problem is a PDF or DOCX, describe how it was produced (Canva, Word, LaTeX, scanned), include the `info:` line and any `extract:` warnings the CLI printed, and, if you can, attach a synthetic file built the same way (or the output of `extractText` on it, with the content rewritten).
 2. **The expected JSON.** The `Resume` object you believe is correct for that sample, or at least the fields that came out wrong and what they should be.
 3. **The actual JSON** cvparse produced, plus the `warnings` array.
 4. **Provider and model**, e.g. `ollama / llama3.1`, `openai / gpt-4o-mini`, and the `--lang` value if you set one.

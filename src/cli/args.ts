@@ -23,7 +23,7 @@ export const DEFAULT_BASE_URLS: Record<CliProvider, string | undefined> = {
 
 /** Options for a `run` command, fully resolved (defaults applied). */
 export interface RunOptions {
-  /** Path to the CV text file, or `-` for stdin. */
+  /** Path to the CV (PDF, DOCX or text), or `-` for stdin. */
   file: string;
   provider: CliProvider;
   model: string;
@@ -45,11 +45,12 @@ export class CliUsageError extends Error {
 
 export const USAGE = `Usage: cvparse <file> [options]
 
-Turn a CV/resume text file into JSON Resume-compatible JSON using an LLM.
+Turn a CV/resume (PDF, DOCX or plain text) into JSON Resume-compatible JSON using an LLM.
 
 Arguments:
-  <file>                    Path to the CV as plain text (.txt, .md, ...). Use "-" for stdin.
-                            PDF/DOCX/images are not supported yet (coming in 0.1).
+  <file>                    Path to the CV: .pdf, .docx or plain text (.txt, .md, ...). The format
+                            is detected from the file contents. Use "-" to read from stdin.
+                            Scanned PDFs and images need OCR, which is planned for 0.2.
 
 Options:
   --provider <name>         ollama | openai | openai-compatible   (default: ollama)
@@ -70,11 +71,12 @@ Output:
 
 Exit codes:
   0  success
-  1  extraction failed (provider error, invalid model output)
-  2  usage error (bad arguments, missing file, unsupported file type)
+  1  extraction failed (provider error, invalid model output, corrupt document)
+  2  usage error (bad arguments, missing file, unsupported or empty input, PDF without text layer)
 
 Examples:
-  npx @cvparse/core ./cv.txt --pretty
+  npx @cvparse/core ./cv.pdf --pretty
+  npx @cvparse/core ./cv.docx --lang es
   npx @cvparse/core ./cv.txt --provider openai --model gpt-4o-mini --api-key sk-...
   npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model qwen2.5
   cat cv.txt | npx @cvparse/core - --lang es
@@ -183,13 +185,8 @@ export function parseCliArgs(
   };
 }
 
-/** Extensions that the 0.0.x preview cannot read (binary formats). */
-export const UNSUPPORTED_EXTENSIONS = new Set([
-  ".pdf",
-  ".doc",
-  ".docx",
-  ".odt",
-  ".rtf",
+/** Image extensions: need OCR (planned for 0.2). */
+export const IMAGE_EXTENSIONS = new Set([
   ".png",
   ".jpg",
   ".jpeg",
@@ -201,10 +198,21 @@ export const UNSUPPORTED_EXTENSIONS = new Set([
   ".heic",
 ]);
 
-/** Returns the lowercase extension of `file` if it is one the 0.0.x preview does not support, else `null`. */
+/** Legacy / other office formats: convert to .docx or PDF first. */
+export const LEGACY_DOCUMENT_EXTENSIONS = new Set([".doc", ".odt", ".rtf", ".pages"]);
+
+/** Returns the lowercase extension of `file` if cvparse cannot read that format, else `null`. */
 export function unsupportedExtension(file: string): string | null {
   const match = /\.[a-z0-9]+$/i.exec(file);
   if (!match) return null;
   const ext = match[0].toLowerCase();
-  return UNSUPPORTED_EXTENSIONS.has(ext) ? ext : null;
+  return IMAGE_EXTENSIONS.has(ext) || LEGACY_DOCUMENT_EXTENSIONS.has(ext) ? ext : null;
+}
+
+/** Human-readable reason for an unsupported extension, for the CLI error message. */
+export function unsupportedExtensionMessage(ext: string): string {
+  if (IMAGE_EXTENSIONS.has(ext)) {
+    return `${ext} files are images: scanned CVs need OCR, which is planned for 0.2. Run OCR first and pass the text, or export the CV as PDF or DOCX.`;
+  }
+  return `${ext} files are not supported. Save the CV as .docx or PDF and try again.`;
 }

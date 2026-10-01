@@ -6,6 +6,17 @@
  */
 
 export { CvparseError, type CvparseErrorCode } from "./errors.js";
+export {
+  type DetectedFormat,
+  type DetectedLayout,
+  type DocumentInput,
+  detectFormat,
+  type ExtractedDocument,
+  extractText,
+  type InputFormat,
+  type TextItem,
+} from "./extract/index.js";
+export { type OrderedPage, orderTextItems, type PageSize } from "./extract/layout.js";
 export { type NormalizedDate, normalizeDate } from "./normalize/dates.js";
 export { type DetectedLanguage, detectLanguage } from "./normalize/language.js";
 export { type NormalizeResult, normalizeResume } from "./normalize/resume.js";
@@ -54,5 +65,12 @@ export {
   type Work,
   WorkSchema,
 } from "./schema/index.js";
-export type { ParseLanguage, ParseOptions, ParseResult, ParseUsage } from "./types.js";
+export type {
+  ExtractionSource,
+  ParseLanguage,
+  ParseOptions,
+  ParseResult,
+  ParseUsage,
+  ResumeInput,
+} from "./types.js";
 export { CVPARSE_VERSION } from "./version.js";

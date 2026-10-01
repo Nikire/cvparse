@@ -7,8 +7,8 @@ Turn CVs and resumes into typed, JSON Resume-compatible JSON using LLMs, with an
 [![License: MIT](https://img.shields.io/github/license/Nikire/cvparse.svg)](https://github.com/Nikire/cvparse/blob/main/LICENSE)
 [![Node >= 22](https://img.shields.io/node/v/%40cvparse%2Fcore.svg)](https://nodejs.org)
 
-> **Status: 0.0.x — early preview.**
-> Today cvparse accepts **plain text only**. You extract the text from the PDF, DOCX or image yourself and pass it in. Built-in PDF and DOCX text extraction land in 0.1, and an OCR adapter for scanned documents in 0.2. See the [roadmap](#roadmap). The schema and API may change before 0.1.
+> **Status: 0.x — early.**
+> cvparse reads **PDF, DOCX and plain text**. PDFs are read in reading order, including two-column and sidebar layouts. Scanned PDFs and images need OCR, which lands as an adapter in 0.2. See the [roadmap](#roadmap). The schema and API may still change before 1.0.
 
 [Versión en español](./README.es.md)
 
@@ -20,18 +20,20 @@ Requires Node >= 22 and [Ollama](https://ollama.com) running on your machine.
 
 ```bash
 ollama pull llama3.1
-npx @cvparse/core ./cv.txt --pretty
+npx @cvparse/core ./cv.pdf --pretty
 ```
 
-The npm package is `@cvparse/core`; the command it installs is `cvparse` (`npm i -g @cvparse/core`, then `cvparse ./cv.txt`).
+The npm package is `@cvparse/core`; the command it installs is `cvparse` (`npm i -g @cvparse/core`, then `cvparse ./cv.pdf`).
 
 `cvparse` defaults to Ollama at `http://localhost:11434/v1`. Nothing leaves your machine.
+
+The input can be a PDF, a DOCX or a plain-text file; the format is detected from the file contents, not the extension. For a PDF or DOCX the CLI prints one `info:` line to stderr saying what it read, e.g. `info: read pdf, 2 page(s), multi-column layout`.
 
 Other providers:
 
 ```bash
 # OpenAI (reads OPENAI_API_KEY from the environment if --api-key is omitted)
-npx @cvparse/core ./cv.txt --provider openai --model gpt-4o-mini --pretty
+npx @cvparse/core ./cv.docx --provider openai --model gpt-4o-mini --pretty
 
 # Any OpenAI-compatible endpoint (LM Studio, vLLM, Groq, OpenRouter, ...)
 npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model my-model
@@ -41,7 +43,7 @@ All flags:
 
 | Flag | Values | Notes |
 | --- | --- | --- |
-| `<file>` | path or `-` | Plain-text CV. `-` reads from stdin. `.pdf`, `.docx` and image files are rejected in the 0.0.x preview (exit 2) |
+| `<file>` | path or `-` | Path to the CV: `.pdf`, `.docx` or plain text (`.txt`, `.md`, ...). The format is detected from the file contents. `-` reads from stdin, as text or bytes. Scanned PDFs and images need OCR, which is planned for 0.2 (exit 2) |
 | `--provider` | `ollama` \| `openai` \| `openai-compatible` | Default: `ollama` |
 | `--model <id>` | any model id the provider knows | Default: `llama3.1` (ollama), `gpt-4o-mini` (openai); required for `openai-compatible` |
 | `--base-url <url>` | URL | Default: `http://localhost:11434/v1` (ollama), `https://api.openai.com/v1` (openai); required for `openai-compatible` |
@@ -56,14 +58,14 @@ The CLI prints only the `resume` object as JSON to **stdout**; `warnings` go to 
 | Code | Meaning |
 | --- | --- |
 | `0` | Success |
-| `1` | Extraction failed (provider error, invalid model output) |
-| `2` | Usage error (bad arguments, missing file, unsupported file type) |
+| `1` | Extraction failed (provider error, invalid model output, corrupt document) |
+| `2` | Usage error (bad arguments, missing file, unsupported or empty input, PDF without text layer) |
 
 So it composes with pipes and scripts:
 
 ```bash
-npx @cvparse/core ./cv.txt | jq '.basics.name'
-cat cv.txt | npx @cvparse/core - --lang es
+npx @cvparse/core ./cv.pdf | jq '.basics.name'
+cat cv.pdf | npx @cvparse/core - --lang es
 ```
 
 ### Programmatic
@@ -72,7 +74,7 @@ cat cv.txt | npx @cvparse/core - --lang es
 npm install @cvparse/core @ai-sdk/openai-compatible
 ```
 
-`parseResume` takes the resume text and any AI SDK language model. Use Ollama for a fully local setup:
+`parseResume` takes the CV, as a string or as the bytes of a PDF, DOCX or text file, plus any AI SDK language model. Use Ollama for a fully local setup:
 
 ```ts
 import { readFile } from 'node:fs/promises';
@@ -88,16 +90,21 @@ const ollama = createOpenAICompatible({
   supportsStructuredOutputs: true,
 });
 
-const text = await readFile('./cv.txt', 'utf8');
+// A Node Buffer is a Uint8Array, so the file bytes can be passed as-is.
+// The format (PDF, DOCX, text) is detected from the bytes.
+const buffer = await readFile('./cv.pdf');
 
-const { resume, usage, warnings } = await parseResume(text, {
+const { resume, source, usage, warnings } = await parseResume(buffer, {
   model: ollama('llama3.1'),
   language: 'auto', // 'es' | 'en' | 'auto'
 });
 
+console.log(source); // { format: 'pdf', pages: 2, layout: 'multi-column' }
 console.log(resume.basics?.name);
 console.log(resume.work?.[0]?.position);
 ```
+
+A string is taken as the CV text. To pass a file name as a tie-breaker for detection, or to skip detection, wrap the bytes: `parseResume({ data: buffer, filename: 'cv.docx' }, { model })` or `parseResume({ data, format: 'pdf' }, { model })`.
 
 Or OpenAI, through the same provider package:
 
@@ -112,8 +119,22 @@ const openai = createOpenAICompatible({
   supportsStructuredOutputs: true,
 });
 
-const { resume } = await parseResume(text, { model: openai('gpt-4o-mini') });
+const { resume } = await parseResume(buffer, { model: openai('gpt-4o-mini') });
 ```
+
+If you only want the text, `extractText` is the same extraction step without the model call. It is useful for inspecting what the model will see, or for feeding your own pipeline:
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { detectFormat, extractText } from '@cvparse/core';
+
+const data = await readFile('./cv.pdf');
+detectFormat(data); // 'pdf' | 'docx' | 'text' | 'image' | 'legacy-doc' | 'zip' | 'unknown'
+
+const { text, format, pages, layout, warnings } = await extractText(data);
+```
+
+PDF and DOCX support is loaded on demand (pdf.js via `unpdf`, and `mammoth`), so passing a string never loads either.
 
 Because `model` is a standard AI SDK `LanguageModel`, any AI SDK provider works: `@ai-sdk/openai`, `@ai-sdk/anthropic`, `@ai-sdk/amazon-bedrock`, `@ai-sdk/google`, and so on. Install the provider you want and pass its model instance. Always pass a model instance: the AI SDK also accepts a bare string (`model: "openai/gpt-4o-mini"`), but that is resolved through the Vercel AI Gateway (it needs `AI_GATEWAY_API_KEY`), not through your own provider. Whatever provider you use, if `warnings` contains a `responseFormat` warning the model did not receive the resume schema and the output will be unreliable; pick a model or provider setting with structured-output support.
 
@@ -135,7 +156,13 @@ The result:
 type ParseResult = {
   resume: Resume;      // typed, validated against ResumeSchema
   usage: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
-  warnings: string[];  // provider warnings, dates that could not be normalized, model confidence notes
+  warnings: string[];  // extraction warnings (prefixed `extract:`), provider warnings,
+                       // dates that could not be normalized, model confidence notes
+  source: {
+    format: 'text' | 'pdf' | 'docx';                      // what the input was read as
+    pages?: number;                                       // PDFs only
+    layout: 'single-column' | 'multi-column' | 'unknown'; // PDFs only; 'unknown' otherwise
+  };
 };
 ```
 
@@ -147,7 +174,7 @@ type ParseResult = {
 import { CvparseError, parseResume } from '@cvparse/core';
 
 try {
-  const { resume } = await parseResume(text, { model });
+  const { resume } = await parseResume(buffer, { model });
 } catch (error) {
   if (CvparseError.is(error)) {
     console.error(error.code, error.message); // e.g. PROVIDER_ERROR Extraction failed: ECONNREFUSED
@@ -159,7 +186,10 @@ try {
 
 | `code` | When |
 | --- | --- |
-| `INVALID_INPUT` | The text is empty or not a string, or `options.model` is missing |
+| `INVALID_INPUT` | The input is empty, not a string / `Uint8Array` / `{ data }`, or no text came out of the document; or `options.model` is missing |
+| `UNSUPPORTED_INPUT` | The bytes are an image (needs OCR, planned for 0.2), a legacy `.doc`, a ZIP that is not a DOCX, or not recognizable as PDF, DOCX or UTF-8 text |
+| `NO_TEXT_LAYER` | The PDF has no extractable text (scanned or image-only). Run OCR first and pass the text |
+| `EXTRACTION_FAILED` | The document could not be read: corrupt or password-protected PDF, broken DOCX |
 | `NO_OBJECT_GENERATED` | The model did not return a valid object (`rawText` holds what it did return) |
 | `PROVIDER_ERROR` | The provider call failed: connection refused, auth, rate limit, abort (`statusCode` when available) |
 | `VALIDATION_ERROR` | The normalized result did not pass `ResumeSchema` |
@@ -167,6 +197,7 @@ try {
 ## Why cvparse
 
 - **There is no maintained TypeScript library for LLM-based CV extraction.** The existing TypeScript projects are rule-based browser parsers (open-resume and its forks), full applications, or regex packages that stopped in 2022. LLM parsers exist in Python, mostly as scripts. cvparse is a library: no UI, no framework, just a function and a CLI.
+- **Two-column PDFs come out in reading order.** cvparse rebuilds the reading order from the positions of the text on the page (a recursive XY-cut): it finds the vertical gutter of two-column and sidebar layouts, keeps full-width headers and footers in place, and then splits by vertical gaps, so the left column is read before the right instead of interleaved line by line. Known limits: three or more columns are only handled incidentally, tables may be read row by row, rotated or right-to-left text is ignored, and a short block of right-aligned dates can occasionally be read as a second column. DOCX files go through `mammoth`, with layout tables read cell by cell and text boxes recovered; DOCX headers and footers are not read.
 - **Spanish CVs are a first-class target.** Spanish date formats ("marzo 2021 – actualidad") and LATAM location conventions (CABA, Argentina; Medellín, Antioquia) are exercised by the test fixtures today. Spain-specific degree normalization ("Grado", "Máster") is on the 0.1 roadmap, and mixed-language CVs are part of the 0.3 evaluation dataset.
 - **Deterministic date normalization.** After the model call, cvparse normalizes dates itself: Spanish, English and Portuguese month names and abbreviations, ongoing markers ("actualidad", "presente", "a la fecha", "current"), day-first numeric dates (`03/2021`, `15/03/2021`) and bare years all become `YYYY`, `YYYY-MM` or `YYYY-MM-DD`, and every date it cannot normalize is reported in `warnings` instead of silently passed through. `normalizeDate` is exported if you want it on its own.
 - **Typed output.** The result is validated with Zod and you get a `Resume` type. No `any`, no post-hoc JSON parsing.
@@ -279,7 +310,7 @@ Exact values depend on the model you use. Small local models will be less consis
 | Parsing without an LLM (deterministic, offline, no model at all) | A rule-based parser such as [open-resume](https://github.com/xitanggg/open-resume)'s parser. Expect lower accuracy on non-standard layouts. |
 | Something that runs in the browser | cvparse targets Node >= 22. Rule-based browser parsers exist; LLM calls from the browser expose your API keys. |
 | High-volume commercial parsing with SLAs, taxonomies and support contracts | Affinda, Textkernel, RChilli, Daxtra, HireAbility. They are ahead on volume, taxonomy coverage and edge cases, and they charge accordingly. |
-| PDF, DOCX or scanned-image input **today** | Not yet: the 0.0.x preview is plain text only. Extract the text yourself (e.g. `pdf-parse`, `mammoth`, Textract) and pass it in, or wait for 0.1 / 0.2. |
+| Scanned PDFs or image input **today** | Not yet: a PDF without a text layer fails with `NO_TEXT_LAYER` and images are rejected. Run OCR yourself (Tesseract, Textract) and pass the text, or wait for the 0.2 OCR adapter. Legacy `.doc` files are rejected too: save them as `.docx` or PDF. |
 | Guaranteed, reproducible output for the same input | LLM output varies between runs and models. cvparse validates the shape, not the semantics. Pin a model and temperature and evaluate on your own data. |
 | CV-to-job matching, ranking or scoring | cvparse only extracts. Pair it with a matcher such as Resume-Matcher. |
 | Python | Several LLM-based CV parsers exist for Python. cvparse is TypeScript-only. |
@@ -288,7 +319,7 @@ Exact values depend on the model you use. Small local models will be less consis
 
 Summary; the full plan is in [docs/ROADMAP.md](./docs/ROADMAP.md).
 
-- **0.1** — PDF text extraction (including two-column layouts) and DOCX input. `npx @cvparse/core ./cv.pdf` works out of the box.
+- **0.1** (done) — PDF text extraction with reading-order reconstruction for two-column and sidebar layouts, DOCX input including tables and text boxes, format detection from bytes, `extractText` / `detectFormat`. `npx @cvparse/core ./cv.pdf` works out of the box. Still open under 0.1: more date forms, degree normalization for Spain and LATAM, `temperature` pass-through.
 - **0.2** — OCR adapter for scanned CVs and images (pluggable: Tesseract, AWS Textract).
 - **0.3** — Public evaluation dataset of synthetic Spanish CVs with hard layouts, and a published benchmark against open-resume.
 - **Later** — Agent skill and MCP server packaging so cvparse can be used directly from coding agents and assistants.

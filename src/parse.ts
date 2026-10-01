@@ -12,6 +12,7 @@ import {
 } from "ai";
 import type { z } from "zod";
 import { CvparseError } from "./errors.js";
+import { extractText } from "./extract/index.js";
 import { detectLanguage } from "./normalize/language.js";
 import { normalizeResume } from "./normalize/resume.js";
 import { buildSystemPrompt, buildUserPrompt } from "./prompt.js";
@@ -20,7 +21,7 @@ import {
   ResumeExtractionSchema,
   ResumeSchema,
 } from "./schema/resume.js";
-import type { ParseOptions, ParseResult } from "./types.js";
+import type { ExtractionSource, ParseOptions, ParseResult, ResumeInput } from "./types.js";
 
 type ExtractionOutput = z.infer<typeof ResumeExtractionSchema>;
 
@@ -85,10 +86,11 @@ function wrapError(error: unknown): CvparseError {
 }
 
 /**
- * Extracts a JSON Resume-compatible object from the plain text of a CV using any AI SDK
- * language model.
+ * Extracts a JSON Resume-compatible object from a CV using any AI SDK language model.
  *
- * The 0.0.x preview accepts text only; PDF/DOCX/OCR extraction is planned for 0.1.x.
+ * `input` can be the CV text, or the bytes of a PDF, DOCX or text file (format detected from
+ * the bytes). Two-column PDFs are read in reading order. Scanned PDFs and images need OCR, which
+ * is planned for 0.2.
  *
  * @example
  * ```ts
@@ -105,17 +107,10 @@ function wrapError(error: unknown): CvparseError {
  * const { resume, warnings } = await parseResume(cvText, { model: ollama("llama3.1") });
  * ```
  *
- * @throws {CvparseError} with `code` `INVALID_INPUT`, `NO_OBJECT_GENERATED`, `PROVIDER_ERROR`
- * or `VALIDATION_ERROR`.
+ * @throws {CvparseError} with `code` `INVALID_INPUT`, `UNSUPPORTED_INPUT`, `NO_TEXT_LAYER`,
+ * `EXTRACTION_FAILED`, `NO_OBJECT_GENERATED`, `PROVIDER_ERROR` or `VALIDATION_ERROR`.
  */
-export async function parseResume(input: string, options: ParseOptions): Promise<ParseResult> {
-  if (typeof input !== "string") {
-    throw new CvparseError("INVALID_INPUT", "parseResume expects the CV as a string of text.");
-  }
-  const text = input.replace(/\r\n?/g, "\n").trim();
-  if (text === "") {
-    throw new CvparseError("INVALID_INPUT", "The CV text is empty.");
-  }
+export async function parseResume(input: ResumeInput, options: ParseOptions): Promise<ParseResult> {
   if (!options?.model) {
     throw new CvparseError(
       "INVALID_INPUT",
@@ -124,6 +119,36 @@ export async function parseResume(input: string, options: ParseOptions): Promise
   }
 
   const warnings: string[] = [];
+  let source: ExtractionSource;
+  let rawText: string;
+  if (typeof input === "string") {
+    rawText = input;
+    source = { format: "text", layout: "unknown" };
+  } else if (input instanceof Uint8Array || (input && input.data instanceof Uint8Array)) {
+    const bytes = input instanceof Uint8Array ? input : input.data;
+    if (bytes.length === 0) {
+      throw new CvparseError("INVALID_INPUT", "The input document is empty (0 bytes).");
+    }
+    const doc = await extractText(input);
+    rawText = doc.text;
+    source = { format: doc.format, pages: doc.pages, layout: doc.layout };
+    for (const w of doc.warnings) warnings.push(`extract: ${w}`);
+  } else {
+    throw new CvparseError(
+      "INVALID_INPUT",
+      "parseResume expects the CV as text, as a Uint8Array/Buffer, or as { data, filename? }.",
+    );
+  }
+
+  const text = rawText.replace(/\r\n?/g, "\n").trim();
+  if (text === "") {
+    throw new CvparseError(
+      "INVALID_INPUT",
+      source.format === "text"
+        ? "The CV text is empty."
+        : `No text could be extracted from the ${source.format.toUpperCase()}.`,
+    );
+  }
   if (text.length > MAX_INPUT_CHARS) {
     warnings.push(
       `Input is ${text.length} characters; only the first ${MAX_INPUT_CHARS} were sent to the model.`,
@@ -197,5 +222,5 @@ export async function parseResume(input: string, options: ParseOptions): Promise
     warnings.push(`model: ${note}`);
   }
 
-  return { resume: validated.data, usage, warnings };
+  return { resume: validated.data, usage, warnings, source };
 }
