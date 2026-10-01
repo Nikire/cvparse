@@ -24,10 +24,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
-          node-version: 22
+          # Node 24 bundles npm 11, which supports npm Trusted Publishing (OIDC).
+          node-version: 24
           cache: npm
-          # Writes an .npmrc that reads NODE_AUTH_TOKEN at publish time.
           registry-url: https://registry.npmjs.org
+
+      - name: Show npm version (must be >= 11.5.1 for Trusted Publishing)
+        run: npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -68,21 +71,12 @@ jobs:
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # NPM_TOKEN must be a granular access token with publish rights (and
-      # "bypass 2FA") for the "@cvparse/core" package, stored as a repository secret.
-      #
-      # Once the package exists on npm you can switch to npm Trusted Publishing
-      # (OIDC) and drop the token entirely: add this repo + this workflow file
-      # as a trusted publisher in the package settings on npmjs.com, then delete
-      # the NPM_TOKEN secret and remove the `env` block below. `id-token: write`
-      # is already granted above, and npm >= 11.5.1 (bundled with current
-      # Node 22 / 24 releases) authenticates via OIDC and generates provenance
-      # on its own.
+      # Authenticates via npm Trusted Publishing: the package settings on npmjs.com
+      # trust this repository + this workflow file (OIDC, `id-token: write` above).
+      # No NPM_TOKEN secret is needed; provenance is generated automatically.
       - name: Publish to npm
         if: steps.npm-check.outputs.published == 'false'
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
