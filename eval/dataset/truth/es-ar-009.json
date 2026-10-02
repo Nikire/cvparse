@@ -1,0 +1,85 @@
+{
+  "basics": {
+    "email": "rocio_acuna@example.com",
+    "label": "Desarrolladora Backend",
+    "location": {
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "region": "CABA"
+    },
+    "name": "Rocío Acuña Pereyra",
+    "phone": "+54 9 11 4123-3149"
+  },
+  "education": [
+    {
+      "area": "Informática",
+      "endDate": "2020",
+      "institution": "Universidad Tecnológica del Plata",
+      "startDate": "2016",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Go"
+    },
+    {
+      "name": "AWS"
+    },
+    {
+      "name": "Node.js"
+    },
+    {
+      "name": "Redis"
+    },
+    {
+      "name": "MongoDB"
+    },
+    {
+      "name": "Kubernetes"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Integración con pasarelas de pago y facturación electrónica."],
+      "location": "Mendoza",
+      "name": "Pagos de los Andes S.A.S.",
+      "position": "Desarrolladora Backend",
+      "startDate": "2022-02"
+    },
+    {
+      "endDate": "2021-11",
+      "highlights": ["Implementación de colas con Kafka para procesar 62 mil eventos diarios."],
+      "location": "Remoto",
+      "name": "Nube del Plata S.R.L.",
+      "position": "Desarrolladora Backend Jr.",
+      "startDate": "2020-04"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "CABA",
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "raw": "Buenos Aires, CABA, Argentina"
+    }
+  }
+}

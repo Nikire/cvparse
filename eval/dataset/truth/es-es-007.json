@@ -1,0 +1,114 @@
+{
+  "basics": {
+    "email": "inigosanchez29@example.org",
+    "label": "Diseñador UX/UI",
+    "location": {
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "region": "Aragón"
+    },
+    "name": "Íñigo Sánchez Castaño",
+    "phone": "+34 667 900 351",
+    "summary": "Diseñador UX/UI con 11 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "UX Research",
+      "endDate": "2022",
+      "institution": "Escuela de Negocios del Sur",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Diseño Multimedia",
+      "endDate": "2015",
+      "institution": "Universitat del Mediterrani Occidental",
+      "startDate": "2011",
+      "studyType": "Grado"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Prototipado"
+    },
+    {
+      "name": "Adobe Photoshop"
+    },
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "Accesibilidad web"
+    },
+    {
+      "name": "Tipografía"
+    },
+    {
+      "name": "Design systems"
+    },
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Figma"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-11",
+      "highlights": ["Diseño del checkout y la búsqueda con filtros."],
+      "location": "Zaragoza",
+      "name": "Apps del Mediterráneo S.A.",
+      "position": "Product Designer Senior",
+      "startDate": "2022-06"
+    },
+    {
+      "endDate": "2022-04",
+      "highlights": ["Rediseño del onboarding móvil que subió la conversión al 33%."],
+      "location": "Remoto",
+      "name": "Banco Digital del Mediterráneo S.L.",
+      "position": "Product Designer",
+      "startDate": "2018-11"
+    },
+    {
+      "endDate": "2018-08",
+      "highlights": [
+        "Identidad visual para 3 marcas de consumo masivo.",
+        "Creación de un design system usado por 6 equipos."
+      ],
+      "location": "Zaragoza",
+      "name": "Agencia Digital del Ebro S.L.",
+      "position": "Diseñador UX/UI",
+      "startDate": "2015-06"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      }
+    ],
+    "location": {
+      "adminRegion": "Aragón",
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "raw": "Zaragoza, Aragón, España"
+    }
+  }
+}

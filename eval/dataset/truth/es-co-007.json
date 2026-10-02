@@ -1,0 +1,112 @@
+{
+  "basics": {
+    "email": "clondono@example.com",
+    "label": "Contadora",
+    "location": {
+      "city": "Medellín",
+      "countryCode": "CO",
+      "region": "Antioquia"
+    },
+    "name": "Catalina Londoño",
+    "phone": "+57 324 115 7276",
+    "summary": "Contadora con 10 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "Administración Contable",
+      "endDate": "2014-11",
+      "institution": "Servicio Técnico Regional Andino",
+      "startDate": "2011-02",
+      "studyType": "Tecnólogo"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "NIIF"
+    },
+    {
+      "name": "Impuestos"
+    },
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Costos"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Presupuestos"
+    },
+    {
+      "name": "SAP FI"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Liquidación de impuestos y presentación de declaraciones juradas.",
+        "Conciliaciones bancarias de 6 cuentas corrientes."
+      ],
+      "location": "Remoto",
+      "name": "Agroindustrias Paisa S.A.S.",
+      "position": "Jefa de Contabilidad",
+      "startDate": "2023-12"
+    },
+    {
+      "endDate": "2023-09",
+      "highlights": [
+        "Reducción del cierre mensual de 9 a 3 días hábiles.",
+        "Coordinación con auditores externos en la auditoría anual."
+      ],
+      "location": "Medellín",
+      "name": "Farmacéutica del Valle S.A.S.",
+      "position": "Contadora Senior",
+      "startDate": "2020-03"
+    },
+    {
+      "endDate": "2019-11",
+      "highlights": [
+        "Cierres contables mensuales y estados financieros bajo NIIF.",
+        "Reducción del cierre mensual de 8 a 3 días hábiles."
+      ],
+      "location": "Medellín",
+      "name": "Constructora del Valle Ltda.",
+      "position": "Analista Contable",
+      "startDate": "2015-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Tecnólogo",
+        "level": "technical",
+        "original": "Tecnólogo"
+      }
+    ],
+    "location": {
+      "adminRegion": "Antioquia",
+      "city": "Medellín",
+      "countryCode": "CO",
+      "raw": "Medellín, Antioquia, Colombia"
+    }
+  }
+}

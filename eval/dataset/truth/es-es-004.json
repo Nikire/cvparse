@@ -1,0 +1,114 @@
+{
+  "basics": {
+    "email": "lucia.etxeberria@example.org",
+    "label": "Docente",
+    "location": {
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "region": "Aragón"
+    },
+    "name": "Lucía Etxeberria Ortega",
+    "phone": "+34 614 722 662",
+    "summary": "Docente con 9 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Matemática",
+      "endDate": "2016-06",
+      "institution": "Universidad de la Ribera",
+      "startDate": "2010-09",
+      "studyType": "Grado"
+    },
+    {
+      "area": "Didáctica Digital",
+      "endDate": "2016",
+      "institution": "Plataforma Aprende+",
+      "studyType": "Bootcamp"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Moodle"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Educación inclusiva"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Dirección de 6 tesis de grado."],
+      "location": "Zaragoza",
+      "name": "Colegio Santa Inés de Levante",
+      "position": "Profesora Adjunta",
+      "startDate": "2022-03"
+    },
+    {
+      "endDate": "2021-12",
+      "highlights": [
+        "Implementación de aulas virtuales en Moodle.",
+        "Coordinación del área de ciencias con 2 docentes."
+      ],
+      "location": "Bilbao",
+      "name": "Escuela Técnica del Ebro",
+      "position": "Coordinadora Académica",
+      "startDate": "2019-03"
+    },
+    {
+      "endDate": "2018-11",
+      "highlights": ["Diseño de planificaciones y materiales didácticos digitales."],
+      "location": "Zaragoza",
+      "name": "Universidad del Delta del Mediterráneo",
+      "position": "Profesora de Matemática",
+      "startDate": "2017-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      },
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      }
+    ],
+    "location": {
+      "adminRegion": "Aragón",
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "raw": "Zaragoza, Aragón, España"
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "basics": {
+    "email": "vpereira@example.com",
+    "label": "Enfermera",
+    "location": {
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "region": "Montevideo"
+    },
+    "name": "Victoria Pereira Silva",
+    "phone": "+598 96 042 865",
+    "summary": "Enfermera con 4 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Cuidados Paliativos",
+      "endDate": "2024",
+      "institution": "Academia Código Libre",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Enfermería",
+      "endDate": "2022",
+      "institution": "Universidad del Este Oriental",
+      "startDate": "2016",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Cuidados intensivos"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Bioseguridad"
+    },
+    {
+      "name": "Atención domiciliaria"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Atención de pacientes críticos en una unidad de 20 camas.",
+        "Administración de medicación y control de signos vitales."
+      ],
+      "location": "Montevideo",
+      "name": "Centro Médico del Plata",
+      "position": "Supervisora de Enfermería",
+      "startDate": "2026"
+    },
+    {
+      "endDate": "2025",
+      "highlights": [
+        "Capacitación al personal en bioseguridad.",
+        "Coordinación de turnos de 2 enfermeros."
+      ],
+      "location": "Montevideo",
+      "name": "Hospital Privado Charrúa",
+      "position": "Enfermera Asistencial",
+      "startDate": "2024"
+    },
+    {
+      "endDate": "2023",
+      "highlights": [
+        "Registro clínico en historia electrónica.",
+        "Atención de pacientes críticos en una unidad de 20 camas.",
+        "Registro clínico en historia electrónica."
+      ],
+      "location": "Salto",
+      "name": "Sanatorio Oriental",
+      "position": "Enfermera de Terapia Intensiva",
+      "startDate": "2022"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Montevideo",
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "raw": "Montevideo, Uruguay"
+    }
+  }
+}

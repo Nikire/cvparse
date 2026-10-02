@@ -1,0 +1,104 @@
+{
+  "basics": {
+    "email": "rodrigo_cabrera@example.com",
+    "label": "Diseñador UX/UI",
+    "location": {
+      "city": "Maldonado",
+      "countryCode": "UY",
+      "region": "Maldonado"
+    },
+    "name": "Rodrigo Cabrera",
+    "phone": "+598 99 604 537",
+    "summary": "Diseñador UX/UI con 7 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "Diseño de Interacción",
+      "endDate": "2022",
+      "institution": "Universidad del Este Oriental",
+      "startDate": "2021",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Diseño Gráfico",
+      "endDate": "2018",
+      "institution": "Universidad Católica del Río de la Plata",
+      "startDate": "2013",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Prototipado"
+    },
+    {
+      "name": "Adobe Photoshop"
+    },
+    {
+      "name": "HTML y CSS"
+    },
+    {
+      "name": "Figma"
+    },
+    {
+      "name": "Design systems"
+    },
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "Accesibilidad web"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025",
+      "highlights": ["Diseño del checkout y la búsqueda con filtros."],
+      "location": "Maldonado",
+      "name": "Apps del Plata S.A.",
+      "position": "Product Designer",
+      "startDate": "2021"
+    },
+    {
+      "endDate": "2021",
+      "highlights": ["Identidad visual para 4 marcas de consumo masivo."],
+      "location": "Maldonado",
+      "name": "Tienda Charrúa S.A.",
+      "position": "Diseñador UX/UI",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Maldonado",
+      "city": "Maldonado",
+      "countryCode": "UY",
+      "raw": "Maldonado, Uruguay"
+    }
+  }
+}

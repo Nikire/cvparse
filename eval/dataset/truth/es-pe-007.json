@@ -1,0 +1,131 @@
+{
+  "basics": {
+    "email": "alex_flores@example.org",
+    "label": "Docente",
+    "location": {
+      "city": "Arequipa",
+      "countryCode": "PE",
+      "region": "Arequipa"
+    },
+    "name": "Álex Flores Paredes",
+    "phone": "+51 933 533 212",
+    "summary": "Docente con 12 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Educación Inclusiva",
+      "endDate": "2017-12",
+      "institution": "Universidad Peruana de Ciencias del Pacífico",
+      "startDate": "2016-03",
+      "studyType": "Diplomado"
+    },
+    {
+      "area": "Moodle para Docentes",
+      "endDate": "2017",
+      "institution": "Plataforma Aprende+",
+      "studyType": "Diplomado"
+    },
+    {
+      "area": "Pedagogía",
+      "endDate": "2014-12",
+      "institution": "Instituto Superior Tecnológico Inca",
+      "startDate": "2011-03",
+      "studyType": "Técnico Profesional"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "B1",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Moodle"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "location": "Arequipa",
+      "name": "Colegio Santa Inés de los Andes",
+      "position": "Investigador Asistente",
+      "startDate": "2022-06"
+    },
+    {
+      "endDate": "2022-04",
+      "location": "Arequipa",
+      "name": "Instituto Belgrano de los Andes",
+      "position": "Profesor Adjunto",
+      "startDate": "2019-10"
+    },
+    {
+      "endDate": "2019-07",
+      "location": "Arequipa",
+      "name": "Escuela Técnica del Pacífico",
+      "position": "Coordinador Académico",
+      "startDate": "2018-02"
+    },
+    {
+      "endDate": "2017",
+      "location": "Remoto",
+      "name": "Liceo Inca",
+      "position": "Profesor de Matemática",
+      "startDate": "2014"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Diplomado",
+        "level": "course",
+        "original": "Diplomado"
+      },
+      {
+        "canonical": "Diplomado",
+        "level": "course",
+        "original": "Diplomado"
+      },
+      {
+        "canonical": "Técnico",
+        "level": "technical",
+        "original": "Técnico Profesional"
+      }
+    ],
+    "location": {
+      "adminRegion": "Arequipa",
+      "city": "Arequipa",
+      "countryCode": "PE",
+      "raw": "Arequipa, Perú"
+    }
+  }
+}

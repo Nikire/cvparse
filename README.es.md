@@ -402,6 +402,61 @@ Salida:
 
 Los valores exactos dependen del modelo que uses. Los modelos locales pequeños serán menos consistentes que los modelos de frontera; ese compromiso lo decidís vos.
 
+## Benchmark
+
+F1 por campo sobre un dataset sintético de CVs en español con diseños difíciles (dos columnas, barras laterales, tablas y cuadros de texto en DOCX, escaneados), comparado con parsers por reglas. El harness está en [eval/](eval/).
+
+<!-- eval:results:start -->
+
+**Antes de leer la tabla.** El dataset y el evaluador los escribieron los autores de cvparse, así que es un benchmark dentro de distribución, no independiente: los formatos de fecha y el vocabulario de títulos son los que los normalizadores de cvparse ya contemplan. Los dos baselines detectan secciones por encabezados en inglés y estos CVs los tienen en español; esa es la brecha que el benchmark quiere mostrar, pero también significa que los baselines pierden la mayoría de las secciones por diseño. resume-parser recibe el texto que extrae cvparse (su lector propio necesita poppler), así que hereda el orden de lectura de cvparse. open-resume solo lee PDF: **Cobertura** indica cuántos CVs intentó cada sistema y **Solo PDF** compara a todos sobre los mismos 40 PDF. Más detalles en la [ficha del dataset](eval/dataset/README.md#who-made-this-and-known-biases).
+
+Dataset 1.0.0, 60 CVs sintéticos en español.
+
+### F1 por campo (%)
+
+| Sistema | Cobertura | Global | Solo PDF (40) | Nombre | Email | Teléfono | Ubicación | Experiencia | Fechas exp. | Educación | Fechas educ. | Habilidades | Idiomas |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 60/60 | **96.4** | 97.1 | 100.0 | 98.3 | 100.0 | 90.0 | 92.5 | 95.6 | 99.1 | 89.9 | 98.9 | 100.0 |
+| open-resume (rules) | 40/60 | **17.2** | 17.2 | 17.7 | 91.9 | 43.1 | 13.3 | 0.0 | 0.0 | 0.0 | 0.0 | 5.7 | 0.0 |
+| resume-parser (regex) (2 con error) | 56/60 | **16.9** | 16.1 | 5.5 | 98.2 | 52.6 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 7.1 | 5.8 |
+
+Global es el promedio de F1 sobre los 10 campos de la tabla, calculado sobre los CVs que cada sistema intentó (los formatos que no puede leer se omiten en vez de contar como cero, y se ven en Cobertura). Reglas de puntuación: [eval/score/README.md](eval/score/README.md).
+
+### Diagnóstico solo de cvparse: nivel educativo
+
+| Sistema | Nivel educ. F1 | P | R | support |
+| --- | ---: | ---: | ---: | ---: |
+| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 96.4 | 97.3 | 95.6 | 113 |
+
+No forma parte de Global. El vocabulario de títulos del dataset se escribió junto con el normalizador de títulos de cvparse, así que no es una medida independiente; los baselines no producen niveles educativos.
+
+### F1 global por diseño (%)
+
+| Diseño | cvparse + llama3.1 8B (Ollama, local) + Tesseract | open-resume (rules) | resume-parser (regex) |
+| --- | ---: | ---: | ---: |
+| academic (4) | 100.0 | 0.0 | 16.7 |
+| functional (4) | 94.6 | 14.0 | 14.0 |
+| scanned (6) | 94.5 | 0.0 | 0.0 |
+| sidebar (8) | 95.6 | 17.7 | 15.5 |
+| single-column (17) | 95.4 | 20.7 | 18.5 |
+| table (6) | 96.7 | n/a | 15.0 |
+| textbox (4) | 96.1 | n/a | 21.1 |
+| two-column (11) | 99.2 | 19.9 | 17.2 |
+
+### Configuración
+
+- **cvparse + llama3.1 8B (Ollama, local) + Tesseract**: cvparse 0.2.0; provider: ollama, model: llama3.1, ocr: tesseract, temperature: 0, language: es, referenceDate: 2026-10-01, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32; 60 CVs en 897 s
+- **open-resume (rules)**: repo: github.com/xitanggg/open-resume, commit: 4f8255a2c763479837f69f1dccf2a3338730cd79, license: AGPL-3.0 (fetched at runtime, not vendored), pdfReader: Node port of read-pdf.ts on unpdf's pdf.js, dates: normalized with cvparse normalizeDate/splitDateRange, node: v22.14.0, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657; 40 CVs en 1 s
+- **resume-parser (regex)**: package: resume-parser@1.1.0, license: ISC, input: plain text from cvparse extractText (its textract/pdftotext reader is bypassed), dates: not extracted (sections are raw text), node: v22.14.0, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657; 56 CVs en 12 s
+
+Reproducir (y luego `npm run eval:report`):
+
+- cvparse + llama3.1 8B (Ollama, local) + Tesseract: `npm run eval -- --system cvparse --provider ollama --model llama3.1 --ocr tesseract`
+- open-resume (rules): `npm run eval -- --system open-resume`
+- resume-parser (regex): `npm run eval -- --system resume-parser`
+
+<!-- eval:results:end -->
+
 ## Cuándo NO usar esto
 
 | Si necesitás... | Usá en su lugar |

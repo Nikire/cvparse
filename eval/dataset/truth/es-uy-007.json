@@ -1,0 +1,108 @@
+{
+  "basics": {
+    "email": "federico_vinoly@example.com",
+    "label": "Desarrollador Backend",
+    "location": {
+      "city": "Maldonado",
+      "countryCode": "UY",
+      "region": "Maldonado"
+    },
+    "name": "Federico Viñoly Sosa",
+    "phone": "+598 96 058 018",
+    "summary": "Desarrollador Backend con 9 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Arquitectura de Microservicios",
+      "endDate": "2018",
+      "institution": "Escuela de Negocios del Sur",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Programación",
+      "endDate": "2017",
+      "institution": "Escuela Técnica Polo del Este",
+      "startDate": "2015",
+      "studyType": "Tecnólogo"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Git"
+    },
+    {
+      "name": "Redis"
+    },
+    {
+      "name": "AWS"
+    },
+    {
+      "name": "GraphQL"
+    },
+    {
+      "name": "Docker"
+    },
+    {
+      "name": "PostgreSQL"
+    },
+    {
+      "name": "TypeScript"
+    },
+    {
+      "name": "NestJS"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "location": "Maldonado",
+      "name": "Código Abierto del Plata S.R.L.",
+      "position": "Desarrollador Backend Sr.",
+      "startDate": "2021"
+    },
+    {
+      "endDate": "2021",
+      "location": "Remoto",
+      "name": "Pagos del Este S.A.",
+      "position": "Desarrollador Backend",
+      "startDate": "2019"
+    },
+    {
+      "endDate": "2019-06",
+      "location": "Salto",
+      "name": "Nube del Este S.A.",
+      "position": "Desarrollador Backend Jr.",
+      "startDate": "2017-09"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Tecnólogo",
+        "level": "technical",
+        "original": "Tecnólogo"
+      }
+    ],
+    "location": {
+      "adminRegion": "Maldonado",
+      "city": "Maldonado",
+      "countryCode": "UY",
+      "raw": "Maldonado, Uruguay"
+    }
+  }
+}

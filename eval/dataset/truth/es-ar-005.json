@@ -1,0 +1,115 @@
+{
+  "basics": {
+    "email": "sofia.pereyra@example.org",
+    "label": "Diseñadora UX/UI",
+    "location": {
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "region": "CABA"
+    },
+    "name": "Sofía Milagros Pereyra",
+    "phone": "+54 9 11 7573-7280",
+    "summary": "Diseñadora UX/UI con 7 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "Diseño Estratégico",
+      "endDate": "2023-12",
+      "institution": "Universidad Nacional de la Pampa Húmeda",
+      "startDate": "2021-03",
+      "studyType": "MBA"
+    },
+    {
+      "area": "Diseño Gráfico",
+      "endDate": "2019-12",
+      "institution": "Universidad Tecnológica del Plata",
+      "startDate": "2013-03",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Accesibilidad web"
+    },
+    {
+      "name": "Tipografía"
+    },
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "Adobe Photoshop"
+    },
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Figma"
+    },
+    {
+      "name": "Design systems"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Creación de un design system usado por 6 equipos.",
+        "Investigación con usuarios y pruebas de usabilidad quincenales."
+      ],
+      "location": "Buenos Aires",
+      "name": "Estudio Creativo del Plata S.A.",
+      "position": "Product Designer",
+      "startDate": "2025-04"
+    },
+    {
+      "endDate": "2024-12",
+      "highlights": [
+        "Rediseño del onboarding móvil que subió la conversión al 42%.",
+        "Identidad visual para 9 marcas de consumo masivo."
+      ],
+      "location": "Rosario",
+      "name": "Agencia Digital del Sur S.A.S.",
+      "position": "Diseñadora UX/UI",
+      "startDate": "2022-06"
+    },
+    {
+      "endDate": "2022-05",
+      "highlights": ["Diseño del checkout y la búsqueda con filtros."],
+      "location": "Buenos Aires",
+      "name": "Apps del Sur S.A.",
+      "position": "Diseñadora Gráfica",
+      "startDate": "2019-08"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "MBA",
+        "level": "master",
+        "original": "MBA"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "CABA",
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "raw": "Buenos Aires, CABA, Argentina"
+    }
+  }
+}

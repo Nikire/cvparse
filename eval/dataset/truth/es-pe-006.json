@@ -1,0 +1,112 @@
+{
+  "basics": {
+    "email": "yesenia_mamani@example.org",
+    "label": "Desarrolladora Backend",
+    "location": {
+      "city": "Lima",
+      "countryCode": "PE",
+      "region": "Lima"
+    },
+    "name": "Yesenia Mamani Gutiérrez",
+    "phone": "+51 940 471 525",
+    "summary": "Desarrolladora Backend con 9 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Informática",
+      "endDate": "2016",
+      "institution": "Universidad Peruana de Ciencias del Pacífico",
+      "startDate": "2011",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio (B1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Kafka"
+    },
+    {
+      "name": "GraphQL"
+    },
+    {
+      "name": "AWS"
+    },
+    {
+      "name": "Java"
+    },
+    {
+      "name": "Node.js"
+    },
+    {
+      "name": "Kubernetes"
+    },
+    {
+      "name": "Git"
+    },
+    {
+      "name": "Redis"
+    },
+    {
+      "name": "PostgreSQL"
+    },
+    {
+      "name": "NestJS"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-12",
+      "highlights": [
+        "Migración de un monolito a microservicios con Docker y Kubernetes.",
+        "Mentoría de 3 desarrolladores junior."
+      ],
+      "location": "Trujillo",
+      "name": "Pagos del Rímac S.A.",
+      "position": "Tech Lead Backend",
+      "startDate": "2024-10"
+    },
+    {
+      "endDate": "2024-06",
+      "highlights": [
+        "Diseño de APIs REST con NestJS y PostgreSQL para 78 mil usuarios activos.",
+        "Implementación de colas con Kafka para procesar 95 mil eventos diarios."
+      ],
+      "location": "Lima",
+      "name": "Fintech del Pacífico S.A.",
+      "position": "Desarrolladora Backend Sr.",
+      "startDate": "2020-04"
+    },
+    {
+      "endDate": "2019-12",
+      "highlights": ["Reducción del tiempo de despliegue de 66 a 8 minutos con GitHub Actions."],
+      "location": "Lima",
+      "name": "Datacenter del Pacífico S.A.C.",
+      "position": "Desarrolladora Backend",
+      "startDate": "2017-02"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Lima",
+      "city": "Lima",
+      "countryCode": "PE",
+      "raw": "Lima, Perú"
+    }
+  }
+}

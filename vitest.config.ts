@@ -9,8 +9,10 @@ export default defineConfig({
   // Mirrors the tsup `define` so tests see the same CVPARSE_VERSION as the build.
   define: { __CVPARSE_VERSION__: JSON.stringify(pkg.version) },
   test: {
-    include: ["test/**/*.test.ts", "src/**/*.test.ts"],
+    include: ["test/**/*.test.ts", "src/**/*.test.ts", "eval/**/*.test.ts"],
     environment: "node",
+    // Third-party baselines are cloned here with their own tests; never run them.
+    exclude: ["**/node_modules/**", "eval/.cache/**"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],

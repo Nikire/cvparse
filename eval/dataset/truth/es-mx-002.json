@@ -1,0 +1,128 @@
+{
+  "basics": {
+    "email": "diego.cruz@example.com",
+    "label": "Desarrollador Backend",
+    "location": {
+      "city": "Mérida",
+      "countryCode": "MX",
+      "region": "Yucatán"
+    },
+    "name": "Diego Cruz Saldaña",
+    "phone": "+52 999 600 6957",
+    "summary": "Desarrollador Backend con 5 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Arquitectura de Microservicios",
+      "endDate": "2024",
+      "institution": "Laboratorio Digital Latam",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Ingeniería de Software",
+      "endDate": "2023",
+      "institution": "Instituto Tecnológico de Tlalnepantla Norte",
+      "startDate": "2021",
+      "studyType": "MBA"
+    },
+    {
+      "area": "Desarrollo de Software",
+      "endDate": "2020",
+      "institution": "Universidad Tecnológica del Valle de Tlaxcalpan",
+      "startDate": "2017",
+      "studyType": "Técnico Superior Universitario"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "AWS"
+    },
+    {
+      "name": "Git"
+    },
+    {
+      "name": "Kafka"
+    },
+    {
+      "name": "MongoDB"
+    },
+    {
+      "name": "Docker"
+    },
+    {
+      "name": "GraphQL"
+    },
+    {
+      "name": "NestJS"
+    },
+    {
+      "name": "Node.js"
+    },
+    {
+      "name": "Kubernetes"
+    },
+    {
+      "name": "Redis"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Diseño de APIs REST con NestJS y PostgreSQL para 99 mil usuarios activos.",
+        "Integración con pasarelas de pago y facturación electrónica.",
+        "Reducción del tiempo de despliegue de 65 a 8 minutos con GitHub Actions."
+      ],
+      "location": "Mérida",
+      "name": "Logística Digital del Bajío S.A. de C.V.",
+      "position": "Desarrollador Backend",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022",
+      "highlights": [
+        "Mentoría de 4 desarrolladores junior.",
+        "Implementación de colas con Kafka para procesar 97 mil eventos diarios."
+      ],
+      "location": "Mérida",
+      "name": "Pagos del Norte S.A.P.I. de C.V.",
+      "position": "Desarrollador Backend Jr.",
+      "startDate": "2021"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "MBA",
+        "level": "master",
+        "original": "MBA"
+      },
+      {
+        "canonical": "Técnico Superior",
+        "level": "technical",
+        "original": "Técnico Superior Universitario"
+      }
+    ],
+    "location": {
+      "adminRegion": "Yucatán",
+      "city": "Mérida",
+      "countryCode": "MX",
+      "raw": "Mérida, Yucatán, México"
+    }
+  }
+}

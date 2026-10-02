@@ -1,0 +1,122 @@
+{
+  "basics": {
+    "email": "paola_ordonez@example.com",
+    "label": "Docente",
+    "location": {
+      "city": "Mérida",
+      "countryCode": "MX",
+      "region": "Yucatán"
+    },
+    "name": "Paola Ordóñez Cervantes",
+    "phone": "+52 999 239 7662",
+    "summary": "Docente con 6 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Educación",
+      "endDate": "2025",
+      "institution": "Universidad Autónoma del Bajío Central",
+      "startDate": "2023",
+      "studyType": "MBA"
+    },
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": "2020",
+      "institution": "Instituto Tecnológico de Tlalnepantla Norte",
+      "startDate": "2014",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Moodle"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Diseño de planificaciones y materiales didácticos digitales."],
+      "location": "Remoto",
+      "name": "Escuela Técnica del Pacífico",
+      "position": "Coordinadora Académica",
+      "startDate": "2024-12"
+    },
+    {
+      "endDate": "2024-11",
+      "highlights": [
+        "Dictado de clases a 8 cursos de nivel secundario.",
+        "Coordinación del área de ciencias con 2 docentes."
+      ],
+      "location": "Mérida",
+      "name": "Liceo del Norte",
+      "position": "Profesora de Matemática",
+      "startDate": "2023-04"
+    },
+    {
+      "endDate": "2023",
+      "highlights": [
+        "Dirección de 5 tesis de grado.",
+        "Implementación de aulas virtuales en Moodle."
+      ],
+      "location": "Monterrey",
+      "name": "Colegio Santa Inés del Bajío",
+      "position": "Docente de Nivel Secundario",
+      "startDate": "2020"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "MBA",
+        "level": "master",
+        "original": "MBA"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Yucatán",
+      "city": "Mérida",
+      "countryCode": "MX",
+      "raw": "Mérida, Yucatán, México"
+    }
+  }
+}

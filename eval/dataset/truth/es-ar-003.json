@@ -1,0 +1,100 @@
+{
+  "basics": {
+    "email": "ramiro.rossi@example.org",
+    "label": "Enfermero",
+    "location": {
+      "city": "Mendoza",
+      "countryCode": "AR",
+      "region": "Mendoza"
+    },
+    "name": "Ramiro Rossi",
+    "phone": "+54 9 261 543-7794",
+    "summary": "Enfermero con 6 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Enfermería",
+      "endDate": "2019-12",
+      "institution": "Universidad Tecnológica del Plata",
+      "startDate": "2013-03",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Atención domiciliaria"
+    },
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "Bioseguridad"
+    },
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Administración de medicamentos"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Coordinación de turnos de 7 enfermeros.",
+        "Atención de pacientes críticos en una unidad de 40 camas."
+      ],
+      "location": "Mendoza",
+      "name": "Clínica del Parque del Litoral",
+      "position": "Supervisor de Enfermería",
+      "startDate": "2025-08"
+    },
+    {
+      "endDate": "2025-07",
+      "highlights": ["Administración de medicación y control de signos vitales."],
+      "location": "Mendoza",
+      "name": "Sanatorio del Sur",
+      "position": "Enfermero Asistencial",
+      "startDate": "2024-02"
+    },
+    {
+      "endDate": "2024-01",
+      "highlights": ["Capacitación al personal en bioseguridad."],
+      "location": "Mendoza",
+      "name": "Hospital Privado del Sur",
+      "position": "Enfermero de Terapia Intensiva",
+      "startDate": "2019-11"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Mendoza",
+      "city": "Mendoza",
+      "countryCode": "AR",
+      "raw": "Mendoza, Argentina"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "basics": {
+    "email": "gabriela.paredes@example.com",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Lima",
+      "countryCode": "PE",
+      "region": "Lima"
+    },
+    "name": "Gabriela Milagros Paredes Peña",
+    "phone": "+51 916 767 906",
+    "summary": "Analista de Recursos Humanos con 7 años de experiencia en selección, desarrollo y clima organizacional. Acompaño a líderes en la gestión de equipos y procesos de cambio."
+  },
+  "education": [
+    {
+      "area": "Psicología Organizacional",
+      "endDate": "2021",
+      "institution": "Universidad Andina de Chachani",
+      "startDate": "2019",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Psicología",
+      "endDate": "2018",
+      "institution": "Pontificia Universidad Católica del Misti",
+      "startDate": "2013",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Entrevistas por competencias"
+    },
+    {
+      "name": "Reclutamiento y selección"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Capacitación"
+    },
+    {
+      "name": "SAP SuccessFactors"
+    },
+    {
+      "name": "Legislación laboral"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-07",
+      "highlights": [
+        "Diseño del programa de onboarding y clima laboral.",
+        "Reducción de la rotación voluntaria del 6%."
+      ],
+      "location": "Lima",
+      "name": "Retail del Rímac E.I.R.L.",
+      "position": "Analista de Recursos Humanos",
+      "startDate": "2024-10"
+    },
+    {
+      "endDate": "2024-08",
+      "highlights": ["Liquidación de haberes para 49 colaboradores."],
+      "location": "Lima",
+      "name": "Talento del Rímac S.A.",
+      "position": "Analista de Selección",
+      "startDate": "2021-02"
+    },
+    {
+      "endDate": "2020-10",
+      "highlights": [
+        "Selección de 47 perfiles técnicos y comerciales por año.",
+        "Implementación de la evaluación de desempeño 360°."
+      ],
+      "location": "Remoto",
+      "name": "Consultora de los Andes S.A.C.",
+      "position": "Asistente de Recursos Humanos",
+      "startDate": "2018-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Lima",
+      "city": "Lima",
+      "countryCode": "PE",
+      "raw": "Lima, Perú"
+    }
+  }
+}

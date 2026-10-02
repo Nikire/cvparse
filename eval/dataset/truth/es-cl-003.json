@@ -1,0 +1,106 @@
+{
+  "basics": {
+    "email": "csoto@example.org",
+    "label": "Ejecutivo Comercial",
+    "location": {
+      "city": "Valparaíso",
+      "countryCode": "CL",
+      "region": "Valparaíso"
+    },
+    "name": "Cristóbal Soto Núñez",
+    "phone": "+56 9 9286 3143",
+    "summary": "Ejecutivo Comercial con 7 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Ventas Consultivas",
+      "endDate": "2019",
+      "institution": "Escuela de Negocios del Sur",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Comercial",
+      "endDate": "2017",
+      "institution": "Universidad Técnica del Pacífico Sur",
+      "startDate": "2013",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio (B1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Gestión de cartera"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Salesforce"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "HubSpot"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Atención al cliente"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Apertura de 8 cuentas nuevas en el sector salud."],
+      "location": "Santiago",
+      "name": "Distribuidora del Norte Grande Ltda.",
+      "position": "Ejecutivo de Cuentas Senior",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2022",
+      "highlights": [
+        "Negociación de contratos marco con cadenas de retail.",
+        "Capacitación de 6 asesores comerciales nuevos."
+      ],
+      "location": "Valparaíso",
+      "name": "Maquinarias de los Andes S.A.",
+      "position": "Ejecutivo de Cuentas",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "Valparaíso",
+      "city": "Valparaíso",
+      "countryCode": "CL",
+      "raw": "Valparaíso, Chile"
+    }
+  }
+}

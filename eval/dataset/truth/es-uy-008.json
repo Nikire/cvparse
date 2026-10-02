@@ -1,0 +1,89 @@
+{
+  "basics": {
+    "email": "ffernandez@example.com",
+    "label": "Docente",
+    "location": {
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "region": "Montevideo"
+    },
+    "name": "Florencia Fernández",
+    "phone": "+598 99 148 920"
+  },
+  "education": [
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": "2018",
+      "institution": "Universidad Católica del Río de la Plata",
+      "startDate": "2014",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Investigación educativa"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Dirección de 2 tesis de grado."],
+      "location": "Montevideo",
+      "name": "Universidad del Delta Charrúa",
+      "position": "Coordinadora Académica",
+      "startDate": "2021"
+    },
+    {
+      "endDate": "2021",
+      "highlights": ["Implementación de aulas virtuales en Moodle."],
+      "location": "Montevideo",
+      "name": "Liceo Charrúa",
+      "position": "Profesora de Matemática",
+      "startDate": "2019"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Montevideo",
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "raw": "Montevideo, Uruguay"
+    }
+  }
+}

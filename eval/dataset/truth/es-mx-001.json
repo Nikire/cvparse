@@ -1,0 +1,125 @@
+{
+  "basics": {
+    "email": "ximena_montano@example.com",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Monterrey",
+      "countryCode": "MX",
+      "region": "Nuevo León"
+    },
+    "name": "Ximena Fernanda Montaño Hernández",
+    "phone": "+52 81 6152 4044",
+    "summary": "Analista de Datos con 7 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Ciencia de Datos",
+      "endDate": "2024",
+      "institution": "Laboratorio Digital Latam",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Ciencia de Datos",
+      "endDate": "2020",
+      "institution": "Instituto Tecnológico de Tlalnepantla Norte",
+      "startDate": "2019",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Sistemas",
+      "endDate": "2018",
+      "institution": "Universidad Popular de Tlaxcalpan",
+      "startDate": "2013",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "dbt"
+    },
+    {
+      "name": "pandas"
+    },
+    {
+      "name": "R"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Tableau"
+    },
+    {
+      "name": "Python"
+    },
+    {
+      "name": "Airflow"
+    },
+    {
+      "name": "scikit-learn"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": [
+        "Modelos de scoring crediticio con Python y SQL.",
+        "Gobierno de datos y documentación del catálogo corporativo.",
+        "Pronóstico de demanda con un error medio del 8%."
+      ],
+      "location": "Monterrey",
+      "name": "Retail del Pacífico S.A. de C.V.",
+      "position": "Analista de Datos",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2022",
+      "highlights": [
+        "Tableros de seguimiento comercial en Power BI para 9 gerencias.",
+        "Automatización de cargas ETL que ahorró 40 horas mensuales."
+      ],
+      "location": "Remoto",
+      "name": "Analítica Azteca S. de R.L. de C.V.",
+      "position": "Analista de Datos Jr.",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "Nuevo León",
+      "city": "Monterrey",
+      "countryCode": "MX",
+      "raw": "Monterrey, Nuevo León, México"
+    }
+  }
+}

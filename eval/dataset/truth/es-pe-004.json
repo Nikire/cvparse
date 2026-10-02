@@ -1,0 +1,112 @@
+{
+  "basics": {
+    "email": "renzo_mamani@example.org",
+    "label": "Ejecutivo Comercial",
+    "location": {
+      "city": "Arequipa",
+      "countryCode": "PE",
+      "region": "Arequipa"
+    },
+    "name": "Renzo Mamani Chávez",
+    "phone": "+51 959 189 862",
+    "summary": "Ejecutivo Comercial con 4 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Marketing Digital",
+      "endDate": "2025-11",
+      "institution": "Escuela de Negocios del Sur",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Dirección Comercial",
+      "endDate": "2023-12",
+      "institution": "Universidad Nacional del Rímac",
+      "startDate": "2021-03",
+      "studyType": "MBA"
+    },
+    {
+      "area": "Comercialización",
+      "endDate": "2020-12",
+      "institution": "Instituto Superior Tecnológico Inca",
+      "startDate": "2018-03",
+      "studyType": "Técnico Profesional"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "HubSpot"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Atención al cliente"
+    },
+    {
+      "name": "Prospección B2B"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Salesforce"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Negociación de contratos marco con cadenas de retail."],
+      "location": "Arequipa",
+      "name": "Distribuidora de los Andes S.A.C.",
+      "position": "Ejecutivo de Cuentas",
+      "startDate": "2024-12"
+    },
+    {
+      "endDate": "2024-10",
+      "highlights": [
+        "Capacitación de 6 asesores comerciales nuevos.",
+        "Apertura de 6 cuentas nuevas en el sector salud."
+      ],
+      "location": "Arequipa",
+      "name": "Software Empresarial del Pacífico S.A.C.",
+      "position": "Asesor Comercial",
+      "startDate": "2021-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "MBA",
+        "level": "master",
+        "original": "MBA"
+      },
+      {
+        "canonical": "Técnico",
+        "level": "technical",
+        "original": "Técnico Profesional"
+      }
+    ],
+    "location": {
+      "adminRegion": "Arequipa",
+      "city": "Arequipa",
+      "countryCode": "PE",
+      "raw": "Arequipa, Perú"
+    }
+  }
+}

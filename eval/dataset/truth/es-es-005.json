@@ -1,0 +1,123 @@
+{
+  "basics": {
+    "email": "alvaroetxeberria91@example.com",
+    "label": "Enfermero",
+    "location": {
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "region": "Aragón"
+    },
+    "name": "Álvaro Etxeberria Martínez",
+    "phone": "+34 689 877 094",
+    "summary": "Enfermero con 11 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Enfermería",
+      "endDate": "2018",
+      "institution": "Universitat del Mediterrani Occidental",
+      "startDate": "2016",
+      "studyType": "Máster"
+    },
+    {
+      "area": "Enfermería",
+      "endDate": "2014",
+      "institution": "Universidad Politécnica del Cantábrico",
+      "startDate": "2010",
+      "studyType": "Grado"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "Atención domiciliaria"
+    },
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "Bioseguridad"
+    },
+    {
+      "name": "Curación de heridas"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Atención de pacientes críticos en una unidad de 90 camas.",
+        "Capacitación al personal en bioseguridad."
+      ],
+      "location": "Bilbao",
+      "name": "Centro Médico del Ebro",
+      "position": "Supervisor de Enfermería",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022",
+      "highlights": ["Coordinación de turnos de 2 enfermeros."],
+      "location": "Zaragoza",
+      "name": "Hospital Privado del Ebro",
+      "position": "Enfermero Asistencial",
+      "startDate": "2019"
+    },
+    {
+      "endDate": "2018",
+      "highlights": [
+        "Administración de medicación y control de signos vitales.",
+        "Registro clínico en historia electrónica."
+      ],
+      "location": "Zaragoza",
+      "name": "Clínica del Parque del Mediterráneo",
+      "position": "Enfermero de Terapia Intensiva",
+      "startDate": "2017"
+    },
+    {
+      "endDate": "2017",
+      "highlights": ["Administración de medicación y control de signos vitales."],
+      "location": "Zaragoza",
+      "name": "Sanatorio del Ebro",
+      "position": "Enfermero",
+      "startDate": "2014"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Máster",
+        "level": "master",
+        "original": "Máster"
+      },
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      }
+    ],
+    "location": {
+      "adminRegion": "Aragón",
+      "city": "Zaragoza",
+      "countryCode": "ES",
+      "raw": "Zaragoza, Aragón, España"
+    }
+  }
+}

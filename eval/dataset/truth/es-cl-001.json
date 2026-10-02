@@ -1,0 +1,103 @@
+{
+  "basics": {
+    "email": "catalina.valdes@example.org",
+    "label": "Diseñadora UX/UI",
+    "location": {
+      "city": "Santiago",
+      "countryCode": "CL",
+      "region": "Región Metropolitana"
+    },
+    "name": "Catalina Antonia Valdés Muñoz",
+    "phone": "+56 9 4975 5105",
+    "summary": "Diseñadora UX/UI con 6 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "Diseño Gráfico",
+      "endDate": "2018",
+      "institution": "Universidad Técnica del Pacífico Sur",
+      "startDate": "2013",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "Figma"
+    },
+    {
+      "name": "Tipografía"
+    },
+    {
+      "name": "Adobe Photoshop"
+    },
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Design systems"
+    },
+    {
+      "name": "Accesibilidad web"
+    },
+    {
+      "name": "HTML y CSS"
+    },
+    {
+      "name": "Prototipado"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": [
+        "Investigación con usuarios y pruebas de usabilidad quincenales.",
+        "Rediseño del onboarding móvil que subió la conversión al 23%.",
+        "Diseño del checkout y la búsqueda con filtros."
+      ],
+      "location": "Santiago",
+      "name": "Banco Digital de los Andes S.A.",
+      "position": "Diseñadora UX/UI",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2023",
+      "highlights": [
+        "Identidad visual para 4 marcas de consumo masivo.",
+        "Creación de un design system usado por 2 equipos.",
+        "Creación de un design system usado por 8 equipos."
+      ],
+      "location": "Santiago",
+      "name": "Tienda Austral S.A.",
+      "position": "Diseñadora Gráfica",
+      "startDate": "2019"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Región Metropolitana",
+      "city": "Santiago",
+      "countryCode": "CL",
+      "raw": "Santiago, Región Metropolitana, Chile"
+    }
+  }
+}

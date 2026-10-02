@@ -1,0 +1,111 @@
+{
+  "basics": {
+    "email": "luisavalencia13@example.com",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "region": "Atlántico"
+    },
+    "name": "Luisa Valencia Cárdenas",
+    "phone": "+57 326 733 2499",
+    "summary": "Analista de Datos con 6 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Ciencia de Datos",
+      "endDate": "2023",
+      "institution": "Fundación Universitaria Andina del Café",
+      "startDate": "2022",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Estadística",
+      "endDate": "2020",
+      "institution": "Universidad Tecnológica del Altiplano",
+      "startDate": "2014",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "scikit-learn"
+    },
+    {
+      "name": "BigQuery"
+    },
+    {
+      "name": "Spark"
+    },
+    {
+      "name": "dbt"
+    },
+    {
+      "name": "pandas"
+    },
+    {
+      "name": "Power BI"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-04",
+      "highlights": [
+        "Gobierno de datos y documentación del catálogo corporativo.",
+        "Automatización de cargas ETL que ahorró 27 horas mensuales."
+      ],
+      "location": "Remoto",
+      "name": "Analítica Paisa Ltda.",
+      "position": "Analista de Datos Sr.",
+      "startDate": "2024-04"
+    },
+    {
+      "endDate": "2024-02",
+      "highlights": ["Pronóstico de demanda con un error medio del 3%."],
+      "location": "Barranquilla",
+      "name": "Telecom del Valle S.A.S.",
+      "position": "Analista de Datos",
+      "startDate": "2020-04"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Atlántico",
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "raw": "Barranquilla, Atlántico, Colombia"
+    }
+  }
+}

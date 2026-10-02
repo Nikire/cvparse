@@ -1,0 +1,126 @@
+{
+  "basics": {
+    "email": "paola.arreola@example.org",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Mérida",
+      "countryCode": "MX",
+      "region": "Yucatán"
+    },
+    "name": "Paola Arreola",
+    "phone": "+52 999 773 7994",
+    "summary": "Analista de Recursos Humanos con 9 años de experiencia en selección, desarrollo y clima organizacional. Acompaño a líderes en la gestión de equipos y procesos de cambio."
+  },
+  "education": [
+    {
+      "area": "Gestión del Talento",
+      "endDate": "2024-04",
+      "institution": "Plataforma Aprende+",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Psicología Organizacional",
+      "endDate": "2018-06",
+      "institution": "Universidad Interamericana del Pacífico",
+      "startDate": "2017-08",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Relaciones del Trabajo",
+      "endDate": "2016-06",
+      "institution": "Universidad Autónoma del Bajío Central",
+      "startDate": "2012-08",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Legislación laboral"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Capacitación"
+    },
+    {
+      "name": "Workday"
+    },
+    {
+      "name": "SAP SuccessFactors"
+    },
+    {
+      "name": "Reclutamiento y selección"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-01",
+      "highlights": [
+        "Liquidación de haberes para 21 colaboradores.",
+        "Reducción de la rotación voluntaria del 8%."
+      ],
+      "location": "Ciudad de México",
+      "name": "Grupo Industrial Azteca S.A. de C.V.",
+      "position": "HR Business Partner",
+      "startDate": "2022-11"
+    },
+    {
+      "endDate": "2022-07",
+      "highlights": ["Selección de 39 perfiles técnicos y comerciales por año."],
+      "location": "Mérida",
+      "name": "Servicios Financieros Azteca S. de R.L. de C.V.",
+      "position": "Analista de Recursos Humanos",
+      "startDate": "2020-03"
+    },
+    {
+      "endDate": "2020-02",
+      "highlights": [
+        "Diseño del programa de onboarding y clima laboral.",
+        "Implementación de la evaluación de desempeño 360°."
+      ],
+      "location": "Mérida",
+      "name": "Consultora del Pacífico S.A. de C.V.",
+      "position": "Analista de Selección",
+      "startDate": "2016-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Yucatán",
+      "city": "Mérida",
+      "countryCode": "MX",
+      "raw": "Mérida, Yucatán, México"
+    }
+  }
+}

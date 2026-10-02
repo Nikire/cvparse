@@ -1,0 +1,109 @@
+{
+  "basics": {
+    "email": "facundoolivera99@example.com",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "region": "Montevideo"
+    },
+    "name": "Facundo Olivera Píriz",
+    "phone": "+598 97 086 265",
+    "summary": "Analista de Recursos Humanos con 8 años de experiencia en selección, desarrollo y clima organizacional. Acompaño a líderes en la gestión de equipos y procesos de cambio."
+  },
+  "education": [
+    {
+      "area": "Dirección de Recursos Humanos",
+      "endDate": "2021",
+      "institution": "Universidad Católica del Río de la Plata",
+      "startDate": "2019",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Gestión del Talento",
+      "endDate": "2021",
+      "institution": "Academia Código Libre",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Relaciones del Trabajo",
+      "endDate": "2018",
+      "institution": "Instituto Universitario Charrúa",
+      "startDate": "2012",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Liquidación de sueldos"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Entrevistas por competencias"
+    },
+    {
+      "name": "SAP SuccessFactors"
+    },
+    {
+      "name": "Legislación laboral"
+    },
+    {
+      "name": "Capacitación"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Reducción de la rotación voluntaria del 5%."],
+      "location": "Remoto",
+      "name": "Retail del Este S.R.L.",
+      "position": "Analista de Recursos Humanos",
+      "startDate": "2021"
+    },
+    {
+      "endDate": "2021",
+      "highlights": ["Implementación de la evaluación de desempeño 360°."],
+      "location": "Montevideo",
+      "name": "Consultora Oriental S.A.",
+      "position": "Analista de Selección",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Montevideo",
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "raw": "Montevideo, Uruguay"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "basics": {
+    "email": "sofia_gimenez@example.org",
+    "label": "Desarrolladora Backend",
+    "location": {
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "region": "CABA"
+    },
+    "name": "Sofía Giménez",
+    "phone": "+54 9 11 9076-8522",
+    "summary": "Desarrolladora Backend con 6 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Informática",
+      "endDate": "2018-12",
+      "institution": "Instituto Universitario Río Paraná",
+      "startDate": "2012-03",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "NestJS"
+    },
+    {
+      "name": "TypeScript"
+    },
+    {
+      "name": "Redis"
+    },
+    {
+      "name": "Kubernetes"
+    },
+    {
+      "name": "Java"
+    },
+    {
+      "name": "PostgreSQL"
+    },
+    {
+      "name": "GraphQL"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-12",
+      "highlights": [
+        "Diseño de APIs REST con NestJS y PostgreSQL para 30 mil usuarios activos.",
+        "Migración de un monolito a microservicios con Docker y Kubernetes."
+      ],
+      "location": "Buenos Aires",
+      "name": "Nube del Litoral S.A.",
+      "position": "Desarrolladora Backend Sr.",
+      "startDate": "2023-12"
+    },
+    {
+      "endDate": "2023-10",
+      "highlights": [
+        "Reducción del tiempo de despliegue de 92 a 8 minutos con GitHub Actions.",
+        "Integración con pasarelas de pago y facturación electrónica."
+      ],
+      "location": "Rosario",
+      "name": "Datacenter de los Andes S.R.L.",
+      "position": "Desarrolladora Backend",
+      "startDate": "2019-11"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "CABA",
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "raw": "Buenos Aires, CABA, Argentina"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "basics": {
+    "email": "atechera@example.com",
+    "label": "Contadora",
+    "location": {
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "region": "Montevideo"
+    },
+    "name": "Agustina Valentina Techera",
+    "phone": "+598 93 809 799",
+    "summary": "Contadora con 7 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "Contabilidad",
+      "endDate": "2019",
+      "institution": "Universidad Técnica del Este",
+      "startDate": "2015",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "SAP FI"
+    },
+    {
+      "name": "Costos"
+    },
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "Impuestos"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Presupuestos"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": [
+        "Cierres contables mensuales y estados financieros bajo NIIF.",
+        "Coordinación con auditores externos en la auditoría anual."
+      ],
+      "location": "Salto",
+      "name": "Estudio Contable del Este S.A.",
+      "position": "Contadora Senior",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2023",
+      "highlights": ["Liquidación de impuestos y presentación de declaraciones juradas."],
+      "location": "Montevideo",
+      "name": "Constructora Charrúa S.R.L.",
+      "position": "Analista Contable",
+      "startDate": "2019"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Montevideo",
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "raw": "Montevideo, Uruguay"
+    }
+  }
+}

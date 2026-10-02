@@ -1,0 +1,109 @@
+{
+  "basics": {
+    "email": "angel.montano@example.org",
+    "label": "Diseñador UX/UI",
+    "location": {
+      "city": "Puebla",
+      "countryCode": "MX",
+      "region": "Puebla"
+    },
+    "name": "Ángel Montaño Cervantes",
+    "phone": "+52 222 758 4379",
+    "summary": "Diseñador UX/UI con 10 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "Diseño Multimedia",
+      "endDate": "2015",
+      "institution": "Universidad Popular de Tlaxcalpan",
+      "startDate": "2010",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Figma"
+    },
+    {
+      "name": "HTML y CSS"
+    },
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "Accesibilidad web"
+    },
+    {
+      "name": "Prototipado"
+    },
+    {
+      "name": "Design systems"
+    },
+    {
+      "name": "Tipografía"
+    },
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Adobe Photoshop"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Diseño del checkout y la búsqueda con filtros.",
+        "Creación de un design system usado por 4 equipos."
+      ],
+      "location": "Puebla",
+      "name": "Apps Azteca S.A.P.I. de C.V.",
+      "position": "Product Designer",
+      "startDate": "2021-12"
+    },
+    {
+      "endDate": "2021-10",
+      "highlights": ["Identidad visual para 6 marcas de consumo masivo."],
+      "location": "Puebla",
+      "name": "Tienda Azteca S. de R.L. de C.V.",
+      "position": "Diseñador UX/UI",
+      "startDate": "2018-10"
+    },
+    {
+      "endDate": "2018-07",
+      "highlights": [
+        "Investigación con usuarios y pruebas de usabilidad quincenales.",
+        "Rediseño del onboarding móvil que subió la conversión al 30%."
+      ],
+      "location": "Puebla",
+      "name": "Estudio Creativo Azteca S. de R.L. de C.V.",
+      "position": "Diseñador Gráfico",
+      "startDate": "2016-03"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Puebla",
+      "city": "Puebla",
+      "countryCode": "MX",
+      "raw": "Puebla, México"
+    }
+  }
+}

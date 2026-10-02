@@ -1,0 +1,92 @@
+{
+  "basics": {
+    "email": "santiago_zuniga@example.com",
+    "label": "Enfermero",
+    "location": {
+      "city": "Mérida",
+      "countryCode": "MX",
+      "region": "Yucatán"
+    },
+    "name": "Santiago Zúñiga Ochoa",
+    "phone": "+52 999 686 5784",
+    "summary": "Enfermero con 4 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Enfermería",
+      "endDate": "2021",
+      "institution": "Universidad Autónoma del Bajío Central",
+      "startDate": "2016",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Cuidados intensivos"
+    },
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Bioseguridad"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Atención de pacientes críticos en una unidad de 50 camas.",
+        "Capacitación al personal en bioseguridad."
+      ],
+      "location": "Ciudad de México",
+      "name": "Clínica Santa Brígida del Pacífico",
+      "position": "Enfermero Asistencial",
+      "startDate": "2024"
+    },
+    {
+      "endDate": "2024",
+      "highlights": [
+        "Administración de medicación y control de signos vitales.",
+        "Registro clínico en historia electrónica."
+      ],
+      "location": "Mérida",
+      "name": "Clínica del Parque Azteca",
+      "position": "Enfermero de Terapia Intensiva",
+      "startDate": "2022"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Yucatán",
+      "city": "Mérida",
+      "countryCode": "MX",
+      "raw": "Mérida, Yucatán, México"
+    }
+  }
+}

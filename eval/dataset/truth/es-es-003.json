@@ -1,0 +1,100 @@
+{
+  "basics": {
+    "email": "apena@example.com",
+    "label": "Desarrollador Backend",
+    "location": {
+      "city": "Sevilla",
+      "countryCode": "ES",
+      "region": "Andalucía"
+    },
+    "name": "Álvaro Peña Ortega",
+    "phone": "+34 631 733 975",
+    "summary": "Desarrollador Backend con 7 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Sistemas",
+      "endDate": "2017-06",
+      "institution": "Universidad Castellana de Ciencias",
+      "startDate": "2013-09",
+      "studyType": "Grado"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio (B1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "NestJS"
+    },
+    {
+      "name": "Kubernetes"
+    },
+    {
+      "name": "Node.js"
+    },
+    {
+      "name": "GraphQL"
+    },
+    {
+      "name": "MongoDB"
+    },
+    {
+      "name": "Docker"
+    },
+    {
+      "name": "Go"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2025-12",
+      "highlights": ["Migración de un monolito a microservicios con Docker y Kubernetes."],
+      "location": "Valencia",
+      "name": "Datacenter del Mediterráneo S.A.",
+      "position": "Desarrollador Backend Sr.",
+      "startDate": "2024-09"
+    },
+    {
+      "endDate": "2024-05",
+      "highlights": [
+        "Implementación de colas con Kafka para procesar 49 mil eventos diarios.",
+        "Diseño de APIs REST con NestJS y PostgreSQL para 92 mil usuarios activos."
+      ],
+      "location": "Sevilla",
+      "name": "Nube del Cantábrico S.L.",
+      "position": "Desarrollador Backend",
+      "startDate": "2020-08"
+    },
+    {
+      "endDate": "2020-06",
+      "highlights": ["Mentoría de 3 desarrolladores junior."],
+      "location": "Sevilla",
+      "name": "Código Abierto del Ebro S.A.",
+      "position": "Desarrollador Backend Jr.",
+      "startDate": "2018-10"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      }
+    ],
+    "location": {
+      "adminRegion": "Andalucía",
+      "city": "Sevilla",
+      "countryCode": "ES",
+      "raw": "Sevilla, Andalucía, España"
+    }
+  }
+}

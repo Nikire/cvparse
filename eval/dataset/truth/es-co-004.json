@@ -1,0 +1,106 @@
+{
+  "basics": {
+    "email": "paula_gomez@example.com",
+    "label": "Desarrolladora Backend",
+    "location": {
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "region": "Atlántico"
+    },
+    "name": "Paula Gómez Ospina",
+    "phone": "+57 309 350 6642",
+    "summary": "Desarrolladora Backend con 8 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo."
+  },
+  "education": [
+    {
+      "area": "Desarrollo de Software",
+      "endDate": "2018",
+      "institution": "Servicio Técnico Regional Andino",
+      "startDate": "2016",
+      "studyType": "Tecnólogo"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Git"
+    },
+    {
+      "name": "Java"
+    },
+    {
+      "name": "TypeScript"
+    },
+    {
+      "name": "Kubernetes"
+    },
+    {
+      "name": "Kafka"
+    },
+    {
+      "name": "Go"
+    },
+    {
+      "name": "Node.js"
+    },
+    {
+      "name": "MongoDB"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Integración con pasarelas de pago y facturación electrónica."],
+      "location": "Cali",
+      "name": "Logística Digital del Valle S.A.S.",
+      "position": "Desarrolladora Backend Sr.",
+      "startDate": "2024-05"
+    },
+    {
+      "endDate": "2024-04",
+      "highlights": [
+        "Migración de un monolito a microservicios con Docker y Kubernetes.",
+        "Reducción del tiempo de despliegue de 52 a 8 minutos con GitHub Actions."
+      ],
+      "location": "Cali",
+      "name": "Pagos Paisa Ltda.",
+      "position": "Desarrolladora Backend",
+      "startDate": "2021-02"
+    },
+    {
+      "endDate": "2020-12",
+      "highlights": [
+        "Mentoría de 5 desarrolladores junior.",
+        "Implementación de colas con Kafka para procesar 39 mil eventos diarios."
+      ],
+      "location": "Barranquilla",
+      "name": "Nube del Valle S.A.S.",
+      "position": "Desarrolladora Backend Jr.",
+      "startDate": "2018-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Tecnólogo",
+        "level": "technical",
+        "original": "Tecnólogo"
+      }
+    ],
+    "location": {
+      "adminRegion": "Atlántico",
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "raw": "Barranquilla, Atlántico, Colombia"
+    }
+  }
+}

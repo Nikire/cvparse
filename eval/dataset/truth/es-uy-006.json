@@ -1,0 +1,129 @@
+{
+  "basics": {
+    "email": "valentina.rodriguez@example.org",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "region": "Montevideo"
+    },
+    "name": "Valentina Rodríguez",
+    "phone": "+598 96 819 789",
+    "summary": "Analista de Datos con 12 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Machine Learning",
+      "endDate": "2025",
+      "institution": "Laboratorio Digital Latam",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Estadística Aplicada",
+      "endDate": "2017",
+      "institution": "Universidad Católica del Río de la Plata",
+      "startDate": "2015",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Programación",
+      "endDate": "2012",
+      "institution": "Instituto Técnico Charrúa",
+      "startDate": "2009",
+      "studyType": "Tecnólogo"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Python"
+    },
+    {
+      "name": "scikit-learn"
+    },
+    {
+      "name": "Spark"
+    },
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "BigQuery"
+    },
+    {
+      "name": "R"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "dbt"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Tableros de seguimiento comercial en Power BI para 4 gerencias."],
+      "location": "Montevideo",
+      "name": "Analítica Oriental S.A.",
+      "position": "Analista de Datos Sr.",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022",
+      "highlights": [
+        "Automatización de cargas ETL que ahorró 21 horas mensuales.",
+        "Pronóstico de demanda con un error medio del 6%."
+      ],
+      "location": "Paysandú",
+      "name": "Datos del Este S.A.",
+      "position": "Analista de Datos",
+      "startDate": "2018"
+    },
+    {
+      "endDate": "2017",
+      "highlights": [
+        "Gobierno de datos y documentación del catálogo corporativo.",
+        "Modelos de scoring crediticio con Python y SQL."
+      ],
+      "location": "Montevideo",
+      "name": "Retail Charrúa S.R.L.",
+      "position": "Analista de Datos Jr.",
+      "startDate": "2013"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Tecnólogo",
+        "level": "technical",
+        "original": "Tecnólogo"
+      }
+    ],
+    "location": {
+      "adminRegion": "Montevideo",
+      "city": "Montevideo",
+      "countryCode": "UY",
+      "raw": "Montevideo, Uruguay"
+    }
+  }
+}

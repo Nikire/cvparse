@@ -22,3 +22,6 @@ Thumbs.db
 
 # Tesseract language data downloaded at runtime
 *.traineddata
+
+# Evaluation: model outputs and third-party baselines (AGPL code is fetched, never committed)
+eval/.cache/

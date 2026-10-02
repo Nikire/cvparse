@@ -1,0 +1,93 @@
+{
+  "basics": {
+    "email": "fernanda_gonzalez@example.org",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Santiago",
+      "countryCode": "CL",
+      "region": "Región Metropolitana"
+    },
+    "name": "Fernanda González Contreras",
+    "phone": "+56 9 3984 3220",
+    "summary": "Analista de Datos con 4 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Estadística",
+      "endDate": "2020",
+      "institution": "Universidad del Estrecho Austral",
+      "startDate": "2015",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "BigQuery"
+    },
+    {
+      "name": "Tableau"
+    },
+    {
+      "name": "scikit-learn"
+    },
+    {
+      "name": "dbt"
+    },
+    {
+      "name": "Airflow"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "pandas"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Modelos de scoring crediticio con Python y SQL."],
+      "location": "Santiago",
+      "name": "Datos Austral SpA",
+      "position": "Analista de Datos",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2023",
+      "highlights": ["Pronóstico de demanda con un error medio del 7%."],
+      "location": "Santiago",
+      "name": "Analítica Austral S.A.",
+      "position": "Analista de Datos Jr.",
+      "startDate": "2021"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Región Metropolitana",
+      "city": "Santiago",
+      "countryCode": "CL",
+      "raw": "Santiago, Región Metropolitana, Chile"
+    }
+  }
+}

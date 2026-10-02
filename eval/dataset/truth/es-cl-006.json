@@ -1,0 +1,102 @@
+{
+  "basics": {
+    "email": "mcanas@example.com",
+    "label": "Docente",
+    "location": {
+      "city": "Concepción",
+      "countryCode": "CL",
+      "region": "Biobío"
+    },
+    "name": "Matías Cañas Rojas",
+    "phone": "+56 9 7362 0956",
+    "summary": "Docente con 8 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Educación Inicial",
+      "endDate": "2018",
+      "institution": "Instituto Profesional del Pacífico",
+      "startDate": "2016",
+      "studyType": "Técnico de Nivel Superior"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Moodle"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Dictado de clases a 7 cursos de nivel secundario.",
+        "Coordinación del área de ciencias con 5 docentes."
+      ],
+      "location": "Concepción",
+      "name": "Universidad del Delta Austral",
+      "position": "Profesor de Matemática",
+      "startDate": "2021"
+    },
+    {
+      "endDate": "2021",
+      "highlights": [
+        "Diseño de planificaciones y materiales didácticos digitales.",
+        "Implementación de aulas virtuales en Moodle."
+      ],
+      "location": "Concepción",
+      "name": "Escuela Técnica Austral",
+      "position": "Docente de Nivel Secundario",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Técnico",
+        "level": "technical",
+        "original": "Técnico de Nivel Superior"
+      }
+    ],
+    "location": {
+      "adminRegion": "Biobío",
+      "city": "Concepción",
+      "countryCode": "CL",
+      "raw": "Concepción, Biobío, Chile"
+    }
+  }
+}

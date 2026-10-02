@@ -1,0 +1,108 @@
+{
+  "basics": {
+    "email": "constanza_sepulveda@example.org",
+    "label": "Enfermera",
+    "location": {
+      "city": "Santiago",
+      "countryCode": "CL",
+      "region": "Región Metropolitana"
+    },
+    "name": "Constanza Francisca Sepúlveda",
+    "phone": "+56 9 6594 2461",
+    "summary": "Enfermera con 11 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Enfermería",
+      "endDate": "2014",
+      "institution": "Universidad Técnica del Pacífico Sur",
+      "startDate": "2008",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Cuidados intensivos"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Atención domiciliaria"
+    },
+    {
+      "name": "Bioseguridad"
+    },
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "RCP avanzada"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "location": "Remoto",
+      "name": "Clínica Santa Brígida del Norte Grande",
+      "position": "Supervisora de Enfermería",
+      "startDate": "2024"
+    },
+    {
+      "endDate": "2024",
+      "location": "Santiago",
+      "name": "Clínica del Parque del Pacífico",
+      "position": "Enfermera Asistencial",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022",
+      "location": "Santiago",
+      "name": "Centro Médico de los Andes",
+      "position": "Enfermera de Terapia Intensiva",
+      "startDate": "2018"
+    },
+    {
+      "endDate": "2018",
+      "location": "Santiago",
+      "name": "Sanatorio del Pacífico",
+      "position": "Enfermera",
+      "startDate": "2015"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Región Metropolitana",
+      "city": "Santiago",
+      "countryCode": "CL",
+      "raw": "Santiago, Región Metropolitana, Chile"
+    }
+  }
+}

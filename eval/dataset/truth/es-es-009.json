@@ -1,0 +1,100 @@
+{
+  "basics": {
+    "email": "jordividal21@example.com",
+    "label": "Ejecutivo Comercial",
+    "location": {
+      "city": "Bilbao",
+      "countryCode": "ES",
+      "region": "País Vasco"
+    },
+    "name": "Jordi Vidal Etxeberria",
+    "phone": "+34 641 782 038"
+  },
+  "education": [
+    {
+      "area": "Marketing Digital",
+      "endDate": "2024",
+      "institution": "Instituto de Formación Continua",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Comercio Internacional",
+      "endDate": "2020",
+      "institution": "Universidad de la Ribera",
+      "startDate": "2016",
+      "studyType": "Grado"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Catalán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Gestión de cartera"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Prospección B2B"
+    },
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "Salesforce"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Apertura de 2 cuentas nuevas en el sector salud."],
+      "location": "Bilbao",
+      "name": "Insumos Médicos del Cantábrico S.L.",
+      "position": "Ejecutivo de Cuentas Senior",
+      "startDate": "2024"
+    },
+    {
+      "endDate": "2023",
+      "highlights": ["Cumplimiento del 84% de la meta anual de ventas."],
+      "location": "Bilbao",
+      "name": "Maquinarias de Levante S.A.",
+      "position": "Ejecutivo de Cuentas",
+      "startDate": "2020"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      }
+    ],
+    "location": {
+      "adminRegion": "País Vasco",
+      "city": "Bilbao",
+      "countryCode": "ES",
+      "raw": "Bilbao, País Vasco, España"
+    }
+  }
+}

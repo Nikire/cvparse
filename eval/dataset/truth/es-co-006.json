@@ -1,0 +1,106 @@
+{
+  "basics": {
+    "email": "esteban_londono@example.org",
+    "label": "Enfermero",
+    "location": {
+      "city": "Bogotá",
+      "countryCode": "CO",
+      "region": "Bogotá D.C."
+    },
+    "name": "Esteban Alejandro Londoño Muñoz",
+    "phone": "+57 351 111 9115",
+    "summary": "Enfermero con 4 años de experiencia en atención de pacientes adultos y cuidados críticos. Trato humano, trabajo en equipo y registro clínico riguroso."
+  },
+  "education": [
+    {
+      "area": "Soporte Vital Avanzado",
+      "endDate": "2024",
+      "institution": "Laboratorio Digital Latam",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Enfermería",
+      "endDate": "2021",
+      "institution": "Servicio Técnico Regional Andino",
+      "startDate": "2019",
+      "studyType": "Tecnólogo"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio (B1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Triage"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Atención domiciliaria"
+    },
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Bioseguridad"
+    },
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "Cuidados intensivos"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Capacitación al personal en bioseguridad."],
+      "location": "Bogotá",
+      "name": "Clínica Santa Brígida del Valle",
+      "position": "Enfermero Asistencial",
+      "startDate": "2024-06"
+    },
+    {
+      "endDate": "2024-02",
+      "highlights": [
+        "Administración de medicación y control de signos vitales.",
+        "Registro clínico en historia electrónica."
+      ],
+      "location": "Bogotá",
+      "name": "Centro Médico de los Andes",
+      "position": "Enfermero de Terapia Intensiva",
+      "startDate": "2021-11"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Tecnólogo",
+        "level": "technical",
+        "original": "Tecnólogo"
+      }
+    ],
+    "location": {
+      "adminRegion": "Bogotá D.C.",
+      "city": "Bogotá",
+      "countryCode": "CO",
+      "raw": "Bogotá, Bogotá D.C., Colombia"
+    }
+  }
+}

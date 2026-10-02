@@ -1,0 +1,122 @@
+{
+  "basics": {
+    "email": "julietasosa34@example.org",
+    "label": "Ejecutiva Comercial",
+    "location": {
+      "city": "La Plata",
+      "countryCode": "AR",
+      "region": "Buenos Aires"
+    },
+    "name": "Julieta Belén Sosa",
+    "phone": "+54 9 221 632-9314",
+    "summary": "Ejecutiva Comercial con 12 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Marketing",
+      "endDate": "2017",
+      "institution": "Instituto Universitario Río Paraná",
+      "startDate": "2015",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Comercio Internacional",
+      "endDate": "2014",
+      "institution": "Universidad Tecnológica del Plata",
+      "startDate": "2009",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "Salesforce"
+    },
+    {
+      "name": "HubSpot"
+    },
+    {
+      "name": "Gestión de cartera"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Atención al cliente"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Prospección B2B"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-01",
+      "highlights": [
+        "Apertura de 2 cuentas nuevas en el sector salud.",
+        "Capacitación de 8 asesores comerciales nuevos."
+      ],
+      "location": "La Plata",
+      "name": "Distribuidora de los Andes S.R.L.",
+      "position": "Ejecutiva de Cuentas Senior",
+      "startDate": "2022-02"
+    },
+    {
+      "endDate": "2022-01",
+      "highlights": ["Negociación de contratos marco con cadenas de retail."],
+      "location": "La Plata",
+      "name": "Grupo Logístico de los Andes S.A.",
+      "position": "Ejecutiva de Cuentas",
+      "startDate": "2018-04"
+    },
+    {
+      "endDate": "2018-03",
+      "highlights": ["Cumplimiento del 41% de la meta anual de ventas."],
+      "location": "La Plata",
+      "name": "Software Empresarial de los Andes S.A.S.",
+      "position": "Asesora Comercial",
+      "startDate": "2014-07"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Buenos Aires",
+      "city": "La Plata",
+      "countryCode": "AR",
+      "raw": "La Plata, Buenos Aires, Argentina"
+    }
+  }
+}

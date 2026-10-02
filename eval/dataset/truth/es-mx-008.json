@@ -1,0 +1,127 @@
+{
+  "basics": {
+    "email": "guadalupe.hernandez@example.org",
+    "label": "Docente",
+    "location": {
+      "city": "Puebla",
+      "countryCode": "MX",
+      "region": "Puebla"
+    },
+    "name": "Guadalupe Hernández Arreola",
+    "phone": "+52 222 166 0756",
+    "summary": "Docente con 5 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": null,
+      "institution": "Universidad Popular de Tlaxcalpan",
+      "startDate": "2024-08",
+      "studyType": "Doctorado"
+    },
+    {
+      "area": "Educación",
+      "endDate": "2023-06",
+      "institution": "Instituto Tecnológico de Tlalnepantla Norte",
+      "startDate": "2021-08",
+      "studyType": "MBA"
+    },
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": "2020-06",
+      "institution": "Universidad Autónoma del Bajío Central",
+      "startDate": "2015-08",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Moodle"
+    },
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Oratoria"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Dictado de clases a 6 cursos de nivel secundario.",
+        "Coordinación del área de ciencias con 3 docentes."
+      ],
+      "location": "Monterrey",
+      "name": "Colegio Santa Inés Azteca",
+      "position": "Coordinadora Académica",
+      "startDate": "2025-09"
+    },
+    {
+      "endDate": "2025-07",
+      "highlights": ["Diseño de planificaciones y materiales didácticos digitales."],
+      "location": "Guadalajara",
+      "name": "Liceo del Bajío",
+      "position": "Profesora de Matemática",
+      "startDate": "2023-06"
+    },
+    {
+      "endDate": "2023-03",
+      "highlights": ["Implementación de aulas virtuales en Moodle."],
+      "location": "Puebla",
+      "name": "Escuela Técnica del Norte",
+      "position": "Docente de Nivel Secundario",
+      "startDate": "2021-09"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Doctorado",
+        "level": "doctorate",
+        "original": "Doctorado"
+      },
+      {
+        "canonical": "MBA",
+        "level": "master",
+        "original": "MBA"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Puebla",
+      "city": "Puebla",
+      "countryCode": "MX",
+      "raw": "Puebla, México"
+    }
+  }
+}

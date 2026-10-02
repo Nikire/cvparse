@@ -1,0 +1,113 @@
+{
+  "basics": {
+    "email": "bfernandez@example.org",
+    "label": "Ejecutivo Comercial",
+    "location": {
+      "city": "Salto",
+      "countryCode": "UY",
+      "region": "Salto"
+    },
+    "name": "Bruno Rodrigo Fernández",
+    "phone": "+598 94 588 215",
+    "summary": "Ejecutivo Comercial con 5 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Marketing Digital",
+      "endDate": "2022",
+      "institution": "Universidad del Este Oriental",
+      "startDate": "2021",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Industrial",
+      "endDate": "2020",
+      "institution": "Universidad Técnica del Este",
+      "startDate": "2015",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Salesforce"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Atención al cliente"
+    },
+    {
+      "name": "Gestión de cartera"
+    },
+    {
+      "name": "HubSpot"
+    },
+    {
+      "name": "Prospección B2B"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": [
+        "Capacitación de 2 asesores comerciales nuevos.",
+        "Negociación de contratos marco con cadenas de retail."
+      ],
+      "location": "Salto",
+      "name": "Insumos Médicos del Este S.A.",
+      "position": "Ejecutivo de Cuentas",
+      "startDate": "2024"
+    },
+    {
+      "endDate": "2024-01",
+      "highlights": [
+        "Apertura de 3 cuentas nuevas en el sector salud.",
+        "Cumplimiento del 99% de la meta anual de ventas."
+      ],
+      "location": "Salto",
+      "name": "Alimentos del Este S.A.",
+      "position": "Asesor Comercial",
+      "startDate": "2021-05"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "Salto",
+      "city": "Salto",
+      "countryCode": "UY",
+      "raw": "Salto, Uruguay"
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "basics": {
+    "email": "bgimenez@example.org",
+    "label": "Contadora",
+    "location": {
+      "city": "Córdoba",
+      "countryCode": "AR",
+      "region": "Córdoba"
+    },
+    "name": "Belén Agustina Giménez",
+    "phone": "+54 9 351 653-0041",
+    "summary": "Contadora con 6 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "Contabilidad y Auditoría",
+      "endDate": "2022-12",
+      "institution": "Instituto Universitario Río Paraná",
+      "startDate": "2020-03",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Tributación",
+      "endDate": "2020-11",
+      "institution": "Plataforma Aprende+",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Contabilidad",
+      "endDate": "2019-12",
+      "institution": "Universidad del Litoral Pampeano",
+      "startDate": "2014-03",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    },
+    {
+      "name": "Presupuestos"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Costos"
+    },
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "SAP FI"
+    },
+    {
+      "name": "Impuestos"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-08",
+      "highlights": [
+        "Coordinación con auditores externos en la auditoría anual.",
+        "Conciliaciones bancarias de 3 cuentas corrientes."
+      ],
+      "location": "Córdoba",
+      "name": "Agroindustrias del Litoral S.R.L.",
+      "position": "Contadora Senior",
+      "startDate": "2023-08"
+    },
+    {
+      "endDate": "2023-04",
+      "highlights": ["Cierres contables mensuales y estados financieros bajo NIIF."],
+      "location": "Buenos Aires",
+      "name": "Auditores del Plata S.A.",
+      "position": "Analista Contable",
+      "startDate": "2019-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Córdoba",
+      "city": "Córdoba",
+      "countryCode": "AR",
+      "raw": "Córdoba, Argentina"
+    }
+  }
+}

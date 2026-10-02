@@ -1,0 +1,104 @@
+{
+  "basics": {
+    "email": "mgimenez@example.com",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Córdoba",
+      "countryCode": "AR",
+      "region": "Córdoba"
+    },
+    "name": "Milagros Giménez",
+    "phone": "+54 9 351 463-4378",
+    "summary": "Analista de Datos con 14 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Economía",
+      "endDate": "2011",
+      "institution": "Universidad del Litoral Pampeano",
+      "startDate": "2005",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "scikit-learn"
+    },
+    {
+      "name": "R"
+    },
+    {
+      "name": "pandas"
+    },
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Python"
+    },
+    {
+      "name": "dbt"
+    },
+    {
+      "name": "Tableau"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "location": "Remoto",
+      "name": "Telecom de los Andes S.A.",
+      "position": "Científica de Datos",
+      "startDate": "2021-09"
+    },
+    {
+      "endDate": "2021-08",
+      "location": "Córdoba",
+      "name": "Analítica de los Andes S.R.L.",
+      "position": "Analista de Datos Sr.",
+      "startDate": "2017-10"
+    },
+    {
+      "endDate": "2017-09",
+      "location": "Córdoba",
+      "name": "Datos del Litoral S.A.S.",
+      "position": "Analista de Datos",
+      "startDate": "2014-06"
+    },
+    {
+      "endDate": "2014-03",
+      "location": "Rosario",
+      "name": "Retail del Sur S.R.L.",
+      "position": "Analista de Datos Jr.",
+      "startDate": "2011-10"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Córdoba",
+      "city": "Córdoba",
+      "countryCode": "AR",
+      "raw": "Córdoba, Argentina"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "basics": {
+    "email": "andres_castano@example.org",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Bogotá",
+      "countryCode": "CO",
+      "region": "Bogotá D.C."
+    },
+    "name": "Andrés Castaño Ríos",
+    "phone": "+57 364 491 0824"
+  },
+  "education": [
+    {
+      "area": "Gestión del Talento",
+      "endDate": "2023",
+      "institution": "Plataforma Aprende+",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Psicología",
+      "endDate": "2021",
+      "institution": "Universidad Tecnológica del Altiplano",
+      "startDate": "2015",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "SAP SuccessFactors"
+    },
+    {
+      "name": "Workday"
+    },
+    {
+      "name": "Legislación laboral"
+    },
+    {
+      "name": "Reclutamiento y selección"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Excel avanzado"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-06",
+      "highlights": ["Selección de 46 perfiles técnicos y comerciales por año."],
+      "location": "Bogotá",
+      "name": "Servicios Financieros del Valle S.A.S.",
+      "position": "Analista de Selección",
+      "startDate": "2024-10"
+    },
+    {
+      "endDate": "2024-09",
+      "highlights": ["Implementación de la evaluación de desempeño 360°."],
+      "location": "Bogotá",
+      "name": "Consultora del Valle Ltda.",
+      "position": "Asistente de Recursos Humanos",
+      "startDate": "2021-04"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Bogotá D.C.",
+      "city": "Bogotá",
+      "countryCode": "CO",
+      "raw": "Bogotá, Bogotá D.C., Colombia"
+    }
+  }
+}

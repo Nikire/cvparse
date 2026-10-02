@@ -1,0 +1,131 @@
+{
+  "basics": {
+    "email": "srestrepo@example.com",
+    "label": "Docente",
+    "location": {
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "region": "Atlántico"
+    },
+    "name": "Sebastián Restrepo Patiño",
+    "phone": "+57 380 884 9917",
+    "summary": "Docente con 7 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": null,
+      "institution": "Universidad Pontificia del Valle de Aburrá",
+      "startDate": "2022",
+      "studyType": "Doctorado"
+    },
+    {
+      "area": "Educación",
+      "endDate": "2021",
+      "institution": "Universidad Tecnológica del Altiplano",
+      "startDate": "2019",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Letras",
+      "endDate": "2018",
+      "institution": "Fundación Universitaria Andina del Café",
+      "startDate": "2012",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "B1",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Moodle"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Investigación educativa"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Dirección de 9 tesis de grado.",
+        "Implementación de aulas virtuales en Moodle."
+      ],
+      "location": "Medellín",
+      "name": "Universidad del Delta Paisa",
+      "position": "Coordinador Académico",
+      "startDate": "2023-07"
+    },
+    {
+      "endDate": "2023-04",
+      "highlights": ["Dictado de clases a 5 cursos de nivel secundario."],
+      "location": "Remoto",
+      "name": "Instituto Belgrano del Caribe",
+      "position": "Profesor de Matemática",
+      "startDate": "2021-10"
+    },
+    {
+      "endDate": "2021-07",
+      "highlights": ["Coordinación del área de ciencias con 6 docentes."],
+      "location": "Barranquilla",
+      "name": "Colegio Santa Inés Paisa",
+      "position": "Docente de Nivel Secundario",
+      "startDate": "2019-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Doctorado",
+        "level": "doctorate",
+        "original": "Doctorado"
+      },
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Atlántico",
+      "city": "Barranquilla",
+      "countryCode": "CO",
+      "raw": "Barranquilla, Atlántico, Colombia"
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "basics": {
+    "email": "florenciaferreyra14@example.org",
+    "label": "Docente",
+    "location": {
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "region": "CABA"
+    },
+    "name": "Florencia Agustina Ferreyra Benítez",
+    "phone": "+54 9 11 8947-7166",
+    "summary": "Docente con 8 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Moodle para Docentes",
+      "endDate": "2024",
+      "institution": "Academia Código Libre",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Ciencias de la Educación",
+      "endDate": "2018",
+      "institution": "Universidad Nacional de la Pampa Húmeda",
+      "startDate": "2012",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "B2",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Investigación educativa"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Moodle"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Dictado de clases a 6 cursos de nivel secundario.",
+        "Coordinación del área de ciencias con 2 docentes."
+      ],
+      "location": "Buenos Aires",
+      "name": "Liceo del Litoral",
+      "position": "Profesora Adjunta",
+      "startDate": "2024-04"
+    },
+    {
+      "endDate": "2023-12",
+      "highlights": [
+        "Implementación de aulas virtuales en Moodle.",
+        "Dirección de 7 tesis de grado."
+      ],
+      "location": "Córdoba",
+      "name": "Universidad del Delta del Plata",
+      "position": "Coordinadora Académica",
+      "startDate": "2022-03"
+    },
+    {
+      "endDate": "2022-02",
+      "highlights": [
+        "Diseño de planificaciones y materiales didácticos digitales.",
+        "Dirección de 5 tesis de grado.",
+        "Coordinación del área de ciencias con 3 docentes."
+      ],
+      "location": "Buenos Aires",
+      "name": "Instituto Belgrano del Litoral",
+      "position": "Profesora de Matemática",
+      "startDate": "2018-05"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "CABA",
+      "city": "Buenos Aires",
+      "countryCode": "AR",
+      "raw": "Buenos Aires, CABA, Argentina"
+    }
+  }
+}

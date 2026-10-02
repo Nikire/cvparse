@@ -1,0 +1,129 @@
+{
+  "basics": {
+    "email": "lucia.serrano@example.org",
+    "label": "Ejecutiva Comercial",
+    "location": {
+      "city": "Madrid",
+      "countryCode": "ES",
+      "region": "Comunidad de Madrid"
+    },
+    "name": "Lucía Serrano",
+    "phone": "+34 622 015 842",
+    "summary": "Ejecutiva Comercial con 8 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Marketing Digital",
+      "endDate": "2024",
+      "institution": "Laboratorio Digital Latam",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Marketing",
+      "endDate": "2018",
+      "institution": "Universidad de la Ribera",
+      "startDate": "2014",
+      "studyType": "Grado"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Salesforce"
+    },
+    {
+      "name": "Prospección B2B"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "HubSpot"
+    },
+    {
+      "name": "Gestión de cartera"
+    },
+    {
+      "name": "Atención al cliente"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Gestión de una cartera de 92 clientes corporativos.",
+        "Cumplimiento del 23% de la meta anual de ventas.",
+        "Apertura de 5 cuentas nuevas en el sector salud."
+      ],
+      "location": "Bilbao",
+      "name": "Alimentos del Mediterráneo S.L.",
+      "position": "Ejecutiva de Cuentas Senior",
+      "startDate": "2025"
+    },
+    {
+      "endDate": "2024",
+      "highlights": [
+        "Capacitación de 9 asesores comerciales nuevos.",
+        "Negociación de contratos marco con cadenas de retail."
+      ],
+      "location": "Madrid",
+      "name": "Grupo Logístico del Cantábrico S.A.",
+      "position": "Ejecutiva de Cuentas",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022",
+      "highlights": [
+        "Negociación de contratos marco con cadenas de retail.",
+        "Gestión de una cartera de 53 clientes corporativos.",
+        "Capacitación de 6 asesores comerciales nuevos."
+      ],
+      "location": "Sevilla",
+      "name": "Maquinarias del Mediterráneo S.L.",
+      "position": "Asesora Comercial",
+      "startDate": "2018"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Grado",
+        "level": "bachelor",
+        "original": "Grado"
+      }
+    ],
+    "location": {
+      "adminRegion": "Comunidad de Madrid",
+      "city": "Madrid",
+      "countryCode": "ES",
+      "raw": "Madrid, Comunidad de Madrid, España"
+    }
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "basics": {
+    "email": "aquispe@example.org",
+    "label": "Contador",
+    "location": {
+      "city": "Cusco",
+      "countryCode": "PE",
+      "region": "Cusco"
+    },
+    "name": "Álex Quispe",
+    "phone": "+51 913 986 032",
+    "summary": "Contador con 11 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "NIIF para Pymes",
+      "endDate": "2017",
+      "institution": "Universidad Andina de Chachani",
+      "startDate": "2016",
+      "studyType": "Diplomado"
+    },
+    {
+      "area": "Contabilidad",
+      "endDate": "2014",
+      "institution": "Universidad Nacional del Rímac",
+      "startDate": "2009",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "C1",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Quechua"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "Costos"
+    },
+    {
+      "name": "NIIF"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    },
+    {
+      "name": "Impuestos"
+    },
+    {
+      "name": "SAP FI"
+    },
+    {
+      "name": "Presupuestos"
+    },
+    {
+      "name": "Excel avanzado"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-01",
+      "highlights": [
+        "Cierres contables mensuales y estados financieros bajo NIIF.",
+        "Reducción del cierre mensual de 4 a 3 días hábiles.",
+        "Liquidación de impuestos y presentación de declaraciones juradas."
+      ],
+      "location": "Remoto",
+      "name": "Constructora del Pacífico E.I.R.L.",
+      "position": "Jefe de Contabilidad",
+      "startDate": "2024-02"
+    },
+    {
+      "endDate": "2023-11",
+      "highlights": [
+        "Conciliaciones bancarias de 6 cuentas corrientes.",
+        "Coordinación con auditores externos en la auditoría anual.",
+        "Reducción del cierre mensual de 5 a 3 días hábiles."
+      ],
+      "location": "Remoto",
+      "name": "Auditores del Rímac S.A.",
+      "position": "Contador Senior",
+      "startDate": "2021-02"
+    },
+    {
+      "endDate": "2020-10",
+      "highlights": [
+        "Liquidación de impuestos y presentación de declaraciones juradas.",
+        "Coordinación con auditores externos en la auditoría anual."
+      ],
+      "location": "Cusco",
+      "name": "Estudio Contable del Pacífico S.A.C.",
+      "position": "Analista Contable",
+      "startDate": "2019-01"
+    },
+    {
+      "endDate": "2018-11",
+      "highlights": [
+        "Cierres contables mensuales y estados financieros bajo NIIF.",
+        "Conciliaciones bancarias de 9 cuentas corrientes."
+      ],
+      "location": "Cusco",
+      "name": "Agroindustrias Inca E.I.R.L.",
+      "position": "Auxiliar Contable",
+      "startDate": "2015-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Diplomado",
+        "level": "course",
+        "original": "Diplomado"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Cusco",
+      "city": "Cusco",
+      "countryCode": "PE",
+      "raw": "Cusco, Perú"
+    }
+  }
+}

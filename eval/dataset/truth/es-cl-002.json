@@ -1,0 +1,96 @@
+{
+  "basics": {
+    "email": "constanza_nunez@example.com",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Antofagasta",
+      "countryCode": "CL",
+      "region": "Antofagasta"
+    },
+    "name": "Constanza Trinidad Núñez",
+    "phone": "+56 9 4041 8769",
+    "summary": "Analista de Recursos Humanos con 5 años de experiencia en selección, desarrollo y clima organizacional. Acompaño a líderes en la gestión de equipos y procesos de cambio."
+  },
+  "education": [
+    {
+      "area": "Administración de Personal",
+      "endDate": "2020",
+      "institution": "Instituto Profesional del Pacífico",
+      "startDate": "2017",
+      "studyType": "Técnico de Nivel Superior"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Legislación laboral"
+    },
+    {
+      "name": "Workday"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Liquidación de sueldos"
+    },
+    {
+      "name": "SAP SuccessFactors"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": [
+        "Implementación de la evaluación de desempeño 360°.",
+        "Diseño del programa de onboarding y clima laboral."
+      ],
+      "location": "Antofagasta",
+      "name": "Consultora de los Andes SpA",
+      "position": "Analista de Recursos Humanos",
+      "startDate": "2025"
+    },
+    {
+      "endDate": "2025",
+      "highlights": [
+        "Selección de 39 perfiles técnicos y comerciales por año.",
+        "Liquidación de haberes para 31 colaboradores."
+      ],
+      "location": "Concepción",
+      "name": "Retail Austral SpA",
+      "position": "Analista de Selección",
+      "startDate": "2021"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Técnico",
+        "level": "technical",
+        "original": "Técnico de Nivel Superior"
+      }
+    ],
+    "location": {
+      "adminRegion": "Antofagasta",
+      "city": "Antofagasta",
+      "countryCode": "CL",
+      "raw": "Antofagasta, Chile"
+    }
+  }
+}

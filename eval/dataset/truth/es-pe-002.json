@@ -1,0 +1,110 @@
+{
+  "basics": {
+    "email": "gabriela.quispe@example.org",
+    "label": "Diseñadora UX/UI",
+    "location": {
+      "city": "Lima",
+      "countryCode": "PE",
+      "region": "Lima"
+    },
+    "name": "Gabriela Quispe Ccori",
+    "phone": "+51 979 713 662",
+    "summary": "Diseñadora UX/UI con 7 años de experiencia en productos digitales para fintech y e-commerce. Combino investigación con usuarios, prototipado y sistemas de diseño escalables."
+  },
+  "education": [
+    {
+      "area": "Diseño Gráfico",
+      "endDate": "2019-12",
+      "institution": "Universidad Peruana de Ciencias del Pacífico",
+      "startDate": "2015-03",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Portugués"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Adobe Illustrator"
+    },
+    {
+      "name": "Investigación con usuarios"
+    },
+    {
+      "name": "HTML y CSS"
+    },
+    {
+      "name": "Figma"
+    },
+    {
+      "name": "Accesibilidad web"
+    },
+    {
+      "name": "Prototipado"
+    },
+    {
+      "name": "Tipografía"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Diseño del checkout y la búsqueda con filtros.",
+        "Identidad visual para 7 marcas de consumo masivo."
+      ],
+      "location": "Remoto",
+      "name": "Estudio Creativo del Rímac E.I.R.L.",
+      "position": "Product Designer",
+      "startDate": "2024-02"
+    },
+    {
+      "endDate": "2023-12",
+      "highlights": [
+        "Creación de un design system usado por 3 equipos.",
+        "Rediseño del onboarding móvil que subió la conversión al 99%."
+      ],
+      "location": "Lima",
+      "name": "Banco Digital del Rímac S.A.",
+      "position": "Diseñadora UX/UI",
+      "startDate": "2021-12"
+    },
+    {
+      "endDate": "2021-11",
+      "highlights": [
+        "Investigación con usuarios y pruebas de usabilidad quincenales.",
+        "Diseño del checkout y la búsqueda con filtros."
+      ],
+      "location": "Remoto",
+      "name": "Agencia Digital del Pacífico S.A.C.",
+      "position": "Diseñadora Gráfica",
+      "startDate": "2019-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Lima",
+      "city": "Lima",
+      "countryCode": "PE",
+      "raw": "Lima, Perú"
+    }
+  }
+}

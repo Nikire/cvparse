@@ -1,0 +1,107 @@
+{
+  "basics": {
+    "email": "javiergarcia37@example.org",
+    "label": "Contador",
+    "location": {
+      "city": "Barcelona",
+      "countryCode": "ES",
+      "region": "Cataluña"
+    },
+    "name": "Javier García",
+    "phone": "+34 610 432 909",
+    "summary": "Contador con 7 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "Contabilidad",
+      "endDate": "2018",
+      "institution": "Centro de FP Mediterráneo",
+      "startDate": "2015",
+      "studyType": "Técnico Superior"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado (C1)",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "B1",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "SAP FI"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Presupuestos"
+    },
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "Impuestos"
+    },
+    {
+      "name": "NIIF"
+    },
+    {
+      "name": "Power BI"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Reducción del cierre mensual de 3 a 3 días hábiles."],
+      "location": "Barcelona",
+      "name": "Constructora del Ebro S.A.",
+      "position": "Jefe de Contabilidad",
+      "startDate": "2024-09"
+    },
+    {
+      "endDate": "2024-06",
+      "highlights": ["Coordinación con auditores externos en la auditoría anual."],
+      "location": "Barcelona",
+      "name": "Agroindustrias del Ebro S.L.",
+      "position": "Contador Senior",
+      "startDate": "2021-12"
+    },
+    {
+      "endDate": "2021-09",
+      "highlights": [
+        "Conciliaciones bancarias de 5 cuentas corrientes.",
+        "Liquidación de impuestos y presentación de declaraciones juradas."
+      ],
+      "location": "Barcelona",
+      "name": "Farmacéutica de Levante S.A.",
+      "position": "Analista Contable",
+      "startDate": "2018-12"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Técnico Superior",
+        "level": "technical",
+        "original": "Técnico Superior"
+      }
+    ],
+    "location": {
+      "adminRegion": "Cataluña",
+      "city": "Barcelona",
+      "countryCode": "ES",
+      "raw": "Barcelona, Cataluña, España"
+    }
+  }
+}

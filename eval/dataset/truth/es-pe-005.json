@@ -1,0 +1,123 @@
+{
+  "basics": {
+    "email": "renzo_huaman@example.com",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Trujillo",
+      "countryCode": "PE",
+      "region": "La Libertad"
+    },
+    "name": "Renzo César Huamán Ccori",
+    "phone": "+51 957 049 533",
+    "summary": "Analista de Datos con 5 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Power BI",
+      "endDate": "2023-12",
+      "institution": "Universidad Peruana de Ciencias del Pacífico",
+      "startDate": "2022-03",
+      "studyType": "Diplomado"
+    },
+    {
+      "area": "Industrial",
+      "endDate": "2020-12",
+      "institution": "Universidad Nacional del Rímac",
+      "startDate": "2014-03",
+      "studyType": "Ingeniería"
+    },
+    {
+      "area": "Machine Learning",
+      "endDate": "2020-02",
+      "institution": "Instituto de Formación Continua",
+      "studyType": "Curso"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Python"
+    },
+    {
+      "name": "Airflow"
+    },
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "BigQuery"
+    },
+    {
+      "name": "pandas"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Spark"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-07",
+      "highlights": ["Pronóstico de demanda con un error medio del 6%."],
+      "location": "Trujillo",
+      "name": "Datos Inca E.I.R.L.",
+      "position": "Científico de Datos",
+      "startDate": "2025-05"
+    },
+    {
+      "endDate": "2025-03",
+      "highlights": [
+        "Modelos de scoring crediticio con Python y SQL.",
+        "Tableros de seguimiento comercial en Power BI para 3 gerencias."
+      ],
+      "location": "Lima",
+      "name": "Seguros de los Andes E.I.R.L.",
+      "position": "Analista de Datos Sr.",
+      "startDate": "2022-09"
+    },
+    {
+      "endDate": "2022-08",
+      "highlights": ["Automatización de cargas ETL que ahorró 20 horas mensuales."],
+      "location": "Trujillo",
+      "name": "Analítica del Rímac S.A.",
+      "position": "Analista de Datos",
+      "startDate": "2020-11"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Diplomado",
+        "level": "course",
+        "original": "Diplomado"
+      },
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      },
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      }
+    ],
+    "location": {
+      "adminRegion": "La Libertad",
+      "city": "Trujillo",
+      "countryCode": "PE",
+      "raw": "Trujillo, La Libertad, Perú"
+    }
+  }
+}

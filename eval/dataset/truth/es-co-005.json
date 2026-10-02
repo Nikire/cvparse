@@ -1,0 +1,141 @@
+{
+  "basics": {
+    "email": "andres_munoz@example.org",
+    "label": "Docente",
+    "location": {
+      "city": "Cali",
+      "countryCode": "CO",
+      "region": "Valle del Cauca"
+    },
+    "name": "Andrés Muñoz Gómez",
+    "phone": "+57 317 234 3032",
+    "summary": "Docente con 8 años de experiencia en enseñanza, planificación curricular e investigación educativa. Me interesa la innovación pedagógica con tecnología."
+  },
+  "education": [
+    {
+      "area": "Educación",
+      "endDate": "2023-11",
+      "institution": "Universidad Tecnológica del Altiplano",
+      "startDate": "2021-02",
+      "studyType": "Maestría"
+    },
+    {
+      "area": "Educación Inclusiva",
+      "endDate": "2023-10",
+      "institution": "Academia Código Libre",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Matemática",
+      "endDate": "2018-11",
+      "institution": "Universidad Pontificia del Valle de Aburrá",
+      "startDate": "2014-02",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio (B1)",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Planificación didáctica"
+    },
+    {
+      "name": "Tutoría"
+    },
+    {
+      "name": "Educación inclusiva"
+    },
+    {
+      "name": "Evaluación por competencias"
+    },
+    {
+      "name": "Google Classroom"
+    },
+    {
+      "name": "Moodle"
+    },
+    {
+      "name": "Oratoria"
+    },
+    {
+      "name": "Investigación educativa"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Dictado de clases a 9 cursos de nivel secundario.",
+        "Diseño de planificaciones y materiales didácticos digitales.",
+        "Implementación de aulas virtuales en Moodle."
+      ],
+      "location": "Medellín",
+      "name": "Colegio Santa Inés de los Andes",
+      "position": "Profesor Adjunto",
+      "startDate": "2025-04"
+    },
+    {
+      "endDate": "2024-12",
+      "highlights": [
+        "Dirección de 7 tesis de grado.",
+        "Coordinación del área de ciencias con 3 docentes."
+      ],
+      "location": "Cali",
+      "name": "Escuela Técnica Paisa",
+      "position": "Coordinador Académico",
+      "startDate": "2023-07"
+    },
+    {
+      "endDate": "2023-05",
+      "highlights": [
+        "Implementación de aulas virtuales en Moodle.",
+        "Dictado de clases a 3 cursos de nivel secundario."
+      ],
+      "location": "Remoto",
+      "name": "Instituto Belgrano del Caribe",
+      "position": "Profesor de Matemática",
+      "startDate": "2020-12"
+    },
+    {
+      "endDate": "2020-08",
+      "highlights": ["Coordinación del área de ciencias con 7 docentes."],
+      "location": "Cali",
+      "name": "Universidad del Delta del Valle",
+      "position": "Docente de Nivel Secundario",
+      "startDate": "2018-02"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Maestría"
+      },
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Valle del Cauca",
+      "city": "Cali",
+      "countryCode": "CO",
+      "raw": "Cali, Valle del Cauca, Colombia"
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "basics": {
+    "email": "vicente.sepulveda@example.com",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Concepción",
+      "countryCode": "CL",
+      "region": "Biobío"
+    },
+    "name": "Vicente Sepúlveda Díaz",
+    "phone": "+56 9 2532 2161",
+    "summary": "Analista de Datos con 6 años de experiencia transformando datos en decisiones de negocio. Experiencia en modelado estadístico, visualización y automatización de reportes."
+  },
+  "education": [
+    {
+      "area": "Estadística",
+      "endDate": null,
+      "institution": "Universidad del Estrecho Austral",
+      "startDate": "2024",
+      "studyType": "Doctorado"
+    },
+    {
+      "area": "Estadística Aplicada",
+      "endDate": "2024",
+      "institution": "Universidad Técnica del Pacífico Sur",
+      "startDate": "2022",
+      "studyType": "Magíster"
+    },
+    {
+      "area": "Estadística",
+      "endDate": "2020",
+      "institution": "Pontificia Universidad de los Andes Australes",
+      "startDate": "2014",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "pandas"
+    },
+    {
+      "name": "scikit-learn"
+    },
+    {
+      "name": "dbt"
+    },
+    {
+      "name": "R"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Python"
+    },
+    {
+      "name": "Tableau"
+    },
+    {
+      "name": "Airflow"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Automatización de cargas ETL que ahorró 64 horas mensuales.",
+        "Pronóstico de demanda con un error medio del 4%."
+      ],
+      "location": "Remoto",
+      "name": "Telecom del Pacífico SpA",
+      "position": "Analista de Datos Sr.",
+      "startDate": "2022"
+    },
+    {
+      "endDate": "2022-05",
+      "highlights": ["Gobierno de datos y documentación del catálogo corporativo."],
+      "location": "Concepción",
+      "name": "Analítica del Norte Grande S.A.",
+      "position": "Analista de Datos",
+      "startDate": "2020-07"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Doctorado",
+        "level": "doctorate",
+        "original": "Doctorado"
+      },
+      {
+        "canonical": "Maestría",
+        "level": "master",
+        "original": "Magíster"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Biobío",
+      "city": "Concepción",
+      "countryCode": "CL",
+      "raw": "Concepción, Biobío, Chile"
+    }
+  }
+}

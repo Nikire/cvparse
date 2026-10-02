@@ -1,0 +1,132 @@
+{
+  "basics": {
+    "email": "esteban_rios@example.org",
+    "label": "Ejecutivo Comercial",
+    "location": {
+      "city": "Cali",
+      "countryCode": "CO",
+      "region": "Valle del Cauca"
+    },
+    "name": "Esteban Ríos",
+    "phone": "+57 338 212 0295",
+    "summary": "Ejecutivo Comercial con 13 años de experiencia en ventas consultivas B2B. Orientación a resultados, relación de largo plazo con clientes y cumplimiento de metas."
+  },
+  "education": [
+    {
+      "area": "Gerencia Comercial",
+      "endDate": "2017-11",
+      "institution": "Fundación Universitaria Andina del Café",
+      "startDate": "2016-02",
+      "studyType": "Especialización"
+    },
+    {
+      "area": "Comercio Internacional",
+      "endDate": "2013-11",
+      "institution": "Universidad Pontificia del Valle de Aburrá",
+      "startDate": "2008-02",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Salesforce"
+    },
+    {
+      "name": "Negociación"
+    },
+    {
+      "name": "Presentaciones ejecutivas"
+    },
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Pronóstico de ventas"
+    },
+    {
+      "name": "Atención al cliente"
+    },
+    {
+      "name": "Prospección B2B"
+    },
+    {
+      "name": "Gestión de cartera"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-03",
+      "highlights": [
+        "Gestión de una cartera de 26 clientes corporativos.",
+        "Negociación de contratos marco con cadenas de retail."
+      ],
+      "location": "Remoto",
+      "name": "Alimentos de los Andes Ltda.",
+      "position": "Jefe de Ventas",
+      "startDate": "2023-02"
+    },
+    {
+      "endDate": "2022-10",
+      "highlights": [
+        "Capacitación de 5 asesores comerciales nuevos.",
+        "Apertura de 9 cuentas nuevas en el sector salud."
+      ],
+      "location": "Bucaramanga",
+      "name": "Software Empresarial Paisa Ltda.",
+      "position": "Ejecutivo de Cuentas Senior",
+      "startDate": "2018-12"
+    },
+    {
+      "endDate": "2018-09",
+      "highlights": [
+        "Cumplimiento del 92% de la meta anual de ventas.",
+        "Apertura de 3 cuentas nuevas en el sector salud."
+      ],
+      "location": "Cali",
+      "name": "Grupo Logístico del Valle Ltda.",
+      "position": "Ejecutivo de Cuentas",
+      "startDate": "2017-06"
+    },
+    {
+      "endDate": "2017-04",
+      "highlights": [
+        "Capacitación de 8 asesores comerciales nuevos.",
+        "Negociación de contratos marco con cadenas de retail."
+      ],
+      "location": "Cali",
+      "name": "Distribuidora de los Andes S.A.",
+      "position": "Asesor Comercial",
+      "startDate": "2013-04"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Especialización",
+        "level": "postgraduate",
+        "original": "Especialización"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Valle del Cauca",
+      "city": "Cali",
+      "countryCode": "CO",
+      "raw": "Cali, Valle del Cauca, Colombia"
+    }
+  }
+}

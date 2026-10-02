@@ -81,7 +81,11 @@
     "postversion": "echo Now run: git push --follow-tags",
     "fixtures:docx": "node scripts/fixtures/make-docx-fixtures.mjs",
     "fixtures:pdf": "node scripts/fixtures/make-pdf-fixtures.mjs",
-    "fixtures:image": "node scripts/fixtures/make-image-fixtures.mjs"
+    "fixtures:image": "node scripts/fixtures/make-image-fixtures.mjs",
+    "eval:dataset": "tsx eval/generate/index.ts",
+    "eval": "tsx eval/run/index.ts",
+    "eval:report": "tsx eval/report/index.ts",
+    "eval:baselines:setup": "tsx eval/baselines/setup.ts"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.61",

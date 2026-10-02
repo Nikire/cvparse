@@ -1,0 +1,113 @@
+{
+  "basics": {
+    "email": "fordonez@example.org",
+    "label": "Contadora",
+    "location": {
+      "city": "Mérida",
+      "countryCode": "MX",
+      "region": "Yucatán"
+    },
+    "name": "Fernanda Ordóñez Ramírez",
+    "phone": "+52 999 234 2104",
+    "summary": "Contadora con 8 años de experiencia en contabilidad general, impuestos y cierres mensuales. Manejo de ERP y relación con auditores externos."
+  },
+  "education": [
+    {
+      "area": "Contaduría Pública",
+      "endDate": "2018-06",
+      "institution": "Universidad Autónoma del Bajío Central",
+      "startDate": "2013-08",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Alemán"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "NIIF"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Conciliaciones bancarias"
+    },
+    {
+      "name": "SAP FI"
+    },
+    {
+      "name": "Auditoría"
+    },
+    {
+      "name": "Costos"
+    },
+    {
+      "name": "Presupuestos"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026-08",
+      "highlights": [
+        "Liquidación de impuestos y presentación de declaraciones juradas.",
+        "Conciliaciones bancarias de 9 cuentas corrientes."
+      ],
+      "location": "Mérida",
+      "name": "Constructora del Norte S.A.P.I. de C.V.",
+      "position": "Jefa de Contabilidad",
+      "startDate": "2023-03"
+    },
+    {
+      "endDate": "2022-11",
+      "highlights": [
+        "Coordinación con auditores externos en la auditoría anual.",
+        "Cierres contables mensuales y estados financieros bajo NIIF."
+      ],
+      "location": "Mérida",
+      "name": "Farmacéutica del Norte S. de R.L. de C.V.",
+      "position": "Contadora Senior",
+      "startDate": "2020-05"
+    },
+    {
+      "endDate": "2020-01",
+      "highlights": [
+        "Reducción del cierre mensual de 4 a 3 días hábiles.",
+        "Conciliaciones bancarias de 2 cuentas corrientes."
+      ],
+      "location": "Remoto",
+      "name": "Agroindustrias del Norte S.A. de C.V.",
+      "position": "Analista Contable",
+      "startDate": "2018-01"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Yucatán",
+      "city": "Mérida",
+      "countryCode": "MX",
+      "raw": "Mérida, Yucatán, México"
+    }
+  }
+}

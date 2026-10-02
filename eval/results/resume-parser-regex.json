@@ -1,0 +1,5640 @@
+{
+  "system": {
+    "name": "resume-parser (regex)",
+    "kind": "baseline",
+    "details": {
+      "package": "resume-parser@1.1.0",
+      "license": "ISC",
+      "input": "plain text from cvparse extractText (its textract/pdftotext reader is bypassed)",
+      "dates": "not extracted (sections are raw text)",
+      "command": "npm run eval -- --system resume-parser",
+      "node": "v22.14.0",
+      "hardware": "12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32",
+      "datasetVersion": "1.0.0",
+      "datasetHash": "76c69f1bbc2c5657",
+      "cvparseCommit": "9b4fa8b506c4c8a3f9699c7c4201976261a5d5fa",
+      "cvparseSrcHash": "253c04ad9d9e5715"
+    }
+  },
+  "finishedAt": "2026-10-02T08:42:15.106Z",
+  "cvparseVersion": "0.2.0",
+  "datasetVersion": "1.0.0",
+  "entries": [
+    {
+      "id": "es-ar-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.299
+    },
+    {
+      "id": "es-ar-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.227
+    },
+    {
+      "id": "es-ar-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-ar-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-ar-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-ar-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.353
+    },
+    {
+      "id": "es-ar-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-ar-008",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-ar-009",
+      "ok": false,
+      "error": "unsupported format: image",
+      "skipped": "unsupported-format",
+      "fields": {}
+    },
+    {
+      "id": "es-cl-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.211
+    },
+    {
+      "id": "es-cl-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.211
+    },
+    {
+      "id": "es-cl-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-cl-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-cl-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 7,
+          "tp": 7,
+          "fp": 0,
+          "fn": 0
+        },
+        "languages": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 2,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-cl-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-cl-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-cl-008",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.217
+    },
+    {
+      "id": "es-co-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 9,
+          "tp": 9,
+          "fp": 0,
+          "fn": 0
+        },
+        "languages": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 2,
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "seconds": 0.217
+    },
+    {
+      "id": "es-co-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-co-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-co-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-co-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-co-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-co-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-co-008",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-co-009",
+      "ok": false,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "error": "NO_TEXT_LAYER: No extractable text found: this PDF has no text layer (scanned or image-only) and needs OCR: pass an OCR adapter (library: options.ocr; CLI: --ocr tesseract|textract) or use vision mode (ocr: \"vision\" / --ocr vision).",
+      "seconds": 0.069
+    },
+    {
+      "id": "es-es-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.219
+    },
+    {
+      "id": "es-es-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-es-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-es-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-es-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-es-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-es-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.217
+    },
+    {
+      "id": "es-es-008",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-es-009",
+      "ok": false,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "error": "NO_TEXT_LAYER: No extractable text found: this PDF has no text layer (scanned or image-only) and needs OCR: pass an OCR adapter (library: options.ocr; CLI: --ocr tesseract|textract) or use vision mode (ocr: \"vision\" / --ocr vision).",
+      "seconds": 0.003
+    },
+    {
+      "id": "es-mx-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.207
+    },
+    {
+      "id": "es-mx-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 10,
+          "tp": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-mx-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-mx-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-mx-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-mx-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-mx-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-mx-008",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-mx-009",
+      "ok": false,
+      "error": "unsupported format: image",
+      "skipped": "unsupported-format",
+      "fields": {}
+    },
+    {
+      "id": "es-pe-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-pe-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-pe-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.217
+    },
+    {
+      "id": "es-pe-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-pe-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 7
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.217
+    },
+    {
+      "id": "es-pe-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 10,
+          "tp": 0,
+          "fp": 0,
+          "fn": 10
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-pe-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-pe-008",
+      "ok": false,
+      "error": "unsupported format: image",
+      "skipped": "unsupported-format",
+      "fields": {}
+    },
+    {
+      "id": "es-uy-001",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-uy-002",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.214
+    },
+    {
+      "id": "es-uy-003",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.215
+    },
+    {
+      "id": "es-uy-004",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-uy-005",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 4,
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 9
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.213
+    },
+    {
+      "id": "es-uy-006",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 5
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.218
+    },
+    {
+      "id": "es-uy-007",
+      "ok": true,
+      "fields": {
+        "basics.name": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 1,
+          "fn": 1
+        },
+        "basics.email": {
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
+          "support": 1,
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "basics.phone": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "basics.location": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 1,
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "work.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "work.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 6,
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "education.entries": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.dates": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "skills": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 8,
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "languages": {
+          "precision": 0,
+          "recall": 0,
+          "f1": 0,
+          "support": 2,
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        }
+      },
+      "seconds": 0.216
+    },
+    {
+      "id": "es-uy-008",
+      "ok": false,
+      "error": "unsupported format: image",
+      "skipped": "unsupported-format",
+      "fields": {}
+    }
+  ],
+  "fields": {
+    "basics.name": {
+      "precision": 0.05555555555555555,
+      "recall": 0.05357142857142857,
+      "f1": 0.05454545454545454,
+      "support": 56,
+      "tp": 3,
+      "fp": 51,
+      "fn": 53
+    },
+    "basics.email": {
+      "precision": 1,
+      "recall": 0.9642857142857143,
+      "f1": 0.9818181818181818,
+      "support": 56,
+      "tp": 54,
+      "fp": 0,
+      "fn": 2
+    },
+    "basics.phone": {
+      "precision": 1,
+      "recall": 0.35714285714285715,
+      "f1": 0.5263157894736842,
+      "support": 56,
+      "tp": 20,
+      "fp": 0,
+      "fn": 36
+    },
+    "basics.location": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "support": 56,
+      "tp": 0,
+      "fp": 0,
+      "fn": 56
+    },
+    "work.entries": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "support": 153,
+      "tp": 0,
+      "fp": 0,
+      "fn": 153
+    },
+    "work.dates": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "support": 306,
+      "tp": 0,
+      "fp": 0,
+      "fn": 306
+    },
+    "education.entries": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "support": 108,
+      "tp": 0,
+      "fp": 0,
+      "fn": 108
+    },
+    "education.dates": {
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "support": 194,
+      "tp": 0,
+      "fp": 0,
+      "fn": 194
+    },
+    "skills": {
+      "precision": 1,
+      "recall": 0.03669724770642202,
+      "f1": 0.07079646017699115,
+      "support": 436,
+      "tp": 16,
+      "fp": 0,
+      "fn": 420
+    },
+    "languages": {
+      "precision": 1,
+      "recall": 0.03007518796992481,
+      "f1": 0.058394160583941604,
+      "support": 133,
+      "tp": 4,
+      "fp": 0,
+      "fn": 129
+    }
+  },
+  "overallF1": 0.16918700465982534,
+  "attempted": 56,
+  "byLayout": {
+    "academic": {
+      "entries": 4,
+      "attempted": 4,
+      "overallF1": 0.16666666666666666
+    },
+    "functional": {
+      "entries": 4,
+      "attempted": 4,
+      "overallF1": 0.13999999999999999
+    },
+    "scanned": {
+      "entries": 6,
+      "attempted": 2,
+      "overallF1": 0
+    },
+    "sidebar": {
+      "entries": 8,
+      "attempted": 8,
+      "overallF1": 0.15454545454545454
+    },
+    "single-column": {
+      "entries": 17,
+      "attempted": 17,
+      "overallF1": 0.18457201713015664
+    },
+    "table": {
+      "entries": 6,
+      "attempted": 6,
+      "overallF1": 0.15
+    },
+    "textbox": {
+      "entries": 4,
+      "attempted": 4,
+      "overallF1": 0.21071428571428572
+    },
+    "two-column": {
+      "entries": 11,
+      "attempted": 11,
+      "overallF1": 0.17151515151515154
+    }
+  },
+  "byFormat": {
+    "docx": {
+      "entries": 16,
+      "attempted": 16,
+      "overallF1": 0.18786485910905476
+    },
+    "image": {
+      "entries": 4,
+      "attempted": 0,
+      "overallF1": null
+    },
+    "pdf": {
+      "entries": 40,
+      "attempted": 40,
+      "overallF1": 0.16137539609237722
+    }
+  },
+  "totalSeconds": 12
+}

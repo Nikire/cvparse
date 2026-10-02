@@ -1,0 +1,112 @@
+{
+  "basics": {
+    "email": "valentina.valencia@example.org",
+    "label": "Analista de Recursos Humanos",
+    "location": {
+      "city": "Cali",
+      "countryCode": "CO",
+      "region": "Valle del Cauca"
+    },
+    "name": "Valentina Valencia Restrepo",
+    "phone": "+57 322 949 1310",
+    "summary": "Analista de Recursos Humanos con 3 años de experiencia en selección, desarrollo y clima organizacional. Acompaño a líderes en la gestión de equipos y procesos de cambio."
+  },
+  "education": [
+    {
+      "area": "People Analytics",
+      "endDate": "2023",
+      "institution": "Instituto de Formación Continua",
+      "studyType": "Curso"
+    },
+    {
+      "area": "Psicología",
+      "endDate": "2022",
+      "institution": "Universidad Nacional del Magdalena Medio",
+      "startDate": "2017",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Intermedio",
+      "language": "Inglés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Excel avanzado"
+    },
+    {
+      "name": "Entrevistas por competencias"
+    },
+    {
+      "name": "Clima laboral"
+    },
+    {
+      "name": "Capacitación"
+    },
+    {
+      "name": "Reclutamiento y selección"
+    },
+    {
+      "name": "Workday"
+    },
+    {
+      "name": "Liquidación de sueldos"
+    },
+    {
+      "name": "Legislación laboral"
+    },
+    {
+      "name": "SAP SuccessFactors"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": [
+        "Liquidación de haberes para 55 colaboradores.",
+        "Implementación de la evaluación de desempeño 360°."
+      ],
+      "location": "Cali",
+      "name": "Grupo Industrial Paisa Ltda.",
+      "position": "Analista de Recursos Humanos",
+      "startDate": "2026-01"
+    },
+    {
+      "endDate": "2025-12",
+      "highlights": [
+        "Diseño del programa de onboarding y clima laboral.",
+        "Reducción de la rotación voluntaria del 2%."
+      ],
+      "location": "Cali",
+      "name": "Consultora del Valle S.A.",
+      "position": "Analista de Selección",
+      "startDate": "2022-11"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Curso",
+        "level": "course",
+        "original": "Curso"
+      },
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Valle del Cauca",
+      "city": "Cali",
+      "countryCode": "CO",
+      "raw": "Cali, Valle del Cauca, Colombia"
+    }
+  }
+}

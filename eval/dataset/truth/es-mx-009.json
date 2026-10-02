@@ -1,0 +1,100 @@
+{
+  "basics": {
+    "email": "hector_ochoa@example.org",
+    "label": "Analista de Datos",
+    "location": {
+      "city": "Puebla",
+      "countryCode": "MX",
+      "region": "Puebla"
+    },
+    "name": "Héctor Emiliano Ochoa Arreola",
+    "phone": "+52 222 436 3119"
+  },
+  "education": [
+    {
+      "area": "Ciencia de Datos",
+      "endDate": "2025",
+      "institution": "Escuela de Negocios del Sur",
+      "studyType": "Bootcamp"
+    },
+    {
+      "area": "Industrial",
+      "endDate": "2018",
+      "institution": "Universidad Popular de Tlaxcalpan",
+      "startDate": "2012",
+      "studyType": "Ingeniería"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "Básico",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "BigQuery"
+    },
+    {
+      "name": "SQL"
+    },
+    {
+      "name": "Power BI"
+    },
+    {
+      "name": "Spark"
+    },
+    {
+      "name": "Python"
+    },
+    {
+      "name": "Airflow"
+    }
+  ],
+  "work": [
+    {
+      "endDate": "2026",
+      "highlights": ["Modelos de scoring crediticio con Python y SQL."],
+      "location": "Puebla",
+      "name": "Banco Digital del Pacífico S.A.P.I. de C.V.",
+      "position": "Analista de Datos",
+      "startDate": "2023"
+    },
+    {
+      "endDate": "2023",
+      "highlights": ["Automatización de cargas ETL que ahorró 30 horas mensuales."],
+      "location": "Puebla",
+      "name": "Seguros Azteca S.A.P.I. de C.V.",
+      "position": "Analista de Datos Jr.",
+      "startDate": "2019"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Bootcamp",
+        "level": "course",
+        "original": "Bootcamp"
+      },
+      {
+        "canonical": "Ingeniería",
+        "level": "bachelor",
+        "original": "Ingeniería"
+      }
+    ],
+    "location": {
+      "adminRegion": "Puebla",
+      "city": "Puebla",
+      "countryCode": "MX",
+      "raw": "Puebla, México"
+    }
+  }
+}

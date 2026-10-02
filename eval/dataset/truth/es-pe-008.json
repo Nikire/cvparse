@@ -1,0 +1,89 @@
+{
+  "basics": {
+    "email": "jhon_ccori@example.com",
+    "label": "Enfermero",
+    "location": {
+      "city": "Cusco",
+      "countryCode": "PE",
+      "region": "Cusco"
+    },
+    "name": "Jhon Ccori Gutiérrez",
+    "phone": "+51 983 742 473"
+  },
+  "education": [
+    {
+      "area": "Enfermería",
+      "endDate": "2020",
+      "institution": "Universidad Andina de Chachani",
+      "startDate": "2014",
+      "studyType": "Licenciatura"
+    }
+  ],
+  "languages": [
+    {
+      "fluency": "Nativo",
+      "language": "Español"
+    },
+    {
+      "fluency": "Avanzado",
+      "language": "Inglés"
+    },
+    {
+      "fluency": "A2",
+      "language": "Francés"
+    }
+  ],
+  "skills": [
+    {
+      "name": "Curación de heridas"
+    },
+    {
+      "name": "Historia clínica electrónica"
+    },
+    {
+      "name": "RCP avanzada"
+    },
+    {
+      "name": "Administración de medicamentos"
+    },
+    {
+      "name": "Atención domiciliaria"
+    },
+    {
+      "name": "Cuidados intensivos"
+    }
+  ],
+  "work": [
+    {
+      "endDate": null,
+      "highlights": ["Capacitación al personal en bioseguridad."],
+      "location": "Cusco",
+      "name": "Clínica Santa Brígida del Rímac",
+      "position": "Enfermero Asistencial",
+      "startDate": "2022-06"
+    },
+    {
+      "endDate": "2022-02",
+      "highlights": ["Registro clínico en historia electrónica."],
+      "location": "Cusco",
+      "name": "Clínica del Parque del Pacífico",
+      "position": "Enfermero de Terapia Intensiva",
+      "startDate": "2020-08"
+    }
+  ],
+  "x_cvparse": {
+    "educationLevels": [
+      {
+        "canonical": "Licenciatura",
+        "level": "bachelor",
+        "original": "Licenciatura"
+      }
+    ],
+    "location": {
+      "adminRegion": "Cusco",
+      "city": "Cusco",
+      "countryCode": "PE",
+      "raw": "Cusco, Perú"
+    }
+  }
+}

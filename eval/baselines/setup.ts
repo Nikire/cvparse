@@ -1,0 +1,188 @@
+/**
+ * Fetches the third-party baselines into eval/.cache/ (gitignored). Run with
+ * `npm run eval:baselines:setup`. Idempotent: re-running with the pinned versions is a no-op.
+ *
+ * - open-resume (AGPL-3.0): shallow-cloned at a pinned commit. Its code is never committed to this
+ *   repo. The parser modules we need are then copied into eval/.cache/open-resume-node/ with their
+ *   `lib/...` path-alias imports rewritten to relative `.ts` imports, so plain tsx/vitest can load
+ *   them. The cloned files themselves are left untouched.
+ * - resume-parser (ISC): the npm tarball at a pinned version, plus its runtime dependencies,
+ *   installed in eval/.cache/resume-parser/. Its dependency tree (textract -> got@5, request) does
+ *   not install under this repo's `engine-strict`, so it is kept out of package.json/lockfile.
+ */
+import { execFileSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+
+/** open-resume default branch (`main`) head at the time the baseline was added (2026-10-02). */
+export const OPEN_RESUME_REPO = "https://github.com/xitanggg/open-resume.git";
+export const OPEN_RESUME_COMMIT = "4f8255a2c763479837f69f1dccf2a3338730cd79";
+/** resume-parser on npm: last release (2022). */
+export const RESUME_PARSER_VERSION = "1.1.0";
+
+const here = dirname(fileURLToPath(import.meta.url));
+export const CACHE_DIR = resolve(here, "..", ".cache");
+export const OPEN_RESUME_DIR = join(CACHE_DIR, "open-resume");
+/** Import-rewritten copy of the parser modules (generated, never committed). */
+export const OPEN_RESUME_NODE_DIR = join(CACHE_DIR, "open-resume-node");
+export const RESUME_PARSER_DIR = join(CACHE_DIR, "resume-parser");
+
+const isWindows = process.platform === "win32";
+
+function run(cmd: string, args: string[], cwd: string): string {
+  return execFileSync(cmd, args, {
+    cwd,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+    // npm is a .cmd shim on Windows.
+    shell: isWindows && cmd === "npm",
+  });
+}
+
+function setupOpenResume(): void {
+  const head = existsSync(join(OPEN_RESUME_DIR, ".git"))
+    ? run("git", ["rev-parse", "HEAD"], OPEN_RESUME_DIR).trim()
+    : "";
+  if (head !== OPEN_RESUME_COMMIT) {
+    rmSync(OPEN_RESUME_DIR, { recursive: true, force: true });
+    mkdirSync(OPEN_RESUME_DIR, { recursive: true });
+    run("git", ["init", "-q"], OPEN_RESUME_DIR);
+    run("git", ["remote", "add", "origin", OPEN_RESUME_REPO], OPEN_RESUME_DIR);
+    run("git", ["fetch", "-q", "--depth", "1", "origin", OPEN_RESUME_COMMIT], OPEN_RESUME_DIR);
+    run("git", ["checkout", "-q", "FETCH_HEAD"], OPEN_RESUME_DIR);
+    console.log(`open-resume: cloned ${OPEN_RESUME_COMMIT}`);
+  } else {
+    console.log(`open-resume: already at ${OPEN_RESUME_COMMIT}`);
+  }
+  buildOpenResumeNode();
+}
+
+/** Lists .ts files under `dir` (recursive), skipping tests. */
+function listTs(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) out.push(...listTs(full));
+    else if (name.endsWith(".ts") && !name.endsWith(".test.ts")) out.push(full);
+  }
+  return out;
+}
+
+/**
+ * Copies the pure parser modules (everything in parse-resume-from-pdf/ except the browser-only
+ * read-pdf.ts and the index.ts that imports it), plus the type/util files they import, into
+ * open-resume-node/ and rewrites `from "lib/x/y"` to relative `./.../y.ts` imports.
+ *
+ * `lib/redux/resumeSlice` pulls in @reduxjs/toolkit for a single constant
+ * (`initialFeaturedSkills`), so it is replaced by a shim exporting the same value.
+ */
+function buildOpenResumeNode(): void {
+  const srcLib = join(OPEN_RESUME_DIR, "src", "app", "lib");
+  const outLib = join(OPEN_RESUME_NODE_DIR, "lib");
+  rmSync(OPEN_RESUME_NODE_DIR, { recursive: true, force: true });
+  mkdirSync(outLib, { recursive: true });
+
+  const parserDir = join(srcLib, "parse-resume-from-pdf");
+  const browserOnly = new Set([join(parserDir, "read-pdf.ts"), join(parserDir, "index.ts")]);
+  const files = [
+    ...listTs(parserDir).filter((f) => !browserOnly.has(f)),
+    join(srcLib, "redux", "types.ts"),
+    join(srcLib, "deep-clone.ts"),
+  ];
+
+  for (const file of files) {
+    const rel = relative(srcLib, file);
+    const target = join(outLib, rel);
+    mkdirSync(dirname(target), { recursive: true });
+    const source = readFileSync(file, "utf8").replace(
+      /from\s+"lib\/([^"]+)"/g,
+      (_m, spec: string) => {
+        let to = relative(dirname(target), join(outLib, `${spec}.ts`))
+          .split(sep)
+          .join("/");
+        if (!to.startsWith(".")) to = `./${to}`;
+        return `from "${to}"`;
+      },
+    );
+    writeFileSync(target, source);
+  }
+
+  writeFileSync(
+    join(outLib, "redux", "resumeSlice.ts"),
+    [
+      "// Generated by eval/baselines/setup.ts: replaces open-resume's redux slice, which the parser",
+      "// only uses for this constant (copied verbatim from src/app/lib/redux/resumeSlice.ts).",
+      'import type { FeaturedSkill } from "./types.ts";',
+      'export const initialFeaturedSkill: FeaturedSkill = { skill: "", rating: 4 };',
+      "export const initialFeaturedSkills: FeaturedSkill[] = Array(6).fill({",
+      "  ...initialFeaturedSkill,",
+      "});",
+      "",
+    ].join("\n"),
+  );
+  writeFileSync(
+    join(OPEN_RESUME_NODE_DIR, "package.json"),
+    `${JSON.stringify({ private: true, type: "module", license: "AGPL-3.0" }, null, 2)}\n`,
+  );
+  writeFileSync(join(OPEN_RESUME_NODE_DIR, "COMMIT"), `${OPEN_RESUME_COMMIT}\n`);
+  console.log(`open-resume: wrote ${files.length + 1} modules to ${OPEN_RESUME_NODE_DIR}`);
+}
+
+function setupResumeParser(): void {
+  const pkgDir = join(RESUME_PARSER_DIR, "package");
+  const pkgJson = join(pkgDir, "package.json");
+  const installed =
+    existsSync(pkgJson) &&
+    (JSON.parse(readFileSync(pkgJson, "utf8")) as { version: string }).version ===
+      RESUME_PARSER_VERSION &&
+    existsSync(join(pkgDir, "node_modules", "underscore"));
+  if (installed) {
+    console.log(`resume-parser: already at ${RESUME_PARSER_VERSION}`);
+    return;
+  }
+  rmSync(RESUME_PARSER_DIR, { recursive: true, force: true });
+  mkdirSync(RESUME_PARSER_DIR, { recursive: true });
+  const tgz = run(
+    "npm",
+    ["pack", `resume-parser@${RESUME_PARSER_VERSION}`, "--silent"],
+    RESUME_PARSER_DIR,
+  )
+    .trim()
+    .split(/\r?\n/)
+    .pop();
+  if (!tgz) throw new Error("npm pack resume-parser returned no tarball name");
+  // Relative file name + cwd: GNU tar treats "C:\..." as a remote host.
+  run("tar", ["-xzf", tgz], RESUME_PARSER_DIR);
+  run(
+    "npm",
+    [
+      "install",
+      "--omit=dev",
+      "--ignore-scripts",
+      "--no-package-lock",
+      "--no-audit",
+      "--no-fund",
+      "--engine-strict=false",
+      "--loglevel=error",
+    ],
+    pkgDir,
+  );
+  console.log(`resume-parser: installed ${RESUME_PARSER_VERSION} in ${pkgDir}`);
+}
+
+const isMain =
+  process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  mkdirSync(CACHE_DIR, { recursive: true });
+  setupOpenResume();
+  setupResumeParser();
+}

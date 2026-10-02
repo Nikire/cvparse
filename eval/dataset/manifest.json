@@ -1,0 +1,1057 @@
+[
+  {
+    "country": "AR",
+    "dateStyles": ["03/2021"],
+    "file": "files/es-ar-001.pdf",
+    "format": "pdf",
+    "id": "es-ar-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": ["accented-name", "role:backend"],
+    "truth": "truth/es-ar-001.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["03/2021", "2014 – 2018", "marzo 2021", "verano 2020"],
+    "file": "files/es-ar-002.pdf",
+    "format": "pdf",
+    "id": "es-ar-002",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "mixed-date-styles",
+      "ongoing-role",
+      "right-aligned-dates",
+      "role:docencia",
+      "season-date",
+      "short-course",
+      "two-surnames"
+    ],
+    "truth": "truth/es-ar-002.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["marzo 2021"],
+    "file": "files/es-ar-003.pdf",
+    "format": "pdf",
+    "id": "es-ar-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": ["ongoing-role", "role:enfermeria", "two-columns"],
+    "truth": "truth/es-ar-003.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["marzo 2021"],
+    "file": "files/es-ar-004.pdf",
+    "format": "pdf",
+    "id": "es-ar-004",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "postgraduate",
+      "role:contabilidad",
+      "short-course",
+      "two-columns"
+    ],
+    "truth": "truth/es-ar-004.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["03/2021", "mar. 2021"],
+    "file": "files/es-ar-005.pdf",
+    "format": "pdf",
+    "id": "es-ar-005",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "mixed-date-styles",
+      "ongoing-role",
+      "postgraduate",
+      "role:diseno"
+    ],
+    "truth": "truth/es-ar-005.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["03/2021", "2014 – 2018", "2019-21"],
+    "file": "files/es-ar-006.docx",
+    "format": "docx",
+    "id": "es-ar-006",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "enie",
+      "mixed-date-styles",
+      "ongoing-role",
+      "remote-role",
+      "role:rrhh",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-ar-006.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["2014 – 2018", "mar. 2021", "marzo 2021"],
+    "file": "files/es-ar-007.docx",
+    "format": "docx",
+    "id": "es-ar-007",
+    "language": "es",
+    "layout": "textbox",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "mixed-date-styles",
+      "postgraduate",
+      "role:ventas",
+      "vml-textbox"
+    ],
+    "truth": "truth/es-ar-007.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["2014 – 2018", "marzo 2021"],
+    "file": "files/es-ar-008.pdf",
+    "format": "pdf",
+    "id": "es-ar-008",
+    "language": "es",
+    "layout": "functional",
+    "tags": ["accented-name", "functional", "ongoing-role", "remote-role", "role:data"],
+    "truth": "truth/es-ar-008.json"
+  },
+  {
+    "country": "AR",
+    "dateStyles": ["03/2021", "2014 – 2018"],
+    "file": "files/es-ar-009.png",
+    "format": "image",
+    "id": "es-ar-009",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "accented-name",
+      "enie",
+      "ongoing-role",
+      "remote-role",
+      "role:backend",
+      "rotated",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-ar-009.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2014 – 2018"],
+    "file": "files/es-cl-001.pdf",
+    "format": "pdf",
+    "id": "es-cl-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "enie",
+      "right-aligned-dates",
+      "role:diseno",
+      "two-surnames"
+    ],
+    "truth": "truth/es-cl-001.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2014 – 2018", "2015 a 2018"],
+    "file": "files/es-cl-002.pdf",
+    "format": "pdf",
+    "id": "es-cl-002",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "enie",
+      "role:rrhh",
+      "technical-degree",
+      "two-columns"
+    ],
+    "truth": "truth/es-cl-002.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "verano 2020"],
+    "file": "files/es-cl-003.pdf",
+    "format": "pdf",
+    "id": "es-cl-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "enie",
+      "ongoing-role",
+      "role:ventas",
+      "season-date",
+      "short-course",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-cl-003.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2015 a 2018", "2018 a la fecha"],
+    "file": "files/es-cl-004.pdf",
+    "format": "pdf",
+    "id": "es-cl-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": ["accented-name", "ongoing-role", "role:data", "sidebar-right", "two-surnames"],
+    "truth": "truth/es-cl-004.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2015 a 2018", "2018 a la fecha"],
+    "file": "files/es-cl-005.docx",
+    "format": "docx",
+    "id": "es-cl-005",
+    "language": "mixed",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "english-headings",
+      "enie",
+      "ongoing-role",
+      "postgraduate",
+      "remote-role",
+      "role:backend",
+      "two-surnames"
+    ],
+    "truth": "truth/es-cl-005.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2015 a 2018", "2018 a la fecha"],
+    "file": "files/es-cl-006.docx",
+    "format": "docx",
+    "id": "es-cl-006",
+    "language": "es",
+    "layout": "table",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "enie",
+      "ongoing-role",
+      "role:docencia",
+      "table-layout",
+      "technical-degree",
+      "two-surnames"
+    ],
+    "truth": "truth/es-cl-006.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2015 a 2018", "2018 a la fecha"],
+    "file": "files/es-cl-007.pdf",
+    "format": "pdf",
+    "id": "es-cl-007",
+    "language": "es",
+    "layout": "functional",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "functional",
+      "ongoing-role",
+      "remote-role",
+      "role:enfermeria"
+    ],
+    "truth": "truth/es-cl-007.json"
+  },
+  {
+    "country": "CL",
+    "dateStyles": ["2014 – 2018", "2018 a la fecha", "2019 – presente", "marzo 2021"],
+    "file": "files/es-cl-008.pdf",
+    "format": "pdf",
+    "id": "es-cl-008",
+    "language": "es",
+    "layout": "academic",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "doctorate",
+      "mixed-date-styles",
+      "ongoing-education",
+      "ongoing-role",
+      "postgraduate",
+      "publications",
+      "remote-role",
+      "role:data",
+      "two-surnames"
+    ],
+    "truth": "truth/es-cl-008.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["2014 – 2018", "Ene 2020", "verano 2020"],
+    "file": "files/es-co-001.pdf",
+    "format": "pdf",
+    "id": "es-co-001",
+    "language": "mixed",
+    "layout": "single-column",
+    "tags": [
+      "english-headings",
+      "ongoing-role",
+      "role:rrhh",
+      "season-date",
+      "short-course",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-001.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["Ene 2020", "mar. 2021"],
+    "file": "files/es-co-002.pdf",
+    "format": "pdf",
+    "id": "es-co-002",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "mixed-date-styles",
+      "postgraduate",
+      "remote-role",
+      "right-aligned-dates",
+      "role:ventas"
+    ],
+    "truth": "truth/es-co-002.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["2014 – 2018", "Ene 2020"],
+    "file": "files/es-co-003.pdf",
+    "format": "pdf",
+    "id": "es-co-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "postgraduate",
+      "remote-role",
+      "role:data",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-003.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["2014 – 2018", "Ene 2020"],
+    "file": "files/es-co-004.pdf",
+    "format": "pdf",
+    "id": "es-co-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": ["accented-name", "ongoing-role", "role:backend", "technical-degree", "two-surnames"],
+    "truth": "truth/es-co-004.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["Ene 2020"],
+    "file": "files/es-co-005.docx",
+    "format": "docx",
+    "id": "es-co-005",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "enie",
+      "ongoing-role",
+      "postgraduate",
+      "remote-role",
+      "role:docencia",
+      "short-course",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-005.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["2014 – 2018", "2020", "mar. 2021"],
+    "file": "files/es-co-006.docx",
+    "format": "docx",
+    "id": "es-co-006",
+    "language": "es",
+    "layout": "table",
+    "tags": [
+      "compound-first-name",
+      "enie",
+      "ongoing-role",
+      "role:enfermeria",
+      "short-course",
+      "table-layout",
+      "technical-degree",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-006.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["Ene 2020"],
+    "file": "files/es-co-007.docx",
+    "format": "docx",
+    "id": "es-co-007",
+    "language": "es",
+    "layout": "textbox",
+    "tags": [
+      "drawingml-textbox",
+      "enie",
+      "ongoing-role",
+      "remote-role",
+      "role:contabilidad",
+      "technical-degree"
+    ],
+    "truth": "truth/es-co-007.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "Ene 2020"],
+    "file": "files/es-co-008.pdf",
+    "format": "pdf",
+    "id": "es-co-008",
+    "language": "es",
+    "layout": "academic",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "doctorate",
+      "enie",
+      "ongoing-education",
+      "ongoing-role",
+      "postgraduate",
+      "publications",
+      "remote-role",
+      "role:docencia",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-008.json"
+  },
+  {
+    "country": "CO",
+    "dateStyles": ["03/2021", "2014 – 2018", "Ene 2020", "verano 2020"],
+    "file": "files/es-co-009.pdf",
+    "format": "pdf",
+    "id": "es-co-009",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "accented-name",
+      "enie",
+      "jpeg-in-pdf",
+      "mixed-date-styles",
+      "role:rrhh",
+      "rotated",
+      "scanner-stamp",
+      "season-date",
+      "short-course",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-co-009.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2015 a 2018", "2018 a la fecha", "2020"],
+    "file": "files/es-es-001.pdf",
+    "format": "pdf",
+    "id": "es-es-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": ["accented-name", "ongoing-role", "role:ventas", "short-course"],
+    "truth": "truth/es-es-001.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2015 a 2018", "verano 2020"],
+    "file": "files/es-es-002.pdf",
+    "format": "pdf",
+    "id": "es-es-002",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "postgraduate",
+      "remote-role",
+      "role:data",
+      "season-date",
+      "short-course",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-002.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["Ene 2020", "marzo 2021"],
+    "file": "files/es-es-003.pdf",
+    "format": "pdf",
+    "id": "es-es-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "enie",
+      "mixed-date-styles",
+      "role:backend",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-003.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["marzo 2021", "verano 2020"],
+    "file": "files/es-es-004.pdf",
+    "format": "pdf",
+    "id": "es-es-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "ongoing-role",
+      "photo",
+      "role:docencia",
+      "season-date",
+      "short-course",
+      "sidebar-right",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-004.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2014 – 2018", "2015 a 2018", "2018 a la fecha"],
+    "file": "files/es-es-005.docx",
+    "format": "docx",
+    "id": "es-es-005",
+    "language": "es",
+    "layout": "single-column",
+    "tags": ["accented-name", "ongoing-role", "postgraduate", "role:enfermeria", "two-surnames"],
+    "truth": "truth/es-es-005.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2014 – 2018", "marzo 2021"],
+    "file": "files/es-es-006.docx",
+    "format": "docx",
+    "id": "es-es-006",
+    "language": "es",
+    "layout": "table",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "ongoing-role",
+      "role:contabilidad",
+      "table-layout",
+      "technical-degree"
+    ],
+    "truth": "truth/es-es-006.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2014 – 2018", "2020", "marzo 2021"],
+    "file": "files/es-es-007.docx",
+    "format": "docx",
+    "id": "es-es-007",
+    "language": "es",
+    "layout": "textbox",
+    "tags": [
+      "accented-name",
+      "drawingml-textbox",
+      "enie",
+      "remote-role",
+      "role:diseno",
+      "short-course",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-007.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2014 – 2018", "2015 a 2018", "2018 a la fecha", "2019 – presente"],
+    "file": "files/es-es-008.pdf",
+    "format": "pdf",
+    "id": "es-es-008",
+    "language": "es",
+    "layout": "academic",
+    "tags": [
+      "date-column",
+      "doctorate",
+      "enie",
+      "ongoing-education",
+      "ongoing-role",
+      "postgraduate",
+      "publications",
+      "role:data",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-008.json"
+  },
+  {
+    "country": "ES",
+    "dateStyles": ["2014 – 2018", "2018 a la fecha", "2019-21", "2020"],
+    "file": "files/es-es-009.pdf",
+    "format": "pdf",
+    "id": "es-es-009",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "jpeg-in-pdf",
+      "mixed-date-styles",
+      "one-column",
+      "ongoing-role",
+      "role:ventas",
+      "rotated",
+      "short-course",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-es-009.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2014 – 2018", "2019-21", "2020"],
+    "file": "files/es-mx-001.pdf",
+    "format": "pdf",
+    "id": "es-mx-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "enie",
+      "postgraduate",
+      "remote-role",
+      "right-aligned-dates",
+      "role:data",
+      "short-course",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-001.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2019 – presente", "2019-21", "verano 2020"],
+    "file": "files/es-mx-002.pdf",
+    "format": "pdf",
+    "id": "es-mx-002",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "enie",
+      "ongoing-role",
+      "postgraduate",
+      "role:backend",
+      "season-date",
+      "short-course",
+      "technical-degree",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-002.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2014 – 2018", "Ene 2020"],
+    "file": "files/es-mx-003.pdf",
+    "format": "pdf",
+    "id": "es-mx-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "accented-name",
+      "enie",
+      "mixed-date-styles",
+      "ongoing-role",
+      "postgraduate",
+      "remote-role",
+      "role:docencia",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-003.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2019-21"],
+    "file": "files/es-mx-004.pdf",
+    "format": "pdf",
+    "id": "es-mx-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "enie",
+      "ongoing-role",
+      "photo",
+      "role:enfermeria",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-004.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["Ene 2020"],
+    "file": "files/es-mx-005.pdf",
+    "format": "pdf",
+    "id": "es-mx-005",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "enie",
+      "remote-role",
+      "role:contabilidad",
+      "sidebar-right",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-005.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2014 – 2018", "Ene 2020"],
+    "file": "files/es-mx-006.docx",
+    "format": "docx",
+    "id": "es-mx-006",
+    "language": "es",
+    "layout": "table",
+    "tags": [
+      "accented-name",
+      "enie",
+      "ongoing-role",
+      "role:diseno",
+      "table-layout",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-006.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["Ene 2020"],
+    "file": "files/es-mx-007.docx",
+    "format": "docx",
+    "id": "es-mx-007",
+    "language": "es",
+    "layout": "textbox",
+    "tags": ["postgraduate", "role:rrhh", "short-course", "vml-textbox"],
+    "truth": "truth/es-mx-007.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["Ene 2020"],
+    "file": "files/es-mx-008.pdf",
+    "format": "pdf",
+    "id": "es-mx-008",
+    "language": "es",
+    "layout": "academic",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "doctorate",
+      "ongoing-education",
+      "ongoing-role",
+      "postgraduate",
+      "publications",
+      "role:docencia",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-008.json"
+  },
+  {
+    "country": "MX",
+    "dateStyles": ["2014 – 2018", "2019-21", "verano 2020"],
+    "file": "files/es-mx-009.png",
+    "format": "image",
+    "id": "es-mx-009",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "role:data",
+      "rotated",
+      "season-date",
+      "short-course",
+      "two-columns",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-mx-009.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["2014 – 2018", "mar. 2021"],
+    "file": "files/es-pe-001.pdf",
+    "format": "pdf",
+    "id": "es-pe-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": ["accented-name", "remote-role", "role:contabilidad"],
+    "truth": "truth/es-pe-001.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["03/2021"],
+    "file": "files/es-pe-002.pdf",
+    "format": "pdf",
+    "id": "es-pe-002",
+    "language": "es",
+    "layout": "two-column",
+    "tags": ["ongoing-role", "remote-role", "role:diseno", "two-columns", "two-surnames"],
+    "truth": "truth/es-pe-002.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["2014 – 2018", "mar. 2021"],
+    "file": "files/es-pe-003.pdf",
+    "format": "pdf",
+    "id": "es-pe-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": [
+      "compound-first-name",
+      "enie",
+      "postgraduate",
+      "remote-role",
+      "role:rrhh",
+      "two-columns",
+      "two-surnames"
+    ],
+    "truth": "truth/es-pe-003.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["mar. 2021"],
+    "file": "files/es-pe-004.pdf",
+    "format": "pdf",
+    "id": "es-pe-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "ongoing-role",
+      "photo",
+      "postgraduate",
+      "role:ventas",
+      "short-course",
+      "technical-degree",
+      "two-surnames"
+    ],
+    "truth": "truth/es-pe-004.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["mar. 2021"],
+    "file": "files/es-pe-005.docx",
+    "format": "docx",
+    "id": "es-pe-005",
+    "language": "es",
+    "layout": "single-column",
+    "tags": ["accented-name", "compound-first-name", "role:data", "short-course", "two-surnames"],
+    "truth": "truth/es-pe-005.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["2014 – 2018", "mar. 2021"],
+    "file": "files/es-pe-006.docx",
+    "format": "docx",
+    "id": "es-pe-006",
+    "language": "es",
+    "layout": "table",
+    "tags": ["accented-name", "role:backend", "table-layout", "two-surnames"],
+    "truth": "truth/es-pe-006.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["2014 – 2018", "mar. 2021", "verano 2020"],
+    "file": "files/es-pe-007.pdf",
+    "format": "pdf",
+    "id": "es-pe-007",
+    "language": "es",
+    "layout": "functional",
+    "tags": [
+      "accented-name",
+      "functional",
+      "mixed-date-styles",
+      "ongoing-role",
+      "remote-role",
+      "role:docencia",
+      "season-date",
+      "short-course",
+      "technical-degree",
+      "two-surnames"
+    ],
+    "truth": "truth/es-pe-007.json"
+  },
+  {
+    "country": "PE",
+    "dateStyles": ["2014 – 2018", "mar. 2021"],
+    "file": "files/es-pe-008.png",
+    "format": "image",
+    "id": "es-pe-008",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "accented-name",
+      "one-column",
+      "ongoing-role",
+      "role:enfermeria",
+      "rotated",
+      "two-surnames"
+    ],
+    "truth": "truth/es-pe-008.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2019-21", "verano 2020"],
+    "file": "files/es-uy-001.pdf",
+    "format": "pdf",
+    "id": "es-uy-001",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "ongoing-role",
+      "role:enfermeria",
+      "season-date",
+      "short-course",
+      "two-digit-range",
+      "two-surnames"
+    ],
+    "truth": "truth/es-uy-001.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018"],
+    "file": "files/es-uy-002.pdf",
+    "format": "pdf",
+    "id": "es-uy-002",
+    "language": "es",
+    "layout": "two-column",
+    "tags": ["compound-first-name", "role:contabilidad", "two-columns"],
+    "truth": "truth/es-uy-002.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2019-21"],
+    "file": "files/es-uy-003.pdf",
+    "format": "pdf",
+    "id": "es-uy-003",
+    "language": "es",
+    "layout": "two-column",
+    "tags": ["postgraduate", "role:diseno", "two-columns", "two-digit-range"],
+    "truth": "truth/es-uy-003.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2020"],
+    "file": "files/es-uy-004.pdf",
+    "format": "pdf",
+    "id": "es-uy-004",
+    "language": "es",
+    "layout": "sidebar",
+    "tags": [
+      "accented-name",
+      "ongoing-role",
+      "photo",
+      "postgraduate",
+      "remote-role",
+      "role:rrhh",
+      "short-course",
+      "sidebar-right",
+      "two-surnames"
+    ],
+    "truth": "truth/es-uy-004.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "Ene 2020"],
+    "file": "files/es-uy-005.docx",
+    "format": "docx",
+    "id": "es-uy-005",
+    "language": "es",
+    "layout": "single-column",
+    "tags": [
+      "accented-name",
+      "compound-first-name",
+      "mixed-date-styles",
+      "postgraduate",
+      "role:ventas"
+    ],
+    "truth": "truth/es-uy-005.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2020"],
+    "file": "files/es-uy-006.docx",
+    "format": "docx",
+    "id": "es-uy-006",
+    "language": "es",
+    "layout": "table",
+    "tags": [
+      "accented-name",
+      "date-column",
+      "ongoing-role",
+      "postgraduate",
+      "role:data",
+      "short-course",
+      "table-layout",
+      "technical-degree"
+    ],
+    "truth": "truth/es-uy-006.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2020", "marzo 2021"],
+    "file": "files/es-uy-007.pdf",
+    "format": "pdf",
+    "id": "es-uy-007",
+    "language": "es",
+    "layout": "functional",
+    "tags": [
+      "enie",
+      "functional",
+      "mixed-date-styles",
+      "ongoing-role",
+      "remote-role",
+      "role:backend",
+      "short-course",
+      "technical-degree",
+      "two-surnames"
+    ],
+    "truth": "truth/es-uy-007.json"
+  },
+  {
+    "country": "UY",
+    "dateStyles": ["2014 – 2018", "2019 – presente", "2019-21"],
+    "file": "files/es-uy-008.png",
+    "format": "image",
+    "id": "es-uy-008",
+    "language": "es",
+    "layout": "scanned",
+    "tags": [
+      "accented-name",
+      "one-column",
+      "ongoing-role",
+      "role:docencia",
+      "rotated",
+      "two-digit-range"
+    ],
+    "truth": "truth/es-uy-008.json"
+  }
+]
