@@ -8,6 +8,8 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-02
+
 ### Added
 
 - Scanned CVs and images. `ParseOptions.ocr` takes an OCR adapter or `"vision"`, and `ParseOptions.ocrLanguages` passes ISO 639-1 language hints (defaulting to `language` when set). `extractText` accepts the same `ocr` / `ocrLanguages` / `abortSignal` options (`ExtractTextOptions`). Full guide in `docs/ocr.md`.
@@ -87,7 +89,8 @@ Initial preview release. Plain-text input only.
 - ESM-only package targeting Node >= 22. Runtime dependencies: `ai`, `zod`, `@ai-sdk/openai-compatible`.
 - English README with Spanish mirror (`README.es.md`), contributing guide, code of conduct (Contributor Covenant 2.1), security policy, MIT license, roadmap.
 
-[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Nikire/cvparse/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/Nikire/cvparse/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Nikire/cvparse/compare/v0.0.2...v0.1.0
 [0.0.2]: https://github.com/Nikire/cvparse/compare/v0.0.1...v0.0.2
