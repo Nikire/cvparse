@@ -13,11 +13,11 @@
       "hardware": "12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32",
       "datasetVersion": "1.0.0",
       "datasetHash": "76c69f1bbc2c5657",
-      "cvparseCommit": "9b4fa8b506c4c8a3f9699c7c4201976261a5d5fa",
+      "cvparseCommit": "81432f5d3015159a7d4a33db03e98f96749286a0",
       "cvparseSrcHash": "253c04ad9d9e5715"
     }
   },
-  "finishedAt": "2026-10-02T08:42:01.076Z",
+  "finishedAt": "2026-10-02T08:44:16.139Z",
   "cvparseVersion": "0.2.0",
   "datasetVersion": "1.0.0",
   "entries": [
@@ -116,7 +116,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.092
+      "seconds": 0.096
     },
     {
       "id": "es-ar-002",
@@ -213,7 +213,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.012
+      "seconds": 0.011
     },
     {
       "id": "es-ar-003",
@@ -310,7 +310,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.01
+      "seconds": 0.009
     },
     {
       "id": "es-ar-004",
@@ -407,7 +407,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.007
+      "seconds": 0.009
     },
     {
       "id": "es-ar-005",
@@ -504,7 +504,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.01
+      "seconds": 0.009
     },
     {
       "id": "es-ar-006",
@@ -719,7 +719,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.006
+      "seconds": 0.008
     },
     {
       "id": "es-cl-002",
@@ -816,7 +816,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.006
+      "seconds": 0.007
     },
     {
       "id": "es-cl-003",
@@ -913,7 +913,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.008
+      "seconds": 0.01
     },
     {
       "id": "es-cl-004",
@@ -1121,7 +1121,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.007
+      "seconds": 0.008
     },
     {
       "id": "es-cl-008",
@@ -1218,7 +1218,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.008
+      "seconds": 0.007
     },
     {
       "id": "es-co-001",
@@ -1315,7 +1315,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.008
+      "seconds": 0.009
     },
     {
       "id": "es-co-002",
@@ -1821,7 +1821,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.072
+      "seconds": 0.065
     },
     {
       "id": "es-es-001",
@@ -1918,7 +1918,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.009
+      "seconds": 0.007
     },
     {
       "id": "es-es-002",
@@ -2112,7 +2112,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.006
+      "seconds": 0.011
     },
     {
       "id": "es-es-004",
@@ -2327,7 +2327,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.007
+      "seconds": 0.009
     },
     {
       "id": "es-es-009",
@@ -2424,7 +2424,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.044
+      "seconds": 0.045
     },
     {
       "id": "es-mx-001",
@@ -2521,7 +2521,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.006
+      "seconds": 0.007
     },
     {
       "id": "es-mx-002",
@@ -2618,7 +2618,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.007
+      "seconds": 0.008
     },
     {
       "id": "es-mx-003",
@@ -2812,7 +2812,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.008
+      "seconds": 0.009
     },
     {
       "id": "es-mx-005",
@@ -2909,7 +2909,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.008
+      "seconds": 0.007
     },
     {
       "id": "es-mx-006",
@@ -3020,7 +3020,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.008
+      "seconds": 0.007
     },
     {
       "id": "es-mx-009",
@@ -3221,7 +3221,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.007
+      "seconds": 0.006
     },
     {
       "id": "es-pe-003",
@@ -3415,7 +3415,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.007
+      "seconds": 0.006
     },
     {
       "id": "es-pe-005",

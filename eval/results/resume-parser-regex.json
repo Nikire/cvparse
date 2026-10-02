@@ -12,11 +12,11 @@
       "hardware": "12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32",
       "datasetVersion": "1.0.0",
       "datasetHash": "76c69f1bbc2c5657",
-      "cvparseCommit": "9b4fa8b506c4c8a3f9699c7c4201976261a5d5fa",
+      "cvparseCommit": "81432f5d3015159a7d4a33db03e98f96749286a0",
       "cvparseSrcHash": "253c04ad9d9e5715"
     }
   },
-  "finishedAt": "2026-10-02T08:42:15.106Z",
+  "finishedAt": "2026-10-02T08:44:29.738Z",
   "cvparseVersion": "0.2.0",
   "datasetVersion": "1.0.0",
   "entries": [
@@ -115,7 +115,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.299
+      "seconds": 0.312
     },
     {
       "id": "es-ar-002",
@@ -212,7 +212,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.227
+      "seconds": 0.224
     },
     {
       "id": "es-ar-003",
@@ -406,7 +406,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.213
+      "seconds": 0.216
     },
     {
       "id": "es-ar-005",
@@ -697,7 +697,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.213
+      "seconds": 0.216
     },
     {
       "id": "es-ar-008",
@@ -898,7 +898,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.211
+      "seconds": 0.213
     },
     {
       "id": "es-cl-002",
@@ -995,7 +995,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.211
+      "seconds": 0.215
     },
     {
       "id": "es-cl-003",
@@ -1286,7 +1286,7 @@
           "fn": 0
         }
       },
-      "seconds": 0.215
+      "seconds": 0.23
     },
     {
       "id": "es-cl-006",
@@ -1383,7 +1383,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.215
+      "seconds": 0.216
     },
     {
       "id": "es-cl-007",
@@ -1480,7 +1480,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.214
+      "seconds": 0.215
     },
     {
       "id": "es-cl-008",
@@ -1577,7 +1577,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.217
+      "seconds": 0.213
     },
     {
       "id": "es-co-001",
@@ -1674,7 +1674,7 @@
           "fn": 0
         }
       },
-      "seconds": 0.217
+      "seconds": 0.213
     },
     {
       "id": "es-co-002",
@@ -1771,7 +1771,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.216
+      "seconds": 0.215
     },
     {
       "id": "es-co-003",
@@ -1868,7 +1868,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.214
+      "seconds": 0.213
     },
     {
       "id": "es-co-004",
@@ -1965,7 +1965,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.216
+      "seconds": 0.213
     },
     {
       "id": "es-co-005",
@@ -2062,7 +2062,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.215
+      "seconds": 0.213
     },
     {
       "id": "es-co-006",
@@ -2159,7 +2159,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.217
     },
     {
       "id": "es-co-007",
@@ -2256,7 +2256,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.214
+      "seconds": 0.211
     },
     {
       "id": "es-co-008",
@@ -2353,7 +2353,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.214
+      "seconds": 0.213
     },
     {
       "id": "es-co-009",
@@ -2451,7 +2451,7 @@
         }
       },
       "error": "NO_TEXT_LAYER: No extractable text found: this PDF has no text layer (scanned or image-only) and needs OCR: pass an OCR adapter (library: options.ocr; CLI: --ocr tesseract|textract) or use vision mode (ocr: \"vision\" / --ocr vision).",
-      "seconds": 0.069
+      "seconds": 0.077
     },
     {
       "id": "es-es-001",
@@ -2548,7 +2548,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.219
+      "seconds": 0.214
     },
     {
       "id": "es-es-002",
@@ -2645,7 +2645,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.215
+      "seconds": 0.216
     },
     {
       "id": "es-es-003",
@@ -2742,7 +2742,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.214
     },
     {
       "id": "es-es-004",
@@ -2839,7 +2839,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.217
     },
     {
       "id": "es-es-005",
@@ -3130,7 +3130,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.217
+      "seconds": 0.215
     },
     {
       "id": "es-es-008",
@@ -3422,7 +3422,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.207
+      "seconds": 0.222
     },
     {
       "id": "es-mx-002",
@@ -3616,7 +3616,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.215
+      "seconds": 0.216
     },
     {
       "id": "es-mx-004",
@@ -3713,7 +3713,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.212
     },
     {
       "id": "es-mx-005",
@@ -3810,7 +3810,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.215
+      "seconds": 0.214
     },
     {
       "id": "es-mx-006",
@@ -3907,7 +3907,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.216
     },
     {
       "id": "es-mx-007",
@@ -4004,7 +4004,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.214
     },
     {
       "id": "es-mx-008",
@@ -4101,7 +4101,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.215
+      "seconds": 0.214
     },
     {
       "id": "es-mx-009",
@@ -4302,7 +4302,7 @@
           "fn": 3
         }
       },
-      "seconds": 0.214
+      "seconds": 0.211
     },
     {
       "id": "es-pe-003",
@@ -4399,7 +4399,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.217
+      "seconds": 0.214
     },
     {
       "id": "es-pe-004",
@@ -4496,7 +4496,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.216
+      "seconds": 0.215
     },
     {
       "id": "es-pe-005",
@@ -4593,7 +4593,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.217
+      "seconds": 0.213
     },
     {
       "id": "es-pe-006",
@@ -4988,7 +4988,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.214
+      "seconds": 0.216
     },
     {
       "id": "es-uy-003",
@@ -5085,7 +5085,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.215
+      "seconds": 0.212
     },
     {
       "id": "es-uy-004",
@@ -5279,7 +5279,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.213
+      "seconds": 0.217
     },
     {
       "id": "es-uy-006",
@@ -5376,7 +5376,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.218
+      "seconds": 0.214
     },
     {
       "id": "es-uy-007",
@@ -5473,7 +5473,7 @@
           "fn": 2
         }
       },
-      "seconds": 0.216
+      "seconds": 0.215
     },
     {
       "id": "es-uy-008",
