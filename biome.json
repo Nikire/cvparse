@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!dist", "!node_modules", "!coverage", "!package-lock.json"]
+    "includes": ["**", "!dist", "!node_modules", "!coverage", "!package-lock.json", "!eval/.cache"]
   },
   "formatter": {
     "enabled": true,
