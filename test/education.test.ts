@@ -128,7 +128,77 @@ const CASES: Case[] = [
   ["Sistemas de Información", "unknown", null],
 ];
 
+/** English / Portuguese titles found in real CVs (regression: "Computer Engineering" was unknown). */
+const ENGLISH_CASES: Case[] = [
+  ["Computer Engineering", "bachelor", "Ingeniería"],
+  ["Mechanical Engineering", "bachelor", "Ingeniería"],
+  ["Engineering degree", "bachelor", "Ingeniería"],
+  ["Engineering Degree in Electronics", "bachelor", "Ingeniería"],
+  ["B.Eng", "bachelor", "Ingeniería"],
+  ["BEng in Civil Engineering", "bachelor", "Ingeniería"],
+  ["Bachelor of Engineering", "bachelor", "Ingeniería"],
+  ["Engineer", "bachelor", "Ingeniería"],
+  ["Systems Engineer", "bachelor", "Ingeniería"],
+  ["Electronic Technician", "technical", "Técnico"],
+  ["Technician", "technical", "Técnico"],
+  ["Engineering Technician", "technical", "Técnico"],
+  ["Technical degree", "technical", "Técnico"],
+  ["Technical Diploma in Electronics", "technical", "Técnico"],
+  ["Technical Certificate in Welding", "technical", "Técnico"],
+  ["Technologist", "technical", "Tecnólogo"],
+  ["Associate", "technical", "Tecnicatura"],
+  ["Associate's Degree", "technical", "Tecnicatura"],
+  ["AAS in Networking", "technical", "Tecnicatura"],
+  ["Vocational Diploma", "technical", "Formación Profesional"],
+  ["Electronics Technician (High School)", "technical", "Técnico"],
+  ["Technical High School Diploma", "secondary", "Secundario"],
+  ["High School Diploma", "secondary", "Secundario"],
+  ["Bachelor's", "bachelor", "Licenciatura"],
+  ["BSc", "bachelor", "Licenciatura"],
+  ["BA", "bachelor", "Licenciatura"],
+  ["Undergraduate degree", "bachelor", "Grado"],
+  ["Master's", "master", "Máster"],
+  ["MSc", "master", "Máster"],
+  ["Master of Engineering", "master", "Máster"],
+  ["MBA", "master", "MBA"],
+  ["PhD", "doctorate", "Doctorado"],
+  ["Doctorate", "doctorate", "Doctorado"],
+  ["Certificate", "course", "Certificación"],
+  ["Professional Certificate", "course", "Certificación"],
+  ["Bootcamp", "course", "Bootcamp"],
+  ["Course", "course", "Curso"],
+  // Unfinished / ongoing studies keep the level of the title.
+  ["Computer Engineering (incomplete)", "bachelor", "Ingeniería"],
+  ["Computer Engineering (unfinished)", "bachelor", "Ingeniería"],
+  ["Computer Engineering - in progress", "bachelor", "Ingeniería"],
+  ["Bachelor's degree (in progress)", "bachelor", "Licenciatura"],
+  ["Electronic Technician (incomplete)", "technical", "Técnico"],
+  ["Master's degree, not completed", "master", "Máster"],
+  ["Ingeniería en Sistemas (incompleto)", "bachelor", "Ingeniería"],
+  ["Ingeniería Electrónica en curso", "bachelor", "Ingeniería"],
+  // Portuguese
+  ["Curso Técnico em Eletrônica", "technical", "Técnico"],
+  ["Curso Superior de Tecnologia em Redes", "technical", "Tecnólogo"],
+  ["Ensino Médio Técnico", "secondary", "Educación Media"],
+  ["Ensino Superior incompleto", "bachelor", "Grado"],
+  ["Graduação em Administração (em curso)", "bachelor", "Grado"],
+  ["Engenharia Elétrica (em andamento)", "bachelor", "Ingeniería"],
+];
+
 describe("normalizeStudyType", () => {
+  it.each(ENGLISH_CASES)("English/Portuguese %j -> %s / %s", (input, level, canonical) => {
+    expect(normalizeStudyType(input)).toEqual({ level, canonical, original: input });
+  });
+
+  it("reads English titles from `area` only when they start it (area stays conservative)", () => {
+    expect(normalizeStudyType(null, "Engineering degree in Electronics")).toMatchObject({
+      level: "bachelor",
+      canonical: "Ingeniería",
+    });
+    // "Computer Engineering" in `area` names the field; the degree itself is unknown.
+    expect(normalizeStudyType(null, "Computer Engineering").level).toBe("unknown");
+  });
+
   it.each(CASES)("%j -> %s / %s", (input, level, canonical) => {
     expect(normalizeStudyType(input)).toEqual({ level, canonical, original: input });
   });

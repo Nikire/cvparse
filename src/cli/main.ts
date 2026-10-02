@@ -15,6 +15,7 @@ import {
   unsupportedExtensionMessage,
 } from "./args.js";
 import { createCliOcr } from "./ocr.js";
+import { checkOllamaContext, contextWarning } from "./ollama-context.js";
 import { createCliModel } from "./provider.js";
 
 export const EXIT_OK = 0;
@@ -29,6 +30,8 @@ export interface CliIo {
   readStdin: () => Promise<string | Uint8Array>;
   /** Overridable for tests; defaults to `parseResume`. */
   parse?: typeof parseResume;
+  /** Overridable for tests; defaults to querying the Ollama server. */
+  checkContext?: typeof checkOllamaContext;
 }
 
 async function readProcessStdin(): Promise<Uint8Array> {
@@ -106,6 +109,15 @@ async function run(options: RunOptions, io: CliIo): Promise<number> {
   }
   for (const warning of result.warnings) {
     io.stderr(`warning: ${warning}\n`);
+  }
+  if (options.provider === "ollama") {
+    const used = (result.usage.inputTokens ?? 0) + (result.usage.outputTokens ?? 0);
+    const check = await (io.checkContext ?? checkOllamaContext)(
+      options.baseUrl,
+      options.model,
+      used,
+    );
+    if (check) io.stderr(contextWarning(check));
   }
   const json = options.pretty
     ? JSON.stringify(result.resume, null, 2)

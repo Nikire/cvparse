@@ -14,6 +14,7 @@ import type { z } from "zod";
 import { CvparseError } from "./errors.js";
 import { extractText } from "./extract/index.js";
 import { scannedPageWarning } from "./extract/messages.js";
+import { checkCoverage, groundResume } from "./normalize/grounding.js";
 import { detectLanguage } from "./normalize/language.js";
 import { normalizeResume } from "./normalize/resume.js";
 import { buildSystemPrompt, buildUserPrompt } from "./prompt.js";
@@ -287,6 +288,8 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   // it would warn about a detected language that is overridden right below.
   const normalized = normalizeResume(raw, language === "auto" ? cvText : undefined, {
     referenceDate,
+    // Lets the normalizer undo months the model invented ("2020" written as "2020-01").
+    sourceText: images.length === 0 ? cvText : undefined,
   });
   warnings.push(...normalized.warnings);
 
@@ -294,7 +297,20 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     normalized.resume.x_cvparse = { ...normalized.resume.x_cvparse, detectedLanguage: language };
   }
 
-  const validated = ResumeSchema.safeParse(normalized.resume);
+  // Grounding and coverage compare the output with the text the model read. In vision mode
+  // (whole document or some pages sent as images) part of the CV is only pixels, so a value
+  // missing from the text may still be real: skip both checks entirely.
+  let resume = normalized.resume;
+  if (images.length === 0 && cvText !== "") {
+    // Coverage is checked on the grounded resume: grounding may move entries into a section the
+    // model left empty (a university returned in work[] goes back to education[]).
+    const grounded = options.grounding !== false ? groundResume(resume, cvText) : null;
+    if (grounded) resume = grounded.resume;
+    warnings.push(...checkCoverage(resume, cvText));
+    if (grounded) warnings.push(...grounded.warnings);
+  }
+
+  const validated = ResumeSchema.safeParse(resume);
   if (!validated.success) {
     throw new CvparseError(
       "VALIDATION_ERROR",

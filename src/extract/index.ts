@@ -1,5 +1,6 @@
 import { CvparseError } from "../errors.js";
 import type { OcrAdapter, OcrInput, OcrMimeType, OcrPage } from "../ocr/types.js";
+import { cleanExtractedText } from "./clean.js";
 import { NEEDS_OCR_HINT, scannedPageWarning } from "./messages.js";
 import type { PdfAnalysis } from "./pdf.js";
 import type { DetectedLayout, ExtractedDocument, InputFormat } from "./types.js";
@@ -183,6 +184,9 @@ export function imageMimeType(data: Uint8Array): OcrMimeType | null {
  * GIF/BMP images, legacy .doc and unknown bytes; `NO_TEXT_LAYER` for PDFs without text and no
  * adapter (every page scanned); `EXTRACTION_FAILED` for corrupt documents; `OCR_FAILED` (also when
  * aborted during OCR) / `MISSING_DEPENDENCY` from OCR.
+ *
+ * The returned text is cleaned with {@link cleanExtractedText} (NFC, PDF dotless-i accents,
+ * ligatures, no-break spaces).
  */
 export async function extractText(
   input: Uint8Array | DocumentInput,
@@ -195,6 +199,16 @@ export async function extractText(
   }
 
   const detected: DetectedFormat = format ?? detectFormat(data, filename);
+  const doc = await extractByFormat(detected, data, filename, options);
+  return { ...doc, text: cleanExtractedText(doc.text) };
+}
+
+async function extractByFormat(
+  detected: DetectedFormat,
+  data: Uint8Array,
+  filename: string | undefined,
+  options: ExtractTextOptions,
+): Promise<ExtractedDocument> {
   switch (detected) {
     case "text":
       return { text: decodeText(data), format: "text", layout: "unknown", warnings: [] };

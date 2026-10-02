@@ -25,6 +25,7 @@ function makeIo(overrides: Partial<CliIo> = {}): Captured {
       io.err.push(text);
     },
     readStdin: async () => "",
+    checkContext: async () => null,
     ...overrides,
   };
   return io;
@@ -132,6 +133,22 @@ describe("cli main", () => {
     const io = makeIo({ parse: capture });
     expect(await main([file, "--ocr", "vision"], {}, io)).toBe(EXIT_OK);
     expect(seen).toBe("vision");
+  });
+
+  it("warns when an Ollama call filled the context window", async () => {
+    const file = tmpFile("cv.txt", "Ana Pérez");
+    const io = makeIo({
+      parse: fakeParse,
+      checkContext: async () => ({ contextLength: 4096, usedTokens: 7000 }),
+    });
+    expect(await main([file], {}, io)).toBe(EXIT_OK);
+    expect(io.err.join("")).toContain("OLLAMA_CONTEXT_LENGTH");
+    const openai = makeIo({
+      parse: fakeParse,
+      checkContext: async () => ({ contextLength: 1, usedTokens: 9 }),
+    });
+    expect(await main([file, "--provider", "openai", "--api-key", "k"], {}, openai)).toBe(EXIT_OK);
+    expect(openai.err.join("")).not.toContain("OLLAMA_CONTEXT_LENGTH");
   });
 
   describe("--extract-only", () => {

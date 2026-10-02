@@ -10,6 +10,17 @@
  * "Grado". When several title words remain, the highest-ranking one wins (Doctorado > Máster >
  * Especialización > Licenciatura > Tecnicatura > Secundario), except that words that clearly
  * denote a short course ("curso", "bootcamp", "certificado", "taller", ...) always win.
+ *
+ * Notes on English / Portuguese titles:
+ * - "<X> Engineering", "Engineer", "Engenharia" are profession titles (bachelor, "Ingeniería") with
+ *   the lowest rank, exactly like "Ingeniería" / "Ingeniero": "Engineering Technician" is technical
+ *   and "Master of Engineering" is a master.
+ * - "Technician", "Technologist", "Associate", "Technical degree/diploma" are technical. A
+ *   technician title earned at secondary school is ambiguous: only explicit phrases ("Technical
+ *   High School", "Secundario Técnico", "Ensino Médio Técnico") are consumed as secondary; in
+ *   "Electronics Technician (High School)" both words survive and the higher rank (technical) wins.
+ * - Unfinished / ongoing markers ("incomplete", "unfinished", "in progress", "incompleto",
+ *   "en curso", "em andamento", "trancado") are blanked first and never change the level.
  */
 
 /** Coarse education level, ordered roughly from lowest to highest formal attainment. */
@@ -87,6 +98,16 @@ const NEUTRAL_PHRASES: readonly RegExp[] = [
   // "Cursó 3 años de ..." loses its accent when folded and would read as a course.
   /\bcurso (?:\d|hasta\b)/,
   /\bgrado academico\b/,
+  // Portuguese "em curso" (ongoing) would otherwise read as a course.
+  /\bem curso\b/,
+  // Unfinished / ongoing studies: they never change the level of the title they qualify.
+  /\bin progress\b/,
+  /\bon-?going\b/,
+  /\bun-?finished\b/,
+  /\bnot (?:completed|finished)\b/,
+  /\bincomplet[eoa]s?\b/,
+  /\bem andamento\b/,
+  /\btrancad[oa]\b/,
 ];
 
 /**
@@ -124,7 +145,44 @@ const RULES: readonly Rule[] = [
     level: "secondary",
     canonical: "Educación Media",
   },
+  { pattern: /\bensino medio tecnico\b/, level: "secondary", canonical: "Educación Media" },
   { pattern: /\bmedia superior\b/, level: "secondary", canonical: "Preparatoria" },
+  // English technical diplomas earned at secondary school. A bare "Technician" next to
+  // "(High School)" is not consumed here: both words stay and the higher rank (technical) wins.
+  {
+    pattern: /\btechnical (?:high|secondary) ?school\b/,
+    level: "secondary",
+    canonical: "Secundario",
+  },
+  {
+    pattern: /\bvocational (?:high|secondary) ?school\b/,
+    level: "secondary",
+    canonical: "Secundario",
+  },
+  // Brazilian "Curso Técnico" is a vocational diploma, not a short course.
+  { pattern: /\bcurso tecnico\b/, level: "technical", canonical: "Técnico" },
+  {
+    pattern: /\bcurso superior de tecnologia\b/,
+    level: "technical",
+    canonical: "Tecnólogo",
+  },
+  // English "technical certificate/diploma" is a vocational title; consumed before the course rules.
+  {
+    pattern: /\btechnical (?:degree|diploma|certificate|school|college|program(?:me)?|studies)\b/,
+    level: "technical",
+    canonical: "Técnico",
+  },
+  {
+    pattern: /\bvocational (?:degree|diploma|certificate|training|school|college|program(?:me)?)\b/,
+    level: "technical",
+    canonical: "Formación Profesional",
+  },
+  // "Bachelor of Engineering" names the engineering family, like "B.Eng".
+  {
+    pattern: /\bbachelor(?:'?s)?(?: degree)? (?:of|in) engineering\b/,
+    level: "bachelor",
+    canonical: "Ingeniería",
+  },
   { pattern: /\bmaestr[oa] mayor de obras?\b/, level: "technical", canonical: "Técnico" },
 
   // --- Doctorate ---------------------------------------------------------------------------
@@ -190,7 +248,11 @@ const RULES: readonly Rule[] = [
   { pattern: /\btecnolog[oa]\b/, level: "technical", canonical: "Tecnólogo" },
   { pattern: /\bterciari[oa]\b/, level: "technical", canonical: "Terciario" },
   { pattern: /\banalista\b/, level: "technical", canonical: "Analista" },
-  { pattern: /\bassociate(?:'s)? (?:degree|of)\b/, level: "technical", canonical: "Tecnicatura" },
+  { pattern: /\bassociate(?:'?s)? (?:degree|of)\b/, level: "technical", canonical: "Tecnicatura" },
+  { pattern: /\bassociate(?:'?s)?\b/, level: "technical", canonical: "Tecnicatura" },
+  { pattern: /\ba\.?a\.?s\.?(?=[\s(,;:/-]|$)/, level: "technical", canonical: "Tecnicatura" },
+  { pattern: /\btechnicians?\b/, level: "technical", canonical: "Técnico" },
+  { pattern: /\btechnologists?\b/, level: "technical", canonical: "Tecnólogo" },
 
   // --- Bachelor ------------------------------------------------------------------------------
   { pattern: /\blicenciatura\b/, level: "bachelor", canonical: "Licenciatura" },
@@ -203,6 +265,9 @@ const RULES: readonly Rule[] = [
   { pattern: /\bdiplomatura\b/, level: "bachelor", canonical: "Diplomatura" },
   { pattern: /\bprofesional\b/, level: "bachelor", canonical: "Profesional" },
   { pattern: /\bbachelors?(?:'s)?\b/, level: "bachelor", canonical: "Licenciatura" },
+  { pattern: /\bundergraduate\b/, level: "bachelor", canonical: "Grado" },
+  { pattern: /\bgraduacao\b/, level: "bachelor", canonical: "Grado" },
+  { pattern: /\bensino superior\b/, level: "bachelor", canonical: "Grado" },
   { pattern: /\bbacharel(?:ado)?\b/, level: "bachelor", canonical: "Licenciatura" },
   { pattern: /\bb\.?eng\.?(?=[\s(,;:/-]|$)/, level: "bachelor", canonical: "Ingeniería" },
   {
@@ -236,7 +301,8 @@ const RULES: readonly Rule[] = [
     rank: PROFESSION_RANK,
   },
   {
-    pattern: /\bengineering degree\b/,
+    // "Computer Engineering", "Engineering degree", "Software Engineer".
+    pattern: /\bengineer(?:ing|s)?\b/,
     level: "bachelor",
     canonical: "Ingeniería",
     rank: PROFESSION_RANK,
@@ -405,4 +471,21 @@ export function normalizeStudyType(
     }
   }
   return { level: "unknown", canonical: null, original: null };
+}
+
+/**
+ * One {@link EducationLevelInfo} per `education[]` entry, in order (the parallel
+ * `x_cvparse.educationLevels` array). `null` when `education` is not an array.
+ */
+export function collectEducationLevels(education: unknown): EducationLevelInfo[] | null {
+  if (!Array.isArray(education)) return null;
+  return education.map((entry) => {
+    if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
+      return normalizeStudyType(null);
+    }
+    const record = entry as Record<string, unknown>;
+    const studyType = typeof record.studyType === "string" ? record.studyType : null;
+    const area = typeof record.area === "string" ? record.area : null;
+    return normalizeStudyType(studyType, area);
+  });
 }

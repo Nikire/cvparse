@@ -60,6 +60,12 @@ const CURRENT_WORDS = new Set([
   "atual",
   "presente momento",
   "ate o momento",
+  // Still being earned (certificates, degrees): no date yet.
+  "in progress",
+  "en progreso",
+  "em andamento",
+  "em curso",
+  "cursando",
 ]);
 
 /** Ongoing markers, longest first, so "hasta la actualidad" wins over "actualidad" as a suffix. */
@@ -670,4 +676,137 @@ export function splitDateRange(
   const text = clean(trimmed);
   if (text === "") return null;
   return splitRangeText(text, options.referenceDate ?? new Date(), false);
+}
+
+/**
+ * Picks the latest date of a value that lists several ("2012, 2019", "Mar 2018 y Jun 2020",
+ * "2015 / 2017") for single-date fields such as `awards[].date`. Parts are split on commas,
+ * semicolons, "&", "+", " / " and "y" / "and" / "e"; each part goes through {@link normalizeDate}.
+ *
+ * Returns `null` unless at least two parts normalize to a date. Ranges ("2019-2021") are not lists
+ * and also return `null`.
+ */
+export function pickLatestDate(
+  input: string | null | undefined,
+  options: DateOptions = {},
+): string | null {
+  if (typeof input !== "string") return null;
+  const parts = input
+    .split(/\s*(?:[,;&+]|\s\/\s|\s(?:y|and|e|und)\s)\s*/i)
+    .map((part) => part.trim())
+    .filter((part) => part !== "");
+  if (parts.length < 2) return null;
+  const values: string[] = [];
+  for (const part of parts) {
+    const date = normalizeDate(part, options);
+    if (date.value !== null && !date.unparsed) values.push(date.value);
+  }
+  if (values.length < 2) return null;
+  // ISO strings sort chronologically; a more precise value of the same year sorts after it.
+  return values.reduce((latest, value) => (value > latest ? value : latest));
+}
+
+/** Lowercase, no diacritics, unified dashes and whitespace; used to look dates up in the CV. */
+function foldSource(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[‐-―−]/g, "-")
+    .replace(/\s+/g, " ");
+}
+
+const MONTH_ALT = Object.keys(MONTHS)
+  .sort((a, b) => b.length - a.length)
+  .join("|");
+const SEASON_ALT = Object.keys(SEASONS).join("|");
+const PERIOD_ALT = `${SEASON_ALT}|q[1-4]|[1-4][tq]|semestre|cuatrimestre|trimestre|bimestre|quarter|semester`;
+const ORDINAL = "(?:st|nd|rd|th|º|°|o)?";
+const MAX_LOOKBEHIND = 32;
+
+/** Text right before the year that names its month: "marzo de ", "Mar. ", "03/", "verano ", "Q1 ". */
+const MONTH_BEFORE = new RegExp(
+  [
+    String.raw`\b(?:${MONTH_ALT})\.?\s*(?:de |del |of )?[,/.-]?\s*$`,
+    String.raw`\b(?:${MONTH_ALT})\.? \d{1,2}${ORDINAL},? ?$`,
+    String.raw`\b(?:${PERIOD_ALT})\.?\s*(?:de |del |of )?[,/.-]?\s*$`,
+    String.raw`(?<!\d)(?:0?[1-9]|1[0-2]) ?[/.-] ?$`,
+  ].join("|"),
+);
+/**
+ * Text right after the year that names its month: "-03", "/03", "-S1", " Q2", ", marzo". A month
+ * name further away ("2019 - marzo 2020") belongs to the next date, not to this year.
+ */
+const MONTH_AFTER = new RegExp(
+  String.raw`^(?: ?[/.-] ?(?:0?[1-9]|1[0-2])(?!\d)| ?[/-]? ?(?:q[1-4]|s[12]|[1-4][tq])\b|,? (?:${MONTH_ALT})\b)`,
+);
+/** Text right before the year that names its day: "15/03/", "15 de marzo de ", "March 15, ". */
+const DAY_BEFORE = new RegExp(
+  [
+    String.raw`(?<!\d)\d{1,2} ?[/.-] ?\d{1,2} ?[/.-] ?$`,
+    String.raw`(?<!\d)\d{1,2}${ORDINAL} (?:de |of )?(?:${MONTH_ALT})\.?\s*(?:de |del |of )?,? ?$`,
+    String.raw`\b(?:${MONTH_ALT})\.? \d{1,2}${ORDINAL},? ?$`,
+  ].join("|"),
+);
+/** Text right after the year that names its day: "-03-15", "/03/15". */
+const DAY_AFTER = /^ ?[/.-] ?\d{1,2} ?[/.-] ?\d{1,2}(?!\d)/;
+
+/** Windows of text around every standalone occurrence of `year` in `folded`. */
+function yearContexts(folded: string, year: string): Array<{ before: string; after: string }> {
+  const contexts: Array<{ before: string; after: string }> = [];
+  const pattern = new RegExp(String.raw`(?<!\d)${year}(?!\d)`, "g");
+  for (const match of folded.matchAll(pattern)) {
+    const index = match.index;
+    contexts.push({
+      before: folded.slice(Math.max(0, index - MAX_LOOKBEHIND), index),
+      after: folded.slice(index + year.length, index + year.length + MAX_LOOKBEHIND),
+    });
+  }
+  return contexts;
+}
+
+/** Result of {@link reduceDatePrecision}. */
+export interface PrecisionReduction {
+  /** The reduced ISO date. */
+  value: string;
+  /** Which invented component was removed. */
+  reason: "month" | "day";
+}
+
+/**
+ * Undoes precision a model invented: models often pad "2020" to "2020-01" (or "2020-03" to
+ * "2020-03-01"). When `iso` ends in `-01` and `sourceText` contains its year but never next to a
+ * month (or day) expression — month names / abbreviations in Spanish, English and Portuguese,
+ * seasons and quarters, `MM/YYYY`, `MM-YYYY`, `YYYY-MM` — the padded component is dropped:
+ * "2020-01" -> "2020", "2020-03-01" -> "2020-03", "2020-01-01" -> "2020".
+ *
+ * Returns `null` when nothing changes, including when the year does not appear in the text at
+ * all (nothing to compare against).
+ */
+export function reduceDatePrecision(iso: string, sourceText: string): PrecisionReduction | null {
+  const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(iso);
+  if (!m) return null;
+  const [, year, month, day] = m as unknown as [string, string, string, string | undefined];
+  // Only trailing "-01" padding is suspicious: "2020-01-15" or "2020-03" stay as they are.
+  if (day !== undefined ? day !== "01" : month !== "01") return null;
+
+  const contexts = yearContexts(foldSource(sourceText), year);
+  if (contexts.length === 0) return null;
+
+  let value = iso;
+  let reason: PrecisionReduction["reason"] | null = null;
+  if (day === "01") {
+    const hasDay = contexts.some((c) => DAY_BEFORE.test(c.before) || DAY_AFTER.test(c.after));
+    if (hasDay) return null;
+    value = `${year}-${month}`;
+    reason = "day";
+  }
+  if (month === "01") {
+    const hasMonth = contexts.some((c) => MONTH_BEFORE.test(c.before) || MONTH_AFTER.test(c.after));
+    if (!hasMonth) {
+      value = year;
+      reason = "month";
+    }
+  }
+  return reason === null ? null : { value, reason };
 }

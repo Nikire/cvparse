@@ -39,6 +39,7 @@ export {
   type EducationLevelInfo,
   normalizeStudyType,
 } from "./normalize/education.js";
+export { checkCoverage, type GroundResult, groundResume } from "./normalize/grounding.js";
 export { type DetectedLanguage, detectLanguage } from "./normalize/language.js";
 export { type NormalizeResult, normalizeResume } from "./normalize/resume.js";
 export {

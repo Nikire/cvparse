@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CvparseError } from "../src/errors.js";
+import { cleanExtractedText } from "../src/extract/clean.js";
 import { detectFormat, extractText } from "../src/extract/index.js";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
@@ -124,5 +125,29 @@ describe("extractText", () => {
       (e: unknown) => e,
     );
     expect((error as CvparseError).code).toBe("INVALID_INPUT");
+  });
+});
+
+describe("cleanExtractedText", () => {
+  it("composes a dotless i + combining acute from PDF fonts into í (regression: Albarracı́n)", () => {
+    expect(cleanExtractedText("Albarracı́n")).toBe("Albarracín");
+    expect(cleanExtractedText("Marı̀a")).toBe("Marìa");
+  });
+
+  it("NFC-composes decomposed accents and keeps a lone dotless i (Turkish)", () => {
+    expect(cleanExtractedText("José Pérez")).toBe("José Pérez");
+    expect(cleanExtractedText("Iğdır Kadıköy")).toBe("Iğdır Kadıköy");
+  });
+
+  it("expands ligatures and turns no-break spaces into spaces", () => {
+    expect(cleanExtractedText("Oﬃce ﬁnance, ﬂow, eﬀort, baﬄe")).toBe(
+      "Office finance, flow, effort, baffle",
+    );
+    expect(cleanExtractedText("Buenos Aires 2020")).toBe("Buenos Aires 2020");
+  });
+
+  it("is applied by extractText", async () => {
+    const doc = await extractText(ascii("Albarracı́n ﬁnal text"));
+    expect(doc.text).toBe("Albarracín final text");
   });
 });

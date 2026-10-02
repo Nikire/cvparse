@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { normalizeDate } from "../src/index.js";
-import { splitDateRange } from "../src/normalize/dates.js";
+import { pickLatestDate, reduceDatePrecision, splitDateRange } from "../src/normalize/dates.js";
 
 /** Fixed anchor so relative dates are deterministic: 1 October 2026. */
 const REF = { referenceDate: new Date(Date.UTC(2026, 9, 1)) };
@@ -328,5 +328,111 @@ describe("splitDateRange", () => {
     // Not a valid month and not after the start: still not a range.
     expect(splitDateRange("2019-19")).toBeNull();
     expect(splitDateRange("2019-15")).toBeNull();
+  });
+});
+
+describe("pickLatestDate", () => {
+  it("keeps the latest of several listed dates", () => {
+    expect(pickLatestDate("2012, 2019")).toBe("2019");
+    expect(pickLatestDate("2019; 2012")).toBe("2019");
+    expect(pickLatestDate("Mar 2018 y Jun 2020")).toBe("2020-06");
+    expect(pickLatestDate("2015 and 2017 & 2016")).toBe("2017");
+    expect(pickLatestDate("2015 / 2017")).toBe("2017");
+    expect(pickLatestDate("2019, mayo 2019")).toBe("2019-05");
+  });
+
+  it("returns null unless at least two parts are dates", () => {
+    expect(pickLatestDate("2019")).toBeNull();
+    expect(pickLatestDate("2019, unknown")).toBeNull();
+    expect(pickLatestDate("Mayo, 2019")).toBeNull();
+    expect(pickLatestDate("")).toBeNull();
+    expect(pickLatestDate(null)).toBeNull();
+  });
+});
+
+describe("reduceDatePrecision", () => {
+  it("drops a month the document never wrote (regression: '(2020–2021)' became 2020-01)", () => {
+    const text = "Universidad Nacional — Computer Engineering (2020–2021)";
+    expect(reduceDatePrecision("2020-01", text)).toEqual({ value: "2020", reason: "month" });
+    expect(reduceDatePrecision("2021-01", text)).toEqual({ value: "2021", reason: "month" });
+    expect(reduceDatePrecision("2020-01-01", text)).toEqual({ value: "2020", reason: "month" });
+  });
+
+  it("keeps the month when a month expression is next to the year", () => {
+    for (const text of [
+      "Enero 2020 - Marzo 2021",
+      "enero de 2020",
+      "Jan. 2020",
+      "January, 2020",
+      "janeiro de 2020",
+      "01/2020",
+      "1-2020",
+      "2020-01",
+      "2020/01",
+      "Q1 2020",
+      "2020-S1",
+      "primer semestre 2020",
+    ]) {
+      expect(reduceDatePrecision("2020-01", text), text).toBeNull();
+    }
+  });
+
+  it("keeps the month when any occurrence of the year has one", () => {
+    expect(reduceDatePrecision("2020-01", "Curso (2020)\nEmpresa X, enero 2020 - hoy")).toBeNull();
+  });
+
+  it("does not borrow a month that belongs to the next date of a range", () => {
+    expect(reduceDatePrecision("2019-01", "2019 - Marzo 2020")).toEqual({
+      value: "2019",
+      reason: "month",
+    });
+  });
+
+  it("drops an invented day but keeps a written month", () => {
+    expect(reduceDatePrecision("2020-03-01", "Marzo 2020 – Junio 2021")).toEqual({
+      value: "2020-03",
+      reason: "day",
+    });
+    expect(reduceDatePrecision("2020-01-01", "Enero 2020")).toEqual({
+      value: "2020-01",
+      reason: "day",
+    });
+    expect(reduceDatePrecision("2020-03-01", "01/03/2020")).toBeNull();
+    expect(reduceDatePrecision("2020-03-01", "1 de marzo de 2020")).toBeNull();
+    expect(reduceDatePrecision("2020-03-01", "March 1, 2020")).toBeNull();
+    expect(reduceDatePrecision("2020-03-01", "2020-03-01")).toBeNull();
+  });
+
+  it("leaves everything else alone", () => {
+    // The year is not in the text: nothing to compare against.
+    expect(reduceDatePrecision("2020-01", "Experiencia en Node.js")).toBeNull();
+    // Not "-01" padding.
+    expect(reduceDatePrecision("2020-03", "2020")).toBeNull();
+    expect(reduceDatePrecision("2020-01-15", "2020")).toBeNull();
+    expect(reduceDatePrecision("2020", "2020")).toBeNull();
+    // "12020" is not the year 2020.
+    expect(reduceDatePrecision("2020-01", "Legajo 12020")).toBeNull();
+  });
+});
+
+describe("normalizeDate: 'in progress' markers", () => {
+  it.each([
+    "In progress",
+    "in progress",
+    "En curso",
+    "en progreso",
+    "Em andamento",
+    "em curso",
+    "Cursando",
+  ])("treats %s as ongoing (null, no unparsed flag)", (input) => {
+    expect(normalizeDate(input)).toEqual({ value: null, current: true, unparsed: false });
+  });
+
+  it("splits a range ending in 'in progress'", () => {
+    expect(splitDateRange("2024 - in progress")).toEqual({
+      start: "2024",
+      end: null,
+      current: true,
+    });
   });
 });

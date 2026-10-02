@@ -111,7 +111,7 @@ function buildSchemas<D extends z.ZodType<string>>(date: D) {
       url: text("Institution website."),
       area: text("Field of study, e.g. 'Ingeniería en Sistemas', 'Computer Science'."),
       studyType: text(
-        "Degree type, normalized in the CV's language, e.g. 'Licenciatura', 'Ingeniería', 'Tecnicatura', 'Maestría', 'Doctorado', 'Bachelor', 'Master', 'PhD'.",
+        "Degree type as written in the CV, in its canonical short form when the CV writes a degree word, e.g. 'Licenciatura', 'Ingeniería', 'Tecnicatura', 'Maestría', 'Doctorado', 'Bachelor', 'Master', 'PhD'; otherwise the title as written (e.g. 'Computer Engineering'). Never a degree type the CV does not write.",
       ),
       startDate: date.nullish(),
       endDate: date.nullish(),
@@ -242,7 +242,7 @@ function buildSchemas<D extends z.ZodType<string>>(date: D) {
         "ISO 639-1 code of the language the CV is written in, e.g. 'es', 'en', 'pt'.",
       ),
       normalizedSkills: textArray(
-        "Flat, deduplicated list of technical and professional skills as canonical lowercase English names, e.g. ['javascript', 'react', 'postgresql', 'team leadership'].",
+        "Flat, deduplicated, lowercase list of the skills in `skills` (every keyword, plus the names of entries without keywords). Computed deterministically by cvparse after extraction, so leave it null during extraction.",
       ),
       location: ExtLocation.nullish(),
       confidenceNotes: textArray(

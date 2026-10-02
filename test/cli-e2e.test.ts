@@ -148,7 +148,12 @@ describe("cli end-to-end against a fake OpenAI-compatible server", () => {
     const code = await main(
       ["-", "--base-url", baseUrl],
       {},
-      { ...io, readStdin: async () => fixture("cv-es-ventas.txt") },
+      {
+        ...io,
+        readStdin: async () => fixture("cv-es-ventas.txt"),
+        // The Ollama context check would hit /api/ps on this fake server; it is tested separately.
+        checkContext: async () => null,
+      },
     );
     expect(code).toBe(EXIT_OK);
     const body = requests.at(-1)?.body as { model: string };

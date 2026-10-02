@@ -62,6 +62,17 @@ export interface ParseOptions {
    */
   referenceDate?: Date;
   /**
+   * Deterministic grounding of the model output against the document text. Defaults to `true`.
+   * Drops values that are not in the CV: email, phone, URLs and profiles; locations (the
+   * candidate's, and per-entry `work`/`education` locations, including the candidate's city
+   * copied into every job); skills, skill keywords and levels not written next to the skill,
+   * plus the matching `x_cvparse.normalizedSkills`; and spoken languages. Every drop adds a
+   * `grounding: ...` warning. Free text (summaries, highlights, positions, company names) and
+   * dates are never grounded. Skipped automatically in vision mode, where the model reads page
+   * images instead of text. Set `false` to keep the raw model output.
+   */
+  grounding?: boolean;
+  /**
    * How to read images and scanned PDFs (no text layer). An {@link OcrAdapter} instance such as
    * `createTesseractAdapter()` from `@cvparse/core/ocr/tesseract` or `createTextractAdapter()`
    * from `@cvparse/core/ocr/textract`; or `"vision"` to send the page images straight to
@@ -98,7 +109,9 @@ export interface ParseResult {
   usage: ParseUsage;
   /**
    * Human-readable warnings: provider/AI SDK warnings (unsupported settings), dates that could
-   * not be normalized, heuristic fallbacks, and the model's own `confidenceNotes`.
+   * not be normalized, heuristic fallbacks, values dropped by grounding (`grounding: ...`),
+   * document sections that came back empty (`coverage: ...`), and the model's own
+   * `confidenceNotes`.
    */
   warnings: string[];
   /** How the input was read (format, pages, detected layout). */

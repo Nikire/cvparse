@@ -25,3 +25,6 @@ Thumbs.db
 
 # Evaluation: model outputs and third-party baselines (AGPL code is fetched, never committed)
 eval/.cache/
+
+# Private regression set with real CVs (PII): never committed
+eval/private/
