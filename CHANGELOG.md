@@ -8,6 +8,8 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-02
+
 ### Added
 
 - Evaluation dataset (`eval/dataset`, CC BY 4.0): 60 synthetic Spanish CVs across Spain, Argentina, Mexico, Colombia, Chile, Peru and Uruguay, in PDF (single column, two columns, sidebar, functional, Europass-style), DOCX (plain, table layout, VML and DrawingML text boxes) and scans (PNG and image-only PDF), with ground truth. Regenerate with `npm run eval:dataset`.
@@ -96,7 +98,8 @@ Initial preview release. Plain-text input only.
 - ESM-only package targeting Node >= 22. Runtime dependencies: `ai`, `zod`, `@ai-sdk/openai-compatible`.
 - English README with Spanish mirror (`README.es.md`), contributing guide, code of conduct (Contributor Covenant 2.1), security policy, MIT license, roadmap.
 
-[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Nikire/cvparse/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Nikire/cvparse/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/Nikire/cvparse/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Nikire/cvparse/compare/v0.0.2...v0.1.0

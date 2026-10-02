@@ -1,6 +1,6 @@
 {
   "name": "@cvparse/core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Turn CVs and resumes into typed, JSON Resume-compatible JSON using LLMs via the Vercel AI SDK. Multi-provider, Ollama/local-first, best-in-class Spanish CV support.",
   "keywords": [
     "resume",
