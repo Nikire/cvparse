@@ -33,8 +33,17 @@ npm ci
 | `npm run release:check` | `npm pack --dry-run`, to see exactly what would be published. |
 | `npm run fixtures:pdf` | Regenerate the PDF fixtures in `test/fixtures/pdf/` with `pdf-lib` (`scripts/fixtures/make-pdf-fixtures.mjs`). |
 | `npm run fixtures:docx` | Regenerate the DOCX fixtures in `test/fixtures/docx/` with `docx` (`scripts/fixtures/make-docx-fixtures.mjs`). |
+| `npm run fixtures:image` | Regenerate the OCR fixtures (`test/fixtures/image/*.png`, `*.jpg` and `test/fixtures/pdf/scanned-es.pdf`) with `@napi-rs/canvas` and `pdf-lib` (`scripts/fixtures/make-image-fixtures.mjs`). |
 
 Before opening a PR, run `npm run lint && npm run typecheck && npm test`. `prepublishOnly` runs the same checks plus the build.
+
+The OCR unit tests use a fake Tesseract worker and a fake Textract client, so they need no network or AWS account. One integration test runs the real tesseract.js on a two-column image; it is skipped unless you set `CVPARSE_OCR_TESTS=1`, because the first run downloads the Spanish traineddata (a few MB) from the jsDelivr CDN into your temp directory:
+
+```bash
+CVPARSE_OCR_TESTS=1 npx vitest run test/ocr-tesseract.test.ts
+```
+
+Run it when you change the Tesseract adapter or the layout code.
 
 To try the CLI from source without building, use `tsx`:
 
@@ -46,6 +55,8 @@ npx tsx src/cli.ts ./path/to/cv.pdf --pretty
 
 The PDF and DOCX files under `test/fixtures/` are committed, but they are generated, not hand-made: every one of them comes from a script in `scripts/fixtures/` that builds it from synthetic content. If you change a script, run `npm run fixtures:pdf` or `npm run fixtures:docx` and commit the result. The scripts pin metadata dates, zip timestamps and shape ids so the output is byte-for-byte deterministic; running them twice must produce no diff. Keep it that way, and never replace a generated fixture with a file exported from a real document.
 
+The OCR fixtures (`npm run fixtures:image`) are the exception: text rendering depends on the fonts installed on your machine, so the output is deterministic per machine but not across machines. The committed files are the reference; regenerate them only when the content changes, and commit all three files together.
+
 ## Project layout
 
 ```
@@ -56,12 +67,19 @@ src/
   errors.ts           CvparseError and its error codes
   types.ts            ResumeInput, ParseOptions, ParseResult, ExtractionSource, ParseLanguage
   version.ts          CVPARSE_VERSION
+  vision.ts           vision mode: images / rendered PDF pages for multimodal models
   extract/
-    index.ts          extractText, detectFormat (magic bytes), DocumentInput; lazy-loads pdf/docx
+    index.ts          extractText, detectFormat (magic bytes), DocumentInput; lazy-loads pdf/docx/ocr
     types.ts          ExtractedDocument, InputFormat, DetectedLayout, TextItem
     pdf.ts            pdf.js (unpdf) text items -> reading-order text
     layout.ts         recursive XY-cut: gutter / band detection, pure and unit-tested
     docx.ts           mammoth HTML -> text, minimal zip reader, DrawingML text-box fallback
+    ocr.ts            recognizeWithAdapter: runs an OcrAdapter, orders items, collects confidence
+    raster.ts         renderPdfPages: scanned PDF pages -> PNG via @napi-rs/canvas (optional peer)
+  ocr/
+    types.ts          OcrAdapter contract
+    tesseract.ts      createTesseractAdapter (@cvparse/core/ocr/tesseract, peer tesseract.js)
+    textract.ts       createTextractAdapter (@cvparse/core/ocr/textract, peer @aws-sdk/client-textract)
   schema/
     index.ts          re-exports
     resume.ts         Zod schemas (JSON Resume + x_cvparse extensions) and derived JSON Schema
@@ -74,14 +92,16 @@ src/
     args.ts           util.parseArgs wiring, USAGE text, defaults
     main.ts           testable main(argv, env, io) returning the exit code
     provider.ts       createOpenAICompatible model factory
+    ocr.ts            --ocr engine -> adapter, imported lazily
 test/
   *.test.ts           Vitest suites (unit, CLI, fake HTTP server end-to-end)
   helpers.ts          fixture loader and sample extractions
-  fixtures/           synthetic CVs used by tests (see below); pdf/ and docx/ are generated
+  fixtures/           synthetic CVs used by tests (see below); pdf/, docx/ and image/ are generated
 scripts/
-  fixtures/           generators for the PDF and DOCX fixtures (npm run fixtures:pdf|docx)
+  fixtures/           generators for the PDF, DOCX and image fixtures (npm run fixtures:pdf|docx|image)
 docs/
   ROADMAP.md
+  ocr.md              OCR and vision guide
 ```
 
 ## Adding a fixture CV

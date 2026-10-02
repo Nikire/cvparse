@@ -84,11 +84,11 @@ describe("cli main", () => {
     expect(io.err.join("")).toContain("Usage: cvparse");
   });
 
-  it("exits 2 for images with an OCR message and for legacy office formats", async () => {
-    for (const file of ["scan.png", "scan.jpg", "scan.tiff"]) {
+  it("exits 2 for unreadable image formats and for legacy office formats", async () => {
+    for (const file of ["scan.gif", "photo.heic"]) {
       const io = makeIo({ parse: fakeParse });
       expect(await main([file], {}, io), file).toBe(EXIT_USAGE);
-      expect(io.err.join("")).toContain("need OCR");
+      expect(io.err.join("")).toContain("Convert the image to PNG or JPEG");
     }
     for (const file of ["cv.doc", "cv.odt", "cv.rtf"]) {
       const io = makeIo({ parse: fakeParse });
@@ -110,6 +110,28 @@ describe("cli main", () => {
     const io = makeIo({ parse: fakeParse });
     expect(await main([file], {}, io)).toBe(EXIT_OK);
     expect(io.err.join("")).not.toContain("info: read");
+  });
+
+  it("hints at --ocr when the input needs OCR", async () => {
+    const file = tmpFile("cv.txt", "Ana");
+    const throwing: typeof parseResume = async () => {
+      throw new CvparseError("OCR_REQUIRED", "The input is an image");
+    };
+    const io = makeIo({ parse: throwing });
+    expect(await main([file], {}, io)).toBe(EXIT_USAGE);
+    expect(io.err.join("")).toContain("hint: pass --ocr tesseract");
+  });
+
+  it("passes vision mode through to parseResume", async () => {
+    const file = tmpFile("cv.txt", "Ana");
+    let seen: unknown;
+    const capture: typeof parseResume = async (input, options) => {
+      seen = options.ocr;
+      return fakeParse(input, options);
+    };
+    const io = makeIo({ parse: capture });
+    expect(await main([file, "--ocr", "vision"], {}, io)).toBe(EXIT_OK);
+    expect(seen).toBe("vision");
   });
 
   describe("--extract-only", () => {
@@ -155,6 +177,9 @@ describe("cli main", () => {
       ["UNSUPPORTED_INPUT", EXIT_USAGE],
       ["NO_TEXT_LAYER", EXIT_USAGE],
       ["INVALID_INPUT", EXIT_USAGE],
+      ["OCR_REQUIRED", EXIT_USAGE],
+      ["MISSING_DEPENDENCY", EXIT_USAGE],
+      ["OCR_FAILED", EXIT_FAILURE],
       ["EXTRACTION_FAILED", EXIT_FAILURE],
       ["PROVIDER_ERROR", EXIT_FAILURE],
     ];

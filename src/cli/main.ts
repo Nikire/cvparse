@@ -14,6 +14,7 @@ import {
   unsupportedExtension,
   unsupportedExtensionMessage,
 } from "./args.js";
+import { createCliOcr } from "./ocr.js";
 import { createCliModel } from "./provider.js";
 
 export const EXIT_OK = 0;
@@ -85,7 +86,19 @@ async function run(options: RunOptions, io: CliIo): Promise<number> {
   const model = createCliModel(options);
   const parse = io.parse ?? parseResume;
   // No retries in the CLI: a missing local Ollama should fail immediately instead of after ~7s.
-  const result = await parse(input, { model, language: options.language, maxRetries: 0 });
+  const ocr = await createCliOcr(options.ocr, options.ocrLanguages);
+  let result: Awaited<ReturnType<typeof parseResume>>;
+  try {
+    result = await parse(input, {
+      model,
+      language: options.language,
+      maxRetries: 0,
+      ocr,
+      ocrLanguages: options.ocrLanguages,
+    });
+  } finally {
+    if (ocr && ocr !== "vision") await ocr.dispose?.();
+  }
 
   if (result.source.format !== "text") {
     const pages = result.source.pages === undefined ? "" : `, ${result.source.pages} page(s)`;
@@ -108,7 +121,16 @@ async function extract(options: ExtractOptions, io: CliIo): Promise<number> {
     io.stdout(input.endsWith("\n") ? input : `${input}\n`);
     return EXIT_OK;
   }
-  const doc = await extractText(input);
+  const ocr = await createCliOcr(options.ocr, options.ocrLanguages);
+  let doc: Awaited<ReturnType<typeof extractText>>;
+  try {
+    doc = await extractText(input, {
+      ocr: ocr === "vision" ? undefined : ocr,
+      ocrLanguages: options.ocrLanguages,
+    });
+  } finally {
+    if (ocr && ocr !== "vision") await ocr.dispose?.();
+  }
   if (doc.format !== "text") {
     const pages = doc.pages === undefined ? "" : `, ${doc.pages} page(s)`;
     io.stderr(`info: read ${doc.format}${pages}, ${doc.layout} layout\n`);
@@ -132,8 +154,10 @@ export async function main(
   env: Record<string, string | undefined> = process.env,
   io: CliIo = defaultIo,
 ): Promise<number> {
+  let mode: "extract" | "run" | "other" = "other";
   try {
     const command = parseCliArgs(argv, env);
+    mode = command.kind === "extract" ? "extract" : command.kind === "run" ? "run" : "other";
     switch (command.kind) {
       case "help":
         io.stderr(USAGE);
@@ -154,10 +178,29 @@ export async function main(
     if (error instanceof CvparseError) {
       io.stderr(`error [${error.code}]: ${error.message}\n`);
       // Problems with the input itself are usage errors, like a missing file or bad flag.
+      if (error.code === "OCR_REQUIRED" || error.code === "NO_TEXT_LAYER") {
+        io.stderr(
+          mode === "extract"
+            ? "hint: pass --ocr tesseract (local) or --ocr textract (AWS).\n"
+            : "hint: pass --ocr tesseract (local), --ocr textract (AWS) or --ocr vision (multimodal model).\n",
+        );
+      }
+      if (error.code === "PROVIDER_ERROR" && /multimodal|image|vision/i.test(error.message)) {
+        io.stderr(
+          "hint: --ocr vision needs a model that accepts images (e.g. --model gemma3:4b with Ollama).\n",
+        );
+      }
+      if (error.code === "MISSING_DEPENDENCY") {
+        io.stderr(
+          "hint: OCR engines are optional; install the package named above next to cvparse.\n",
+        );
+      }
       if (
         error.code === "INVALID_INPUT" ||
         error.code === "UNSUPPORTED_INPUT" ||
-        error.code === "NO_TEXT_LAYER"
+        error.code === "NO_TEXT_LAYER" ||
+        error.code === "OCR_REQUIRED" ||
+        error.code === "MISSING_DEPENDENCY"
       ) {
         return EXIT_USAGE;
       }

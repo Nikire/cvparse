@@ -12,11 +12,20 @@ export {
   type DocumentInput,
   detectFormat,
   type ExtractedDocument,
+  type ExtractTextOptions,
   extractText,
   type InputFormat,
+  imageMimeType,
   type TextItem,
 } from "./extract/index.js";
 export { type OrderedPage, orderTextItems, type PageSize } from "./extract/layout.js";
+export { recognizeWithAdapter } from "./extract/ocr.js";
+export {
+  type RenderedPage,
+  type RenderPdfOptions,
+  type RenderPdfResult,
+  renderPdfPages,
+} from "./extract/raster.js";
 export {
   type DateOptions,
   type DateRange,
@@ -32,6 +41,14 @@ export {
 } from "./normalize/education.js";
 export { type DetectedLanguage, detectLanguage } from "./normalize/language.js";
 export { type NormalizeResult, normalizeResume } from "./normalize/resume.js";
+export {
+  type OcrAdapter,
+  type OcrInput,
+  type OcrItem,
+  type OcrMimeType,
+  type OcrPage,
+  ocrItemsToTextItems,
+} from "./ocr/types.js";
 export { parseResume } from "./parse.js";
 export { buildSystemPrompt, buildUserPrompt } from "./prompt.js";
 export {
@@ -81,6 +98,7 @@ export {
 } from "./schema/index.js";
 export type {
   ExtractionSource,
+  OcrSource,
   ParseLanguage,
   ParseOptions,
   ParseResult,

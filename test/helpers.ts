@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MockLanguageModelV4 } from "ai/test";
+import type { OcrAdapter, OcrInput, OcrPage } from "../src/ocr/types.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -132,4 +133,107 @@ export function mockModelThatThrows(error: unknown) {
       throw error;
     },
   });
+}
+
+// ---------------------------------------------------------------------------------------------
+// Fake OCR adapters (no engine, no network).
+
+/** Line boxes matching `test/fixtures/image/cv-es-two-column.png` (1240x1754), top-left origin. */
+export const FAKE_OCR_PAGE = { width: 1240, height: 1754 };
+
+const OCR_HEADER = [
+  "LUCÍA BEATRIZ MORALES",
+  "Analista de Datos Sr. — Montevideo, Uruguay",
+  "lucia.morales@example.com · +598 99 123 456",
+];
+const OCR_LEFT = [
+  "EXPERIENCIA",
+  "Analista de Datos Sr.",
+  "Banco Oriental S.A.",
+  "marzo 2021 – actualidad",
+  "Tableros de riesgo crediticio en Power BI.",
+  "Modelos de scoring con Python y SQL.",
+  "Analista de Datos",
+  "Retail Sur",
+  "06/2017 – 02/2021",
+  "Reportes de ventas semanales.",
+  "Automatización de cargas ETL.",
+];
+const OCR_RIGHT = [
+  "HABILIDADES",
+  "Python",
+  "SQL",
+  "Power BI",
+  "Excel avanzado",
+  "IDIOMAS",
+  "Español (nativo)",
+  "Inglés (B2)",
+];
+
+function ocrLines(lines: string[], x: number, top: number) {
+  return lines.map((text, i) => ({
+    text,
+    x,
+    y: top + i * 42,
+    width: Math.round(text.length * 14),
+    height: 28,
+    confidence: 0.95,
+  }));
+}
+
+/**
+ * Positioned items for the two-column fixture, in the order an engine emits blocks: header,
+ * then the whole left column, then the whole right column.
+ */
+export function fakeTwoColumnItems() {
+  return [
+    ...ocrLines(OCR_HEADER, 80, 80),
+    ...ocrLines(OCR_LEFT, 80, 260),
+    ...ocrLines(OCR_RIGHT, 760, 260),
+  ];
+}
+
+/** Options for {@link fakeOcrAdapter}. */
+export interface FakeOcrOptions {
+  name?: string;
+  confidence?: number;
+  supportsPdf?: boolean;
+  /** Make `recognize` reject with this. */
+  throws?: unknown;
+  /** Extra adapter warnings returned with each page. */
+  warnings?: string[];
+  /** Return plain text instead of positioned items. */
+  textOnly?: boolean;
+}
+
+/** A fake adapter that records its inputs and returns the two-column fixture content. */
+export function fakeOcrAdapter(options: FakeOcrOptions = {}) {
+  const calls: OcrInput[] = [];
+  const adapter: OcrAdapter & { calls: OcrInput[] } = {
+    name: options.name ?? (options.textOnly ? "fake-text" : "fake"),
+    supports: { pdf: options.supportsPdf ?? false },
+    calls,
+    async recognize(input: OcrInput): Promise<OcrPage> {
+      calls.push(input);
+      if (options.throws !== undefined) throw options.throws;
+      const page: OcrPage = {
+        confidence: options.confidence ?? 0.95,
+        warnings: options.warnings,
+      };
+      if (options.textOnly) {
+        page.text = [...OCR_HEADER, ...OCR_LEFT, ...OCR_RIGHT].join("\n");
+      } else {
+        page.width = FAKE_OCR_PAGE.width;
+        page.height = FAKE_OCR_PAGE.height;
+        page.items = fakeTwoColumnItems();
+      }
+      return page;
+    },
+  };
+  return adapter;
+}
+
+/** A fake adapter that only returns plain text (no boxes). */
+export function fakeTextOcrAdapter(options: Omit<FakeOcrOptions, "textOnly"> = {}) {
+  return fakeOcrAdapter({ ...options, textOnly: true });
 }

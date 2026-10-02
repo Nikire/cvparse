@@ -3,7 +3,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it, vi } from "vitest";
 import { CvparseError } from "../src/errors.js";
-import { extractPdfText } from "../src/extract/pdf.js";
+import { scannedPageWarning } from "../src/extract/messages.js";
+import { analyzePdf, extractPdfText, largestImageCoverage } from "../src/extract/pdf.js";
 
 // Records when unpdf (and with it pdf.js) is first loaded, so we can assert laziness.
 const unpdfLoaded = vi.hoisted(() => ({ value: false }));
@@ -134,6 +135,39 @@ describe("extractPdfText", () => {
     expect(CvparseError.is(error)).toBe(true);
     expect((error as CvparseError).code).toBe("NO_TEXT_LAYER");
     expect((error as CvparseError).message).toMatch(/text layer/);
+    // Valid for library and CLI users alike.
+    expect((error as CvparseError).message).toContain("options.ocr");
+    expect((error as CvparseError).message).toContain("--ocr tesseract|textract");
+    expect((error as CvparseError).message).toContain("--ocr vision");
+  });
+
+  it("keeps the text pages of a mixed PDF and flags the scanned one", async () => {
+    const result = await extractPdfText(pdfFixture("mixed-es.pdf"));
+
+    expect(result.pages).toBe(2);
+    expect(result.scannedPages).toEqual([2]);
+    expect(result.warnings).toEqual([scannedPageWarning(2)]);
+    expect(result.warnings[0]).toMatch(/page 2 looks scanned; pass an OCR adapter/);
+    expect(result.layout).toBe("single-column");
+    expectInOrder(result.text, ["MARÍA FERNANDA LÓPEZ GARCÍA", "Portugués: intermedio"]);
+  });
+
+  it("treats a scanned page with a scanner-app stamp as scanned (NO_TEXT_LAYER)", async () => {
+    const analysis = await analyzePdf(pdfFixture("scanned-stamp-es.pdf"));
+    expect(analysis.pages).toHaveLength(1);
+    expect(analysis.pages[0]?.text).toContain("Escaneado con CamScanner");
+    expect(analysis.pages[0]?.chars).toBeGreaterThan(20);
+    expect(analysis.pages[0]?.needsOcr).toBe(true);
+
+    const error = await extractPdfText(pdfFixture("scanned-stamp-es.pdf")).catch((e: unknown) => e);
+    expect((error as CvparseError).code).toBe("NO_TEXT_LAYER");
+  });
+
+  it("does not flag text pages as scanned", async () => {
+    const analysis = await analyzePdf(pdfFixture("two-pages-es.pdf"));
+    expect(analysis.pages.map((p) => p.needsOcr)).toEqual([false, false]);
+    const mixed = await analyzePdf(pdfFixture("mixed-es.pdf"));
+    expect(mixed.pages.map((p) => p.needsOcr)).toEqual([false, true]);
   });
 
   it("throws EXTRACTION_FAILED for corrupt bytes", async () => {
@@ -162,5 +196,38 @@ describe("extractPdfText", () => {
     // A second extraction over the very same array must work too.
     const again = await extractPdfText(plain);
     expect(again.pages).toBe(1);
+  });
+});
+
+describe("largestImageCoverage", () => {
+  const page = 595 * 842;
+
+  it("measures an image drawn full-page under nested transforms", () => {
+    const ops = {
+      fnArray: [10, 12, 12, 85, 11],
+      argsArray: [null, [1, 0, 0, 1, 0, 0], [595, 0, 0, 842, 0, 0], ["img", 10, 10], null],
+    };
+    expect(largestImageCoverage(ops, page)).toBeCloseTo(1);
+  });
+
+  it("restores the transform after Q and inside form XObjects", () => {
+    const ops = {
+      fnArray: [10, 12, 11, 74, 85, 75, 85],
+      argsArray: [
+        null,
+        [595, 0, 0, 842, 0, 0],
+        null,
+        [[100, 0, 0, 100, 0, 0], null],
+        ["logo"],
+        null,
+        ["tiny"],
+      ],
+    };
+    // Only the 100x100 logo inside the form and a 1x1 image outside: no large image.
+    expect(largestImageCoverage(ops, page)).toBeCloseTo((100 * 100) / page);
+  });
+
+  it("returns 0 without images", () => {
+    expect(largestImageCoverage({ fnArray: [10, 11], argsArray: [null, null] }, page)).toBe(0);
   });
 });

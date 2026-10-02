@@ -13,7 +13,13 @@ export type CvparseErrorCode =
   /** The PDF has no extractable text layer (scanned/image-only). OCR lands in 0.2. */
   | "NO_TEXT_LAYER"
   /** The document could not be parsed (corrupt file, encrypted PDF, broken DOCX). */
-  | "EXTRACTION_FAILED";
+  | "EXTRACTION_FAILED"
+  /** The input is an image or a scanned PDF and no OCR adapter / vision mode was configured. */
+  | "OCR_REQUIRED"
+  /** The OCR adapter failed (engine error, cloud API error). */
+  | "OCR_FAILED"
+  /** An optional peer dependency (tesseract.js, @aws-sdk/client-textract, @napi-rs/canvas) is not installed. */
+  | "MISSING_DEPENDENCY";
 
 /**
  * Error thrown by `parseResume`. Wraps provider and AI SDK errors so callers can

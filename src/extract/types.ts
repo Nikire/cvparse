@@ -4,7 +4,7 @@
  */
 
 /** Input formats cvparse can turn into text. */
-export type InputFormat = "text" | "pdf" | "docx";
+export type InputFormat = "text" | "pdf" | "docx" | "image";
 
 /** Page layout detected during extraction. Only meaningful for paginated formats. */
 export type DetectedLayout = "single-column" | "multi-column" | "unknown";
@@ -21,6 +21,21 @@ export interface ExtractedDocument {
   layout: DetectedLayout;
   /** Non-fatal observations: skipped pages, empty pages, text boxes ignored, etc. */
   warnings: string[];
+  /**
+   * PDF pages (1-based) that look scanned (no text layer, or only a short stamp over a page-size
+   * image) and were NOT read, because no OCR adapter was given. Their text is missing from
+   * `text`. Absent when every page was read.
+   */
+  scannedPages?: number[];
+  /** Present when an OCR adapter produced (part of) the text (images, scanned PDFs/pages). */
+  ocr?: {
+    /** Adapter name (`OcrAdapter.name`). */
+    adapter: string;
+    /** Mean confidence 0..1 across recognized pages, when the engine reports it. */
+    confidence?: number;
+    /** Pages (images) that were recognized; `pages` above is the document's page count. */
+    pages: number;
+  };
 }
 
 /** A positioned text fragment, in PDF user-space points, origin bottom-left. */

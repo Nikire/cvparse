@@ -92,9 +92,21 @@ describe("extractText", () => {
     expect(forced.format).toBe("text");
   });
 
-  it("rejects images, legacy .doc, non-DOCX zips and unknown bytes with UNSUPPORTED_INPUT", async () => {
+  it("rejects images without an OCR adapter with OCR_REQUIRED", async () => {
+    for (const [data, filename] of [
+      [bytes(0x89, 0x50, 0x4e, 0x47), "scan.png"],
+      [bytes(0x47, 0x49, 0x46, 0x38, 0x39, 0x61), "scan.gif"],
+    ] as const) {
+      const error = await extractText({ data, filename }).catch((e: unknown) => e);
+      expect(CvparseError.is(error), filename).toBe(true);
+      expect((error as CvparseError).code).toBe("OCR_REQUIRED");
+      expect((error as CvparseError).message).toMatch(/options\.ocr/);
+      expect((error as CvparseError).message).toContain(filename);
+    }
+  });
+
+  it("rejects legacy .doc, non-DOCX zips and unknown bytes with UNSUPPORTED_INPUT", async () => {
     const cases: Array<[Uint8Array, string | undefined, RegExp]> = [
-      [bytes(0x89, 0x50, 0x4e, 0x47), "scan.png", /OCR/],
       [bytes(0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1), "old.doc", /Legacy Word/],
       [bytes(0x50, 0x4b, 0x03, 0x04, 0x00, 0x00), "a.zip", /ZIP archive/],
       [bytes(0x00, 0x01, 0x02), undefined, /Could not recognize/],

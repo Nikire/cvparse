@@ -13,6 +13,7 @@ import {
 import type { z } from "zod";
 import { CvparseError } from "./errors.js";
 import { extractText } from "./extract/index.js";
+import { scannedPageWarning } from "./extract/messages.js";
 import { detectLanguage } from "./normalize/language.js";
 import { normalizeResume } from "./normalize/resume.js";
 import { buildSystemPrompt, buildUserPrompt } from "./prompt.js";
@@ -22,6 +23,12 @@ import {
   ResumeSchema,
 } from "./schema/resume.js";
 import type { ExtractionSource, ParseOptions, ParseResult, ResumeInput } from "./types.js";
+import {
+  buildMixedVisionPrompt,
+  buildVisionPrompt,
+  toVisionImages,
+  type VisionImage,
+} from "./vision.js";
 
 type ExtractionOutput = z.infer<typeof ResumeExtractionSchema>;
 
@@ -89,8 +96,9 @@ function wrapError(error: unknown): CvparseError {
  * Extracts a JSON Resume-compatible object from a CV using any AI SDK language model.
  *
  * `input` can be the CV text, or the bytes of a PDF, DOCX or text file (format detected from
- * the bytes). Two-column PDFs are read in reading order. Scanned PDFs and images need OCR, which
- * is planned for 0.2.
+ * the bytes). Two-column PDFs are read in reading order. Images and scanned PDF pages need
+ * `options.ocr` (an OCR adapter, or `"vision"` to send them to the model as images); in a PDF that
+ * mixes text and scanned pages, only the scanned pages are OCR'd / sent as images.
  *
  * @example
  * ```ts
@@ -108,7 +116,8 @@ function wrapError(error: unknown): CvparseError {
  * ```
  *
  * @throws {CvparseError} with `code` `INVALID_INPUT`, `UNSUPPORTED_INPUT`, `NO_TEXT_LAYER`,
- * `EXTRACTION_FAILED`, `NO_OBJECT_GENERATED`, `PROVIDER_ERROR` or `VALIDATION_ERROR`.
+ * `EXTRACTION_FAILED`, `OCR_REQUIRED`, `OCR_FAILED`, `MISSING_DEPENDENCY`, `NO_OBJECT_GENERATED`,
+ * `PROVIDER_ERROR` or `VALIDATION_ERROR`.
  */
 export async function parseResume(input: ResumeInput, options: ParseOptions): Promise<ParseResult> {
   if (!options?.model) {
@@ -119,8 +128,12 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   }
 
   const warnings: string[] = [];
-  let source: ExtractionSource;
+  let source: ExtractionSource = { format: "text", layout: "unknown" };
   let rawText: string;
+  /** Page images sent to the model in vision mode; empty otherwise. */
+  let images: VisionImage[] = [];
+  /** Set when a PDF mixes text pages (sent as text) with scanned pages (sent as images). */
+  let mixed: { textPages: number[]; imagePages: number[] } | undefined;
   if (typeof input === "string") {
     rawText = input;
     source = { format: "text", layout: "unknown" };
@@ -129,10 +142,56 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     if (bytes.length === 0) {
       throw new CvparseError("INVALID_INPUT", "The input document is empty (0 bytes).");
     }
-    const doc = await extractText(input);
-    rawText = doc.text;
-    source = { format: doc.format, pages: doc.pages, layout: doc.layout };
-    for (const w of doc.warnings) warnings.push(`extract: ${w}`);
+    let doc: Awaited<ReturnType<typeof extractText>> | undefined;
+    try {
+      doc = await extractText(input, {
+        ocr: typeof options.ocr === "object" ? options.ocr : undefined,
+        // Only explicit hints: deriving them from `language` would override the languages an
+        // adapter was configured with.
+        ocrLanguages: options.ocrLanguages,
+        abortSignal: options.abortSignal,
+      });
+    } catch (error) {
+      // Vision mode: images and fully scanned PDFs go to the model as pictures, not OCR text.
+      const needsPixels =
+        CvparseError.is(error) && (error.code === "OCR_REQUIRED" || error.code === "NO_TEXT_LAYER");
+      if (options.ocr !== "vision" || !needsPixels) throw error;
+      const vision = await toVisionImages(bytes, options.abortSignal);
+      images = vision.images;
+      warnings.push(...vision.warnings);
+      source = {
+        format: vision.format,
+        pages: vision.totalPages,
+        layout: "unknown",
+        ocr: { adapter: "vision", pages: vision.images.length },
+      };
+    }
+    if (doc) {
+      rawText = doc.text;
+      source = { format: doc.format, pages: doc.pages, layout: doc.layout };
+      if (doc.ocr) source.ocr = { ...doc.ocr };
+      let docWarnings = doc.warnings;
+      const scanned = doc.scannedPages ?? [];
+      if (options.ocr === "vision" && scanned.length > 0) {
+        // Mixed PDF: text pages go as text, scanned pages as images.
+        const vision = await toVisionImages(bytes, options.abortSignal, { pages: scanned });
+        images = vision.images;
+        warnings.push(...vision.warnings);
+        const sent = new Set(images.map((image) => image.page));
+        const covered = new Set(scanned.filter((p) => sent.has(p)).map(scannedPageWarning));
+        docWarnings = docWarnings.filter((w) => !covered.has(w));
+        mixed = {
+          textPages: Array.from({ length: doc.pages ?? 0 }, (_, i) => i + 1).filter(
+            (p) => !scanned.includes(p),
+          ),
+          imagePages: images.flatMap((image) => (image.page === undefined ? [] : [image.page])),
+        };
+        source.ocr = { adapter: "vision", pages: images.length };
+      }
+      for (const w of docWarnings) warnings.push(`extract: ${w}`);
+    } else {
+      rawText = "";
+    }
   } else {
     throw new CvparseError(
       "INVALID_INPUT",
@@ -141,7 +200,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   }
 
   const text = rawText.replace(/\r\n?/g, "\n").trim();
-  if (text === "") {
+  if (text === "" && images.length === 0) {
     throw new CvparseError(
       "INVALID_INPUT",
       source.format === "text"
@@ -157,7 +216,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   const cvText = text.slice(0, MAX_INPUT_CHARS);
 
   const language = options.language ?? "auto";
-  const heuristicLanguage = language === "auto" ? detectLanguage(cvText) : null;
+  const heuristicLanguage = language === "auto" && cvText ? detectLanguage(cvText) : null;
 
   const referenceDate = options.referenceDate ?? new Date();
   const instructions = buildSystemPrompt({
@@ -173,7 +232,28 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     const result = await generateText({
       model: options.model,
       instructions,
-      prompt: buildUserPrompt(cvText),
+      ...(images.length > 0
+        ? {
+            messages: [
+              {
+                role: "user" as const,
+                content: [
+                  {
+                    type: "text" as const,
+                    text: mixed
+                      ? buildMixedVisionPrompt(cvText, mixed.textPages, mixed.imagePages)
+                      : buildVisionPrompt(images.length),
+                  },
+                  ...images.map((image) => ({
+                    type: "file" as const,
+                    mediaType: image.mediaType,
+                    data: image.data,
+                  })),
+                ],
+              },
+            ],
+          }
+        : { prompt: buildUserPrompt(cvText) }),
       output: Output.object({
         // Wire format: strict-friendly JSON schema (all keys required, null allowed).
         // Validation: lenient Zod schema, so models that omit keys still pass.

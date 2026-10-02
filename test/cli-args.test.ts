@@ -162,9 +162,11 @@ describe("parseCliArgs", () => {
 });
 
 describe("unsupportedExtension", () => {
-  it("flags images and legacy office formats", () => {
-    expect(unsupportedExtension("scan.jpeg")).toBe(".jpeg");
-    expect(unsupportedExtension("scan.png")).toBe(".png");
+  it("flags image formats no OCR path reads, and legacy office formats", () => {
+    expect(unsupportedExtension("scan.gif")).toBe(".gif");
+    expect(unsupportedExtension("photo.HEIC")).toBe(".heic");
+    expect(unsupportedExtension("scan.png")).toBeNull();
+    expect(unsupportedExtension("scan.jpeg")).toBeNull();
     expect(unsupportedExtension("./old.DOC")).toBe(".doc");
     expect(unsupportedExtension("cv.odt")).toBe(".odt");
   });
@@ -198,6 +200,34 @@ describe("--extract-only", () => {
   });
 });
 
+describe("--ocr / --ocr-lang", () => {
+  it("parses the engine and comma-separated languages", () => {
+    const cmd = parseCliArgs(["scan.png", "--ocr", "tesseract", "--ocr-lang", "es, EN"]);
+    expect(cmd.kind).toBe("run");
+    if (cmd.kind === "run") {
+      expect(cmd.options.ocr).toBe("tesseract");
+      expect(cmd.options.ocrLanguages).toEqual(["es", "en"]);
+    }
+    const plain = parseCliArgs(["cv.pdf"]);
+    if (plain.kind === "run") expect(plain.options.ocr).toBeUndefined();
+  });
+
+  it("rejects unknown engines, bad language lists and vision with --extract-only", () => {
+    expect(() => parseCliArgs(["a.png", "--ocr", "abbyy"])).toThrow(/Unknown OCR engine/);
+    expect(() => parseCliArgs(["a.png", "--ocr", "tesseract", "--ocr-lang", ","])).toThrow(
+      /--ocr-lang/,
+    );
+    expect(() => parseCliArgs(["a.png", "--ocr", "vision", "--extract-only"])).toThrow(/vision/);
+  });
+
+  it("passes tesseract/textract through --extract-only", () => {
+    expect(parseCliArgs(["a.png", "--ocr", "textract", "--extract-only"])).toEqual({
+      kind: "extract",
+      options: { file: "a.png", ocr: "textract", ocrLanguages: undefined },
+    });
+  });
+});
+
 describe("USAGE", () => {
   it("documents every flag", () => {
     for (const flag of [
@@ -213,5 +243,16 @@ describe("USAGE", () => {
       expect(USAGE).toContain(flag);
     }
     expect(USAGE).toMatch(/^Usage: cvparse <file>/);
+  });
+});
+
+describe("--ocr vision defaults", () => {
+  it("defaults to a multimodal model when --model is omitted", () => {
+    const ollama = parseCliArgs(["scan.png", "--ocr", "vision"]);
+    if (ollama.kind === "run") expect(ollama.options.model).toBe("gemma3:4b");
+    const explicit = parseCliArgs(["scan.png", "--ocr", "vision", "--model", "qwen2.5vl"]);
+    if (explicit.kind === "run") expect(explicit.options.model).toBe("qwen2.5vl");
+    const textOnly = parseCliArgs(["cv.pdf"]);
+    if (textOnly.kind === "run") expect(textOnly.options.model).toBe("llama3.1");
   });
 });

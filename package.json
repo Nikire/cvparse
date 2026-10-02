@@ -34,6 +34,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./ocr/tesseract": {
+      "types": "./dist/ocr/tesseract.d.ts",
+      "import": "./dist/ocr/tesseract.js",
+      "default": "./dist/ocr/tesseract.js"
+    },
+    "./ocr/textract": {
+      "types": "./dist/ocr/textract.d.ts",
+      "import": "./dist/ocr/textract.js",
+      "default": "./dist/ocr/textract.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -70,7 +80,8 @@
     "version": "node scripts/release-changelog.mjs && git add CHANGELOG.md",
     "postversion": "echo Now run: git push --follow-tags",
     "fixtures:docx": "node scripts/fixtures/make-docx-fixtures.mjs",
-    "fixtures:pdf": "node scripts/fixtures/make-pdf-fixtures.mjs"
+    "fixtures:pdf": "node scripts/fixtures/make-pdf-fixtures.mjs",
+    "fixtures:image": "node scripts/fixtures/make-image-fixtures.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.61",
@@ -80,13 +91,42 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@aws-sdk/client-textract": "^3.1145.0",
     "@biomejs/biome": "^2.5.15",
+    "@napi-rs/canvas": "^1.0.10",
     "@types/node": "^26.6.3",
     "docx": "^9.8.1",
     "pdf-lib": "^1.17.1",
+    "tesseract.js": "^7.0.0",
     "tsup": "^8.5.1",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3"
+  },
+  "peerDependencies": {
+    "@aws-sdk/client-textract": ">=3.0.0",
+    "@napi-rs/canvas": ">=0.1.0",
+    "tesseract.js": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@aws-sdk/client-textract": {
+      "optional": true
+    },
+    "@napi-rs/canvas": {
+      "optional": true
+    },
+    "tesseract.js": {
+      "optional": true
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "ocr/tesseract": [
+        "./dist/ocr/tesseract.d.ts"
+      ],
+      "ocr/textract": [
+        "./dist/ocr/textract.d.ts"
+      ]
+    }
   }
 }

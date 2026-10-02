@@ -14,12 +14,23 @@ export const DEFAULT_MODELS: Record<CliProvider, string | undefined> = {
   "openai-compatible": undefined,
 };
 
+/** Default model per provider for `--ocr vision` when `--model` is omitted. */
+export const DEFAULT_VISION_MODELS: Record<CliProvider, string | undefined> = {
+  ollama: "gemma3:4b",
+  openai: "gpt-4o-mini",
+  "openai-compatible": undefined,
+};
+
 /** Default base URL per provider when `--base-url` is omitted. */
 export const DEFAULT_BASE_URLS: Record<CliProvider, string | undefined> = {
   ollama: "http://localhost:11434/v1",
   openai: "https://api.openai.com/v1",
   "openai-compatible": undefined,
 };
+
+/** OCR engines selectable from the CLI. `vision` sends page images to the (multimodal) model. */
+export type CliOcr = "tesseract" | "textract" | "vision";
+export const CLI_OCR: readonly CliOcr[] = ["tesseract", "textract", "vision"];
 
 /** Options for a `run` command, fully resolved (defaults applied). */
 export interface RunOptions {
@@ -31,12 +42,19 @@ export interface RunOptions {
   apiKey: string | undefined;
   language: ParseLanguage;
   pretty: boolean;
+  /** OCR engine for images and scanned PDFs (`--ocr`). */
+  ocr: CliOcr | undefined;
+  /** OCR language hints (`--ocr-lang es,en`). */
+  ocrLanguages: string[] | undefined;
 }
 
 /** Options for an `extract` command (`--extract-only`): no model involved. */
 export interface ExtractOptions {
   /** Path to the CV (PDF, DOCX or text), or `-` for stdin. */
   file: string;
+  /** OCR engine for images and scanned PDFs; `vision` is not allowed here (it needs a model). */
+  ocr: Exclude<CliOcr, "vision"> | undefined;
+  ocrLanguages: string[] | undefined;
 }
 
 export type CliCommand =
@@ -52,16 +70,17 @@ export class CliUsageError extends Error {
 
 export const USAGE = `Usage: cvparse <file> [options]
 
-Turn a CV/resume (PDF, DOCX or plain text) into JSON Resume-compatible JSON using an LLM.
+Turn a CV/resume (PDF, DOCX, image or plain text) into JSON Resume-compatible JSON using an LLM.
 
 Arguments:
-  <file>                    Path to the CV: .pdf, .docx or plain text (.txt, .md, ...). The format
-                            is detected from the file contents. Use "-" to read from stdin.
-                            Scanned PDFs and images need OCR, which is planned for 0.2.
+  <file>                    Path to the CV: .pdf, .docx, .png/.jpg/.webp/.tiff or plain text. The
+                            format is detected from the file contents. Use "-" to read from stdin.
+                            Images and scanned PDFs need --ocr.
 
 Options:
   --provider <name>         ollama | openai | openai-compatible   (default: ollama)
-  --model <id>              Model id (default: llama3.1 for ollama, gpt-4o-mini for openai)
+  --model <id>              Model id (default: llama3.1 for ollama, gpt-4o-mini for openai;
+                            with --ocr vision: gemma3:4b for ollama)
   --base-url <url>          API base URL (default: http://localhost:11434/v1 for ollama,
                             https://api.openai.com/v1 for openai; required for openai-compatible)
   --api-key <key>           API key sent as a Bearer token. Falls back to env CVPARSE_API_KEY
@@ -70,6 +89,12 @@ Options:
                             https://api.openai.com/v1 for openai); override it and the key goes there.
   --lang <auto|es|en>       Language of the CV (default: auto)
   --pretty                  Pretty-print the JSON output
+  --ocr <engine>            OCR for images and scanned PDFs: tesseract (local; npm i tesseract.js),
+                            textract (AWS; npm i @aws-sdk/client-textract, uses the default AWS
+                            credential chain and AWS_REGION), or vision (send page images to the
+                            model, which must accept images, e.g. gemma3:4b or gpt-4o-mini).
+                            Scanned PDFs are rendered with @napi-rs/canvas (npm i @napi-rs/canvas).
+  --ocr-lang <codes>        OCR language hints, comma-separated ISO codes (default: --lang, or es,en)
   --extract-only            Print the text extracted from the document and exit, without calling
                             any model. Use it to check reading order on two-column PDFs or to
                             attach the extracted text to a bug report. Needs no provider or key.
@@ -91,6 +116,8 @@ Examples:
   npx @cvparse/core ./cv.txt --provider openai-compatible --base-url http://localhost:1234/v1 --model qwen2.5
   cat cv.txt | npx @cvparse/core - --lang es
   npx @cvparse/core ./cv.pdf --extract-only > cv.txt
+  npx @cvparse/core ./scan.jpg --ocr tesseract --ocr-lang es
+  npx @cvparse/core ./scan.pdf --ocr vision --model gemma3:4b
 `;
 
 const ARG_OPTIONS = {
@@ -101,6 +128,8 @@ const ARG_OPTIONS = {
   lang: { type: "string" },
   pretty: { type: "boolean", default: false },
   "extract-only": { type: "boolean", default: false },
+  ocr: { type: "string" },
+  "ocr-lang": { type: "string" },
   help: { type: "boolean", short: "h", default: false },
   version: { type: "boolean", short: "v", default: false },
 } as const;
@@ -138,9 +167,23 @@ export function parseCliArgs(
   }
   const file = positionals[0] as string;
 
+  const ocrRaw = values.ocr;
+  if (ocrRaw !== undefined && !CLI_OCR.includes(ocrRaw as CliOcr)) {
+    throw new CliUsageError(
+      `Unknown OCR engine "${ocrRaw}". Expected one of: ${CLI_OCR.join(", ")}.`,
+    );
+  }
+  const ocr = ocrRaw as CliOcr | undefined;
+  const ocrLanguages = parseOcrLanguages(values["ocr-lang"]);
+
   // Extraction never talks to a model, so provider/model/key validation does not apply.
   if (values["extract-only"]) {
-    return { kind: "extract", options: { file } };
+    if (ocr === "vision") {
+      throw new CliUsageError(
+        "--ocr vision needs a model, so it cannot be used with --extract-only.",
+      );
+    }
+    return { kind: "extract", options: { file, ocr, ocrLanguages } };
   }
 
   const providerRaw = values.provider ?? "ollama";
@@ -159,7 +202,9 @@ export function parseCliArgs(
   }
   const language = langRaw as ParseLanguage;
 
-  const model = values.model ?? DEFAULT_MODELS[provider];
+  // Vision mode needs a multimodal model; llama3.1 (the Ollama default) is text-only.
+  const model =
+    values.model ?? (ocr === "vision" ? DEFAULT_VISION_MODELS[provider] : DEFAULT_MODELS[provider]);
   if (!model) {
     throw new CliUsageError(`--model is required for provider "${provider}".`);
   }
@@ -198,22 +243,28 @@ export function parseCliArgs(
       apiKey,
       language,
       pretty: values.pretty ?? false,
+      ocr,
+      ocrLanguages,
     },
   };
 }
 
-/** Image extensions: need OCR (planned for 0.2). */
-export const IMAGE_EXTENSIONS = new Set([
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".webp",
-  ".gif",
-  ".tif",
-  ".tiff",
-  ".bmp",
-  ".heic",
-]);
+function parseOcrLanguages(raw: string | undefined): string[] | undefined {
+  if (raw === undefined) return undefined;
+  const codes = raw
+    .split(",")
+    .map((code) => code.trim().toLowerCase())
+    .filter((code) => code !== "");
+  if (codes.length === 0 || codes.some((code) => !/^[a-z]{2,3}(_[a-z]+)?$/.test(code))) {
+    throw new CliUsageError(
+      `--ocr-lang expects comma-separated language codes such as "es,en", got "${raw}".`,
+    );
+  }
+  return codes;
+}
+
+/** Image formats no OCR path accepts; convert to PNG or JPEG first. */
+export const IMAGE_EXTENSIONS = new Set([".gif", ".bmp", ".heic", ".heif", ".svg"]);
 
 /** Legacy / other office formats: convert to .docx or PDF first. */
 export const LEGACY_DOCUMENT_EXTENSIONS = new Set([".doc", ".odt", ".rtf", ".pages"]);
@@ -229,7 +280,7 @@ export function unsupportedExtension(file: string): string | null {
 /** Human-readable reason for an unsupported extension, for the CLI error message. */
 export function unsupportedExtensionMessage(ext: string): string {
   if (IMAGE_EXTENSIONS.has(ext)) {
-    return `${ext} files are images: scanned CVs need OCR, which is planned for 0.2. Run OCR first and pass the text, or export the CV as PDF or DOCX.`;
+    return `${ext} images are not supported. Convert the image to PNG or JPEG and pass --ocr.`;
   }
   return `${ext} files are not supported. Save the CV as .docx or PDF and try again.`;
 }

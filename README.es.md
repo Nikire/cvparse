@@ -8,7 +8,7 @@ Convierte CVs y currículums en JSON tipado y compatible con JSON Resume usando 
 [![Node >= 22](https://img.shields.io/node/v/%40cvparse%2Fcore.svg)](https://nodejs.org)
 
 > **Estado: 0.x — etapa temprana.**
-> cvparse lee **PDF, DOCX y texto plano**. Los PDF se leen en orden de lectura, incluidos los layouts a dos columnas y con barra lateral. Los PDF escaneados y las imágenes necesitan OCR, que llega como adaptador en 0.2. Ver la [hoja de ruta](#hoja-de-ruta). El schema y la API todavía pueden cambiar antes de 1.0.
+> cvparse lee **PDF, DOCX y texto plano**. Los PDF se leen en orden de lectura, incluidos los layouts a dos columnas y con barra lateral. Las **imágenes (PNG, JPEG, WebP, TIFF) y los PDF escaneados** se leen con un adaptador de OCR (Tesseract en local, o AWS Textract) o en modo visión (las imágenes de las páginas van a un modelo multimodal); ver [CVs escaneados e imágenes](#cvs-escaneados-e-imágenes). Ver la [hoja de ruta](#hoja-de-ruta). El schema y la API todavía pueden cambiar antes de 1.0.
 
 [English version](./README.md)
 
@@ -27,7 +27,7 @@ El paquete npm es `@cvparse/core`; el comando que instala es `cvparse` (`npm i -
 
 `cvparse` usa por defecto Ollama en `http://localhost:11434/v1`. Nada sale de tu máquina.
 
-La entrada puede ser un PDF, un DOCX o un archivo de texto plano; el formato se detecta por el contenido del archivo, no por la extensión. Para un PDF o DOCX el CLI imprime una línea `info:` por stderr con lo que leyó, p. ej. `info: read pdf, 2 page(s), multi-column layout`.
+La entrada puede ser un PDF, un DOCX, un archivo de texto plano o, con `--ocr`, una imagen o un PDF escaneado; el formato se detecta por el contenido del archivo, no por la extensión. Para un PDF o DOCX el CLI imprime una línea `info:` por stderr con lo que leyó, p. ej. `info: read pdf, 2 page(s), multi-column layout`.
 
 Otros proveedores:
 
@@ -43,14 +43,16 @@ Todos los flags:
 
 | Flag | Valores | Notas |
 | --- | --- | --- |
-| `<file>` | ruta o `-` | Ruta al CV: `.pdf`, `.docx` o texto plano (`.txt`, `.md`, ...). El formato se detecta por el contenido del archivo. `-` lee de stdin, como texto o como bytes. Los PDF escaneados y las imágenes necesitan OCR, previsto para 0.2 (salida 2) |
+| `<file>` | ruta o `-` | Ruta al CV: `.pdf`, `.docx`, `.png` / `.jpg` / `.webp` / `.tiff` o texto plano (`.txt`, `.md`, ...). El formato se detecta por el contenido del archivo. `-` lee de stdin, como texto o como bytes. Las imágenes y los PDF escaneados necesitan `--ocr`; sin él, el CLI sale con código 2 y una pista |
 | `--provider` | `ollama` \| `openai` \| `openai-compatible` | Por defecto: `ollama` |
 | `--model <id>` | cualquier id de modelo que conozca el proveedor | Por defecto: `llama3.1` (ollama), `gpt-4o-mini` (openai); obligatorio para `openai-compatible` |
 | `--base-url <url>` | URL | Por defecto: `http://localhost:11434/v1` (ollama), `https://api.openai.com/v1` (openai); obligatorio para `openai-compatible` |
 | `--api-key <key>` | string | Se envía como Bearer token. Si se omite, usa la variable de entorno `CVPARSE_API_KEY` (cualquier proveedor) u `OPENAI_API_KEY` (solo con `--provider openai`). La clave solo se envía a la base URL configurada: `https://api.openai.com/v1` por defecto con `--provider openai`; si sobrescribís `--base-url`, la clave se manda a ese host |
 | `--lang` | `es` \| `en` \| `auto` | Pista del idioma del CV. Por defecto: `auto` |
 | `--pretty` | flag | Indenta la salida JSON |
-| `--extract-only` | flag | Imprime el texto extraído del documento en orden de lectura y termina, sin llamar a ningún modelo. Sirve para ver cómo se leyó un PDF a dos columnas o para adjuntar el texto a un reporte de bug. No necesita proveedor ni clave |
+| `--ocr <engine>` | `tesseract` \| `textract` \| `vision` | Cómo leer imágenes y PDF escaneados. `tesseract`: local (`npm i tesseract.js`). `textract`: AWS (`npm i @aws-sdk/client-textract`; usa la cadena de credenciales por defecto de AWS y `AWS_REGION`). `vision`: manda las imágenes de las páginas al modelo, que tiene que aceptar imágenes (p. ej. `gemma3:4b`, `gpt-4o-mini`). Los PDF escaneados se renderizan con `@napi-rs/canvas` (`npm i @napi-rs/canvas`). Ver [CVs escaneados e imágenes](#cvs-escaneados-e-imágenes) |
+| `--ocr-lang <codes>` | códigos ISO separados por coma, p. ej. `es,en` | Pistas de idioma para el OCR. Por defecto: `--lang` si se indicó, si no `es,en` |
+| `--extract-only` | flag | Imprime el texto extraído del documento en orden de lectura y termina, sin llamar a ningún modelo. Sirve para ver cómo se leyó un PDF a dos columnas o para adjuntar el texto a un reporte de bug. No necesita proveedor ni clave. Funciona con `--ocr tesseract` / `textract`, no con `--ocr vision` |
 | `-h`, `--help` | flag | Imprime la ayuda por stderr |
 | `-v`, `--version` | flag | Imprime la versión de cvparse |
 
@@ -59,8 +61,8 @@ El CLI imprime únicamente el objeto `resume` como JSON por **stdout**; los `war
 | Código | Significado |
 | --- | --- |
 | `0` | Éxito |
-| `1` | Falló la extracción (error del proveedor, salida del modelo inválida, documento corrupto) |
-| `2` | Error de uso (argumentos incorrectos, archivo inexistente, entrada no soportada o vacía, PDF sin capa de texto) |
+| `1` | Falló la extracción (error del proveedor, salida del modelo inválida, documento corrupto, error del motor o la API de OCR) |
+| `2` | Error de uso (argumentos incorrectos, archivo inexistente, entrada no soportada o vacía, imagen o PDF escaneado sin `--ocr`, paquete de OCR no instalado) |
 
 Así se puede encadenar con pipes y scripts:
 
@@ -75,7 +77,7 @@ cat cv.pdf | npx @cvparse/core - --lang es
 npm install @cvparse/core @ai-sdk/openai-compatible
 ```
 
-`parseResume` recibe el CV, como string o como los bytes de un archivo PDF, DOCX o de texto, más cualquier modelo de lenguaje del AI SDK. Con Ollama todo corre en local:
+`parseResume` recibe el CV, como string o como los bytes de un archivo PDF, DOCX o de texto (o de una imagen o un PDF escaneado, con la opción `ocr`; ver [CVs escaneados e imágenes](#cvs-escaneados-e-imágenes)), más cualquier modelo de lenguaje del AI SDK. Con Ollama todo corre en local:
 
 ```ts
 import { readFile } from 'node:fs/promises';
@@ -150,6 +152,8 @@ type ParseOptions = {
   maxRetries?: number;              // reintentos ante errores recuperables del proveedor, por defecto 2 (el del AI SDK)
   temperature?: number;             // temperatura de muestreo; omitila para el default del proveedor, 0 va bien para copiar
   referenceDate?: Date;             // "hoy" para fechas relativas ("hace 3 años"); por defecto new Date()
+  ocr?: OcrAdapter | 'vision';      // cómo leer imágenes y PDF escaneados; sin esto fallan con OCR_REQUIRED / NO_TEXT_LAYER
+  ocrLanguages?: readonly string[]; // pistas de idioma para el OCR (ISO 639-1, p. ej. ['es', 'en']); por defecto `language` si se indicó
 };
 ```
 
@@ -162,9 +166,14 @@ type ParseResult = {
   warnings: string[];  // avisos de extracción (con prefijo `extract:`), avisos del proveedor,
                        // fechas que no se pudieron normalizar, notas de confianza del modelo
   source: {
-    format: 'text' | 'pdf' | 'docx';                      // cómo se leyó la entrada
-    pages?: number;                                       // solo PDF
-    layout: 'single-column' | 'multi-column' | 'unknown'; // solo PDF; 'unknown' en el resto
+    format: 'text' | 'pdf' | 'docx' | 'image';            // cómo se leyó la entrada
+    pages?: number;                                       // PDF (y modo visión)
+    layout: 'single-column' | 'multi-column' | 'unknown'; // PDF e imágenes con OCR; 'unknown' en el resto
+    ocr?: {                                               // solo si el texto vino de OCR o del modo visión
+      adapter: string;                                    // 'tesseract', 'textract', el nombre de tu adaptador, o 'vision'
+      confidence?: number;                                // promedio 0..1, si el motor lo reporta (no en modo visión)
+      pages: number;                                      // páginas (imágenes) reconocidas
+    };
   };
 };
 ```
@@ -190,18 +199,104 @@ try {
 | `code` | Cuándo |
 | --- | --- |
 | `INVALID_INPUT` | La entrada está vacía, no es un string / `Uint8Array` / `{ data }`, o el documento no tenía texto; o falta `options.model` |
-| `UNSUPPORTED_INPUT` | Los bytes son una imagen (necesita OCR, previsto para 0.2), un `.doc` antiguo, un ZIP que no es DOCX, o no se reconocen como PDF, DOCX ni texto UTF-8 |
-| `NO_TEXT_LAYER` | El PDF no tiene texto extraíble (escaneado o solo imagen). Corré OCR primero y pasá el texto |
+| `UNSUPPORTED_INPUT` | Un `.doc` antiguo, un ZIP que no es DOCX, un formato de imagen que ningún camino de OCR acepta (GIF, BMP), o bytes que no se reconocen como PDF, DOCX, imagen ni texto UTF-8 |
+| `OCR_REQUIRED` | La entrada es una imagen y no se configuró la opción `ocr`. Pasá un adaptador de OCR u `ocr: 'vision'`. Código de salida 2 en el CLI |
+| `NO_TEXT_LAYER` | El PDF no tiene texto extraíble (escaneado o solo imagen) y no se configuró la opción `ocr`. Se resuelve igual que `OCR_REQUIRED`. Código de salida 2 en el CLI |
+| `OCR_FAILED` | Falló el adaptador de OCR: error del motor, error de la API de Textract (acceso denegado, throttling, documento inválido), imagen no soportada por ese motor. `statusCode` si vino de una API HTTP. Código de salida 1 en el CLI |
+| `MISSING_DEPENDENCY` | Falta una dependencia peer opcional: `tesseract.js`, `@aws-sdk/client-textract`, o `@napi-rs/canvas` (necesaria para renderizar PDF escaneados). El mensaje incluye el comando `npm install`. Código de salida 2 en el CLI |
 | `EXTRACTION_FAILED` | No se pudo leer el documento: PDF corrupto o protegido con contraseña, DOCX roto |
 | `NO_OBJECT_GENERATED` | El modelo no devolvió un objeto válido (`rawText` contiene lo que sí devolvió) |
 | `PROVIDER_ERROR` | Falló la llamada al proveedor: conexión rechazada, autenticación, rate limit, abort (`statusCode` cuando está disponible) |
 | `VALIDATION_ERROR` | El resultado normalizado no pasó `ResumeSchema` |
 
+## CVs escaneados e imágenes
+
+Una foto, un escaneo o un PDF sin capa de texto no tiene texto para leer. cvparse los resuelve de una de tres formas, que se eligen con `ParseOptions.ocr` (o `--ocr` en el CLI). La guía completa, con todas las opciones de los adaptadores, uso offline, consejos de calidad y cómo escribir tu propio adaptador, está en [docs/ocr.md](./docs/ocr.md) (en inglés).
+
+| | Tesseract | AWS Textract | Modo visión |
+| --- | --- | --- | --- |
+| Opción | `ocr: createTesseractAdapter()` | `ocr: createTextractAdapter()` | `ocr: 'vision'` |
+| Corre | En local (WASM, en un worker thread) | En AWS, se paga por página | Donde corra tu `model` |
+| Modelo | Cualquier modelo de texto | Cualquier modelo de texto | Tiene que aceptar imágenes (`gemma3:4b`, `qwen2.5vl`, `gpt-4o-mini`, ...) |
+| Instalación | `npm install tesseract.js` | `npm install @aws-sdk/client-textract` | nada extra |
+
+Los motores de OCR son **dependencias peer opcionales** y se cargan solo cuando los usás; si falta uno, recibís `MISSING_DEPENDENCY` con el comando de instalación. Los PDF escaneados se renderizan primero a PNG, para lo que hace falta otra peer opcional, `@napi-rs/canvas`, en cualquiera de los tres modos. Los adaptadores de OCR reciben como máximo 20 páginas renderizadas, y el modo visión manda como máximo 5 imágenes de página al modelo; un warning avisa cuando un documento quedó cortado. Instalá los paquetes en el mismo proyecto que cvparse; `npx @cvparse/core` usa entonces esa instalación local.
+
+### Tesseract (local)
+
+```bash
+npm install tesseract.js @napi-rs/canvas   # @napi-rs/canvas solo hace falta para PDF escaneados
+```
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { parseResume } from '@cvparse/core';
+import { createTesseractAdapter } from '@cvparse/core/ocr/tesseract';
+
+const ocr = createTesseractAdapter({ languages: ['es', 'en'] });
+try {
+  const { resume, source } = await parseResume(await readFile('./scan.jpg'), { model, ocr });
+  console.log(source.ocr); // { adapter: 'tesseract', confidence: 0.91, pages: 1 }
+} finally {
+  await ocr.dispose?.(); // el worker thread mantiene vivo el proceso hasta que se libera
+}
+```
+
+```bash
+npx @cvparse/core ./scan.jpg --ocr tesseract --ocr-lang es
+```
+
+Tesseract lee bien el texto impreso, y como las palabras con posición pasan por la misma detección de columnas que los PDF, los escaneos a dos columnas salen en orden de lectura. Con el escaneo sintético a dos columnas de `test/fixtures/pdf/scanned-es.pdf` tarda unos 2 segundos en la CPU de una notebook, con un solo error de OCR (una `@` leída como `Q`). Reutilizá un mismo adaptador para un lote de CVs. `source.ocr.confidence` es la confianza promedio por palabra, y cvparse agrega un warning para las páginas por debajo de 0.7, así podés derivar los resultados dudosos a una persona.
+
+### AWS Textract (en la nube)
+
+```bash
+npm install @aws-sdk/client-textract @napi-rs/canvas   # @napi-rs/canvas solo hace falta para PDF escaneados
+```
+
+```ts
+import { createTextractAdapter } from '@cvparse/core/ocr/textract';
+
+const ocr = createTextractAdapter({ region: 'us-east-1' }); // features: 'detect' (por defecto) o 'layout'
+const { resume } = await parseResume(await readFile('./scan.png'), { model, ocr });
+await ocr.dispose?.();
+```
+
+```bash
+npx @cvparse/core ./scan.pdf --ocr textract
+```
+
+Las credenciales y la región salen de la cadena estándar del AWS SDK (`AWS_PROFILE`, `AWS_ACCESS_KEY_ID`, SSO, roles de instancia; `AWS_REGION`). `features: 'layout'` usa el modelo de layout de Textract para el orden de lectura y cuesta más por página; ver [docs/ocr.md](./docs/ocr.md#detect-vs-layout). Textract acepta JPEG, PNG y TIFF de hasta 10 MB, no WebP.
+
+### Modo visión
+
+Sin motor de OCR: las imágenes de las páginas van directo al modelo, que las lee por su cuenta. El modelo tiene que aceptar imágenes.
+
+```ts
+const { resume, source } = await parseResume(await readFile('./scan.png'), {
+  model: ollama('gemma3:4b'),
+  ocr: 'vision',
+});
+```
+
+```bash
+npx @cvparse/core ./scan.pdf --ocr vision --model gemma3:4b
+npx @cvparse/core ./photo.jpg --ocr vision --provider openai --model gpt-4o-mini
+```
+
+En local, `gemma3:4b` leyó bien nombre, puestos, fechas, habilidades e idiomas del PNG sintético de los fixtures en unos 13 segundos; `qwen2.5vl` es otra opción. `llama3.2-vision` no carga en las versiones actuales de Ollama (arquitectura desconocida `mllama`). En la nube, `gpt-4o-mini` es una opción barata. El modo visión acepta imágenes PNG, JPEG y WebP, y PDF escaneados (renderizados con `@napi-rs/canvas`).
+
+### Privacidad
+
+- **Tesseract** corre en tu máquina y nunca manda la imagen a ningún lado. La primera vez que usa un idioma descarga el archivo `traineddata` (unos pocos MB) desde el CDN de jsDelivr, lo que necesita red y le dice al CDN qué idiomas usás. Configurá `langPath` / `cachePath` para servir o precargar esos archivos y trabajar offline ([detalles](./docs/ocr.md#traineddata-and-offline-use)). Con Tesseract y Ollama, nada sale de tu máquina.
+- **Textract** manda el CV a AWS, en la región que elijas. Revisá tu acuerdo de procesamiento de datos y el opt-out de servicios de IA de AWS antes de usarlo con candidatos reales.
+- **El modo visión** manda las imágenes de las páginas al proveedor de modelo que configuraste: tu propia máquina con Ollama, los servidores del proveedor en cualquier otro caso.
+
 ## Por qué cvparse
 
 - **No existe una librería TypeScript mantenida para extracción de CVs con LLM.** Los proyectos TypeScript que hay son parsers por reglas para el navegador (open-resume y sus forks), aplicaciones completas, o paquetes de regex abandonados en 2022. Los parsers con LLM existen en Python, en su mayoría como scripts. cvparse es una librería: sin UI, sin framework, solo una función y un CLI.
 - **Los PDF a dos columnas salen en orden de lectura.** cvparse reconstruye el orden de lectura a partir de la posición del texto en la página (un XY-cut recursivo): detecta la canaleta vertical de los layouts a dos columnas y con barra lateral, deja en su lugar los encabezados y pies a ancho completo, y después corta por los huecos verticales, así que la columna izquierda se lee antes que la derecha en vez de intercalarse línea por línea. Límites conocidos: tres o más columnas solo se resuelven de forma incidental, las tablas pueden leerse fila por fila, el texto rotado o de derecha a izquierda se ignora, y un bloque corto de fechas alineadas a la derecha puede a veces leerse como segunda columna. Los DOCX pasan por `mammoth`, con las tablas de maquetación leídas celda por celda y los cuadros de texto recuperados; los encabezados y pies de página del DOCX no se leen.
-- **Los CVs en español son un objetivo de primera clase.** Los formatos de fecha en español ("marzo 2021 – actualidad") y las convenciones de ubicación de LATAM (CABA, Argentina; Medellín, Antioquia) ya se ejercitan en los fixtures de prueba. La normalización de títulos de España ("Grado", "Máster") está en la hoja de ruta de 0.1, y los CVs con idiomas mezclados forman parte del dataset de evaluación de 0.3.
+- **Los CVs en español son un objetivo de primera clase.** Los formatos de fecha en español ("marzo 2021 – actualidad") y las convenciones de ubicación de LATAM (CABA, Argentina; Medellín, Antioquia) ya se ejercitan en los fixtures de prueba. Los títulos de España y LATAM ("Grado", "Máster", "Licenciatura", "Tecnicatura") se normalizan en `x_cvparse.educationLevels`, y los CVs con idiomas mezclados forman parte del dataset de evaluación de 0.3.
 - **Normalización de fechas determinística.** Después de la llamada al modelo, cvparse normaliza las fechas por su cuenta: nombres y abreviaturas de meses en español, inglés y portugués, marcadores de vigencia ("actualidad", "presente", "a la fecha", "current"), fechas numéricas con el día primero (`03/2021`, `15/03/2021`) y años sueltos se convierten en `YYYY`, `YYYY-MM` o `YYYY-MM-DD`, y cada fecha que no puede normalizar se reporta en `warnings` en vez de pasar en silencio. `normalizeDate` se exporta por si lo querés usar solo.
 - **Salida tipada.** El resultado se valida con Zod y obtenés un tipo `Resume`. Sin `any`, sin parsear JSON a mano después.
 - **Multi-proveedor.** Traé cualquier modelo que soporte el Vercel AI SDK. Cambiá Ollama por OpenAI, Anthropic, Bedrock o Google modificando una línea.
@@ -314,7 +409,8 @@ Los valores exactos dependen del modelo que uses. Los modelos locales pequeños 
 | Parsear sin LLM (determinístico, offline, sin ningún modelo) | Un parser por reglas como el de [open-resume](https://github.com/xitanggg/open-resume). Esperá menor precisión en layouts no estándar. |
 | Algo que corra en el navegador | cvparse apunta a Node >= 22. Existen parsers por reglas para el navegador; las llamadas a LLM desde el navegador exponen tus API keys. |
 | Parsing comercial de alto volumen con SLAs, taxonomías y contratos de soporte | Affinda, Textkernel, RChilli, Daxtra, HireAbility. Están por delante en volumen, cobertura de taxonomías y casos borde, y cobran en consecuencia. |
-| PDF escaneados o imágenes como entrada **hoy** | Todavía no: un PDF sin capa de texto falla con `NO_TEXT_LAYER` y las imágenes se rechazan. Corré OCR vos (Tesseract, Textract) y pasá el texto, o esperá al adaptador de OCR de 0.2. Los `.doc` antiguos también se rechazan: guardalos como `.docx` o PDF. |
+| CVs escritos a mano, o fotos de celular de baja calidad (borrosas, en ángulo, mal iluminadas) | Tesseract no lee letra manuscrita ni corrige la perspectiva; los modelos de visión y Textract se defienden mejor, pero igual leen mal nombres, emails y fechas en fotos malas. Pedí un PDF o un escaneo limpio, o derivá estos casos a una persona. |
+| Archivos `.doc` antiguos | Se rechazan. Guardalos como `.docx` o PDF primero. |
 | Salida garantizada y reproducible para la misma entrada | La salida de un LLM varía entre ejecuciones y modelos. cvparse valida la forma, no la semántica. Fijá un modelo y una temperatura y evaluá con tus propios datos. |
 | Matching, ranking o scoring de CV contra ofertas | cvparse solo extrae. Combinalo con un matcher como Resume-Matcher. |
 | Python | Existen varios parsers de CV con LLM para Python. cvparse es solo TypeScript. |
@@ -323,8 +419,8 @@ Los valores exactos dependen del modelo que uses. Los modelos locales pequeños 
 
 Resumen; el plan completo está en [docs/ROADMAP.md](./docs/ROADMAP.md).
 
-- **0.1** (hecho) — Extracción de texto de PDF con reconstrucción del orden de lectura para layouts a dos columnas y con barra lateral, entrada DOCX incluidas tablas y cuadros de texto, detección de formato por bytes, `extractText` / `detectFormat`. `npx @cvparse/core ./cv.pdf` funciona directamente. Pendiente dentro de 0.1: más formas de fecha, normalización de títulos para España y LATAM, pasaje de `temperature`.
-- **0.2** — Adaptador de OCR para CVs escaneados e imágenes (intercambiable: Tesseract, AWS Textract).
+- **0.1** (hecho) — Extracción de texto de PDF con reconstrucción del orden de lectura para layouts a dos columnas y con barra lateral, entrada DOCX incluidas tablas y cuadros de texto, detección de formato por bytes, `extractText` / `detectFormat`. `npx @cvparse/core ./cv.pdf` funciona directamente. 0.1.1 sumó más formas de fecha, normalización de títulos para España y LATAM, y `temperature` / `referenceDate`.
+- **0.2** (hecho, sin publicar) — CVs escaneados e imágenes: interfaz de adaptador de OCR intercambiable con adaptadores de referencia para Tesseract (local) y AWS Textract, modo visión para modelos multimodales, entrada PNG/JPEG/WebP/TIFF en el CLI, confianza del OCR en `source.ocr`.
 - **0.3** — Dataset de evaluación público de CVs sintéticos en español con layouts difíciles, y un benchmark publicado contra open-resume.
 - **Más adelante** — Empaquetado como agent skill y servidor MCP para usar cvparse directamente desde agentes de código y asistentes.
 
@@ -334,7 +430,7 @@ Los issues y pull requests son bienvenidos. Leé primero [CONTRIBUTING.md](./CON
 
 ## Seguridad
 
-Los CVs son datos personales. cvparse envía el texto únicamente al proveedor de modelo que configurás y a ningún otro lado. Para reportar una vulnerabilidad, ver [SECURITY.md](./SECURITY.md).
+Los CVs son datos personales. cvparse envía el texto (o, en modo visión, las imágenes de las páginas) únicamente al proveedor de modelo que configurás, más a AWS si elegís el adaptador de Textract, y a ningún otro lado. Para reportar una vulnerabilidad, ver [SECURITY.md](./SECURITY.md).
 
 ## Licencia
 

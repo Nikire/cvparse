@@ -1,6 +1,7 @@
 import type { LanguageModel } from "ai";
 import type { DocumentInput } from "./extract/index.js";
 import type { DetectedLayout, InputFormat } from "./extract/types.js";
+import type { OcrAdapter } from "./ocr/types.js";
 import type { Resume } from "./schema/resume.js";
 
 /**
@@ -17,6 +18,8 @@ export interface ExtractionSource {
   pages?: number;
   /** Page layout detected for PDFs; `"unknown"` otherwise. */
   layout: DetectedLayout;
+  /** Present when OCR or vision mode produced the text. */
+  ocr?: OcrSource;
 }
 
 /** Language hint for the CV text. `auto` lets the model (and a small heuristic) detect it. */
@@ -58,6 +61,26 @@ export interface ParseOptions {
    * for reproducible output.
    */
   referenceDate?: Date;
+  /**
+   * How to read images and scanned PDFs (no text layer). An {@link OcrAdapter} instance such as
+   * `createTesseractAdapter()` from `@cvparse/core/ocr/tesseract` or `createTextractAdapter()`
+   * from `@cvparse/core/ocr/textract`; or `"vision"` to send the page images straight to
+   * `model`, which must then be a vision-capable model. Without it, images and scanned PDFs are
+   * rejected with `OCR_REQUIRED`.
+   */
+  ocr?: OcrAdapter | "vision";
+  /** Language hints for OCR engines (ISO 639-1 codes, e.g. `["es", "en"]`). Not derived from `language`: when omitted, the adapter uses its own configured languages. */
+  ocrLanguages?: readonly string[];
+}
+
+/** OCR details when an adapter or vision mode was used. */
+export interface OcrSource {
+  /** Adapter name, or `"vision"`. */
+  adapter: string;
+  /** Mean confidence 0..1 across pages when the engine reports it. */
+  confidence?: number;
+  /** Pages (images) that were recognized. */
+  pages: number;
 }
 
 /** Token usage of the extraction call. Values are `undefined` when the provider does not report them. */

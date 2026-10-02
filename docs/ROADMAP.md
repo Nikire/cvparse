@@ -35,11 +35,11 @@ Goal: `npx @cvparse/core ./cv.pdf` and `npx @cvparse/core ./cv.docx` work withou
 
 Goal: a scanned or photographed CV goes in, JSON comes out.
 
-- [ ] OCR adapter interface: `(input: Buffer) => Promise<string>`.
-- [ ] Reference adapters: Tesseract (local, privacy-preserving) and AWS Textract (hosted, better on layouts).
-- [ ] Vision-model path: for providers that accept images, send the page image directly instead of OCR text, and let users choose.
-- [ ] Image inputs (PNG, JPEG) in the CLI.
-- [ ] Confidence notes surface OCR quality so consumers can route low-confidence results to human review.
+- [x] ~~OCR adapter interface: `(input: Buffer) => Promise<string>`.~~ Shipped as `OcrAdapter` (`recognize(input) => OcrPage | OcrPage[]`): adapters can return positioned items instead of plain text, and those go through the same reading-order code as PDFs, so two-column scans read column by column. Adapters that take PDFs directly declare `supports.pdf`; otherwise cvparse renders scanned PDFs to PNG with `@napi-rs/canvas` (optional peer, max 20 pages). See `docs/ocr.md`.
+- [x] Reference adapters: Tesseract (`@cvparse/core/ocr/tesseract`, local, privacy-preserving) and AWS Textract (`@cvparse/core/ocr/textract`, hosted, `detect` or `layout`). Engines are optional peer dependencies, loaded on first use.
+- [x] Vision-model path: `ocr: "vision"` sends the page images (max 5) to the model instead of OCR text. Works locally with `gemma3:4b` through Ollama.
+- [x] Image inputs (PNG, JPEG, WebP, TIFF) in the CLI, with `--ocr tesseract|textract|vision` and `--ocr-lang`.
+- [x] OCR quality surfaced: `source.ocr.confidence` (mean word confidence) and an `ocr:` warning for pages below 0.7, so consumers can route low-confidence results to human review.
 
 ## 0.3 — Prove it
 
