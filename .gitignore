@@ -28,3 +28,6 @@ eval/.cache/
 
 # Private regression set with real CVs (PII): never committed
 eval/private/
+
+# Subset benchmark runs (--only/--limit)
+eval/results/partial/

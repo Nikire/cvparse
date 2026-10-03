@@ -9,20 +9,20 @@
       "temperature": "0",
       "language": "es",
       "referenceDate": "2026-10-01",
-      "hardware": "12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32; GPU: NVIDIA GeForce RTX 4070 SUPER",
-      "command": "npm run eval -- --system cvparse --provider ollama --model llama3.1 --ocr tesseract --name \"cvparse + llama3.1 8B (Ollama, local) + Tesseract\" --gpu \"NVIDIA GeForce RTX 4070 SUPER\"",
+      "hardware": "12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32; GPU: NVIDIA GeForce RTX 4070 SUPER; Ollama OLLAMA_CONTEXT_LENGTH=16384",
+      "command": "npm run eval -- --system cvparse --provider ollama --model llama3.1 --ocr tesseract --name \"cvparse + llama3.1 8B (Ollama, local) + Tesseract\" --gpu \"NVIDIA GeForce RTX 4070 SUPER; Ollama OLLAMA_CONTEXT_LENGTH=16384\"",
       "node": "v22.14.0",
       "ollamaVersion": "0.35.0",
       "modelDigest": "sha256:46e0c10c039e",
       "tesseract.js": "7.0.0",
       "datasetVersion": "1.0.0",
       "datasetHash": "76c69f1bbc2c5657",
-      "cvparseCommit": "81432f5d3015159a7d4a33db03e98f96749286a0",
-      "cvparseSrcHash": "253c04ad9d9e5715"
+      "cvparseCommit": "a1b366a2c7b9d472c0729fa32c319c06eb00e5b8",
+      "cvparseSrcHash": "cc69c5e165216f3f"
     }
   },
-  "finishedAt": "2026-10-02T08:59:46.338Z",
-  "cvparseVersion": "0.2.0",
+  "finishedAt": "2026-10-03T12:51:52.088Z",
+  "cvparseVersion": "0.3.0",
   "datasetVersion": "1.0.0",
   "entries": [
     {
@@ -129,7 +129,7 @@
           "fn": 0
         }
       },
-      "seconds": 12.698
+      "seconds": 11.196
     },
     {
       "id": "es-ar-002",
@@ -235,7 +235,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.928
+      "seconds": 13.535
     },
     {
       "id": "es-ar-003",
@@ -323,13 +323,13 @@
           "fn": 0
         },
         "skills": {
-          "precision": 0.8571428571428571,
-          "recall": 0.8571428571428571,
-          "f1": 0.8571428571428571,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 7,
-          "tp": 6,
-          "fp": 1,
-          "fn": 1
+          "tp": 7,
+          "fp": 0,
+          "fn": 0
         },
         "languages": {
           "precision": 1,
@@ -341,7 +341,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.211
+      "seconds": 11.181
     },
     {
       "id": "es-ar-004",
@@ -447,7 +447,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.134
+      "seconds": 11.978
     },
     {
       "id": "es-ar-005",
@@ -553,7 +553,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.672
+      "seconds": 14.702
     },
     {
       "id": "es-ar-006",
@@ -659,7 +659,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.328
+      "seconds": 11.553
     },
     {
       "id": "es-ar-007",
@@ -765,7 +765,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.046
+      "seconds": 11.381
     },
     {
       "id": "es-ar-008",
@@ -871,7 +871,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.236
+      "seconds": 12.119
     },
     {
       "id": "es-ar-009",
@@ -959,13 +959,13 @@
           "fn": 0
         },
         "skills": {
-          "precision": 0.8571428571428571,
-          "recall": 1,
-          "f1": 0.923076923076923,
+          "precision": 0.8,
+          "recall": 0.6666666666666666,
+          "f1": 0.7272727272727272,
           "support": 6,
-          "tp": 6,
+          "tp": 4,
           "fp": 1,
-          "fn": 0
+          "fn": 2
         },
         "languages": {
           "precision": 1,
@@ -977,7 +977,7 @@
           "fn": 0
         }
       },
-      "seconds": 11.816
+      "seconds": 10.444
     },
     {
       "id": "es-cl-001",
@@ -1083,7 +1083,7 @@
           "fn": 0
         }
       },
-      "seconds": 12.187
+      "seconds": 11.993
     },
     {
       "id": "es-cl-002",
@@ -1189,7 +1189,7 @@
           "fn": 0
         }
       },
-      "seconds": 11.745
+      "seconds": 10.12
     },
     {
       "id": "es-cl-003",
@@ -1259,12 +1259,12 @@
           "fn": 0
         },
         "education.dates": {
-          "precision": 0.75,
+          "precision": 1,
           "recall": 1,
-          "f1": 0.8571428571428571,
+          "f1": 1,
           "support": 3,
           "tp": 3,
-          "fp": 1,
+          "fp": 0,
           "fn": 0
         },
         "education.level": {
@@ -1295,7 +1295,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.671
+      "seconds": 11.016
     },
     {
       "id": "es-cl-004",
@@ -1401,7 +1401,7 @@
           "fn": 0
         }
       },
-      "seconds": 11.704
+      "seconds": 10.308
     },
     {
       "id": "es-cl-005",
@@ -1444,33 +1444,6 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
-          "support": 4,
-          "tp": 0,
-          "fp": 4,
-          "fn": 4
-        },
-        "work.dates": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
-          "support": 8,
-          "tp": 0,
-          "fp": 0,
-          "fn": 8
-        },
-        "education.entries": {
-          "precision": 1,
-          "recall": 1,
-          "f1": 1,
-          "support": 2,
-          "tp": 2,
-          "fp": 0,
-          "fn": 0
-        },
-        "education.dates": {
           "precision": 1,
           "recall": 1,
           "f1": 1,
@@ -1479,14 +1452,41 @@
           "fp": 0,
           "fn": 0
         },
-        "education.level": {
+        "work.dates": {
           "precision": 1,
           "recall": 1,
           "f1": 1,
-          "support": 2,
-          "tp": 2,
+          "support": 8,
+          "tp": 8,
           "fp": 0,
           "fn": 0
+        },
+        "education.entries": {
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2,
+          "tp": 1,
+          "fp": 0,
+          "fn": 1
+        },
+        "education.dates": {
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 4,
+          "tp": 2,
+          "fp": 0,
+          "fn": 2
+        },
+        "education.level": {
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
+          "support": 2,
+          "tp": 1,
+          "fp": 0,
+          "fn": 1
         },
         "skills": {
           "precision": 1,
@@ -1507,7 +1507,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.055
+      "seconds": 115.698
     },
     {
       "id": "es-cl-006",
@@ -1613,7 +1613,7 @@
           "fn": 0
         }
       },
-      "seconds": 12.72
+      "seconds": 10.63
     },
     {
       "id": "es-cl-007",
@@ -1719,7 +1719,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.615
+      "seconds": 13.028
     },
     {
       "id": "es-cl-008",
@@ -1825,7 +1825,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.105
+      "seconds": 17.448
     },
     {
       "id": "es-co-001",
@@ -1896,12 +1896,12 @@
         },
         "education.dates": {
           "precision": 1,
-          "recall": 1,
-          "f1": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
           "support": 3,
-          "tp": 3,
+          "tp": 2,
           "fp": 0,
-          "fn": 0
+          "fn": 1
         },
         "education.level": {
           "precision": 1,
@@ -1931,7 +1931,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.563
+      "seconds": 11.88
     },
     {
       "id": "es-co-002",
@@ -2037,7 +2037,7 @@
           "fn": 0
         }
       },
-      "seconds": 18.028
+      "seconds": 14.636
     },
     {
       "id": "es-co-003",
@@ -2143,7 +2143,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.593
+      "seconds": 12.094
     },
     {
       "id": "es-co-004",
@@ -2249,7 +2249,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.027
+      "seconds": 13.012
     },
     {
       "id": "es-co-005",
@@ -2311,30 +2311,30 @@
         },
         "education.entries": {
           "precision": 1,
-          "recall": 0.6666666666666666,
-          "f1": 0.8,
+          "recall": 1,
+          "f1": 1,
           "support": 3,
-          "tp": 2,
+          "tp": 3,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "education.dates": {
           "precision": 1,
-          "recall": 0.8,
-          "f1": 0.888888888888889,
+          "recall": 1,
+          "f1": 1,
           "support": 5,
-          "tp": 4,
+          "tp": 5,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "education.level": {
           "precision": 1,
-          "recall": 0.6666666666666666,
-          "f1": 0.8,
+          "recall": 1,
+          "f1": 1,
           "support": 3,
-          "tp": 2,
+          "tp": 3,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "skills": {
           "precision": 1,
@@ -2355,7 +2355,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.818
+      "seconds": 16.345
     },
     {
       "id": "es-co-006",
@@ -2398,22 +2398,22 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
           "support": 2,
-          "tp": 0,
-          "fp": 2,
-          "fn": 2
+          "tp": 1,
+          "fp": 1,
+          "fn": 1
         },
         "work.dates": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
           "support": 4,
-          "tp": 0,
+          "tp": 2,
           "fp": 0,
-          "fn": 4
+          "fn": 2
         },
         "education.entries": {
           "precision": 1,
@@ -2461,7 +2461,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.939
+      "seconds": 11.444
     },
     {
       "id": "es-co-007",
@@ -2567,7 +2567,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.31
+      "seconds": 12.202
     },
     {
       "id": "es-co-008",
@@ -2673,7 +2673,7 @@
           "fn": 0
         }
       },
-      "seconds": 19.219
+      "seconds": 15.55
     },
     {
       "id": "es-co-009",
@@ -2779,7 +2779,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.623
+      "seconds": 12.207
     },
     {
       "id": "es-es-001",
@@ -2885,7 +2885,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.251
+      "seconds": 13.469
     },
     {
       "id": "es-es-002",
@@ -2955,12 +2955,12 @@
           "fn": 0
         },
         "education.dates": {
-          "precision": 0.8333333333333334,
+          "precision": 1,
           "recall": 1,
-          "f1": 0.9090909090909091,
+          "f1": 1,
           "support": 5,
           "tp": 5,
-          "fp": 1,
+          "fp": 0,
           "fn": 0
         },
         "education.level": {
@@ -2991,7 +2991,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.901
+      "seconds": 12.579
     },
     {
       "id": "es-es-003",
@@ -3097,7 +3097,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.03
+      "seconds": 11.952
     },
     {
       "id": "es-es-004",
@@ -3149,13 +3149,13 @@
           "fn": 0
         },
         "work.dates": {
-          "precision": 0.8333333333333334,
-          "recall": 0.8333333333333334,
-          "f1": 0.8333333333333334,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 6,
-          "tp": 5,
-          "fp": 1,
-          "fn": 1
+          "tp": 6,
+          "fp": 0,
+          "fn": 0
         },
         "education.entries": {
           "precision": 1,
@@ -3203,7 +3203,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.373
+      "seconds": 12.585
     },
     {
       "id": "es-es-005",
@@ -3309,7 +3309,7 @@
           "fn": 0
         }
       },
-      "seconds": 19.134
+      "seconds": 15.131
     },
     {
       "id": "es-es-006",
@@ -3415,7 +3415,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.15
+      "seconds": 12.398
     },
     {
       "id": "es-es-007",
@@ -3521,7 +3521,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.366
+      "seconds": 12.221
     },
     {
       "id": "es-es-008",
@@ -3627,7 +3627,7 @@
           "fn": 0
         }
       },
-      "seconds": 19.574
+      "seconds": 15.162
     },
     {
       "id": "es-es-009",
@@ -3733,7 +3733,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.705
+      "seconds": 11.896
     },
     {
       "id": "es-mx-001",
@@ -3839,7 +3839,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.379
+      "seconds": 12.692
     },
     {
       "id": "es-mx-002",
@@ -3945,7 +3945,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.655
+      "seconds": 14.27
     },
     {
       "id": "es-mx-003",
@@ -4051,7 +4051,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.904
+      "seconds": 14.229
     },
     {
       "id": "es-mx-004",
@@ -4157,7 +4157,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.252
+      "seconds": 9.845
     },
     {
       "id": "es-mx-005",
@@ -4263,7 +4263,7 @@
           "fn": 0
         }
       },
-      "seconds": 17.574
+      "seconds": 14.376
     },
     {
       "id": "es-mx-006",
@@ -4369,7 +4369,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.232
+      "seconds": 12.126
     },
     {
       "id": "es-mx-007",
@@ -4457,13 +4457,13 @@
           "fn": 0
         },
         "skills": {
-          "precision": 1,
-          "recall": 1,
-          "f1": 1,
+          "precision": 0.8571428571428571,
+          "recall": 0.8571428571428571,
+          "f1": 0.8571428571428571,
           "support": 7,
-          "tp": 7,
-          "fp": 0,
-          "fn": 0
+          "tp": 6,
+          "fp": 1,
+          "fn": 1
         },
         "languages": {
           "precision": 1,
@@ -4475,7 +4475,7 @@
           "fn": 0
         }
       },
-      "seconds": 18.016
+      "seconds": 13.785
     },
     {
       "id": "es-mx-008",
@@ -4581,7 +4581,7 @@
           "fn": 0
         }
       },
-      "seconds": 19.755
+      "seconds": 15.356
     },
     {
       "id": "es-mx-009",
@@ -4660,13 +4660,13 @@
           "fn": 0
         },
         "education.level": {
-          "precision": 0.5,
-          "recall": 0.5,
-          "f1": 0.5,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 2,
-          "tp": 1,
-          "fp": 1,
-          "fn": 1
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
         },
         "skills": {
           "precision": 1,
@@ -4679,15 +4679,15 @@
         },
         "languages": {
           "precision": 1,
-          "recall": 1,
-          "f1": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
           "support": 3,
-          "tp": 3,
+          "tp": 2,
           "fp": 0,
-          "fn": 0
+          "fn": 1
         }
       },
-      "seconds": 13.885
+      "seconds": 10.903
     },
     {
       "id": "es-pe-001",
@@ -4793,7 +4793,7 @@
           "fn": 0
         }
       },
-      "seconds": 20.425
+      "seconds": 15.078
     },
     {
       "id": "es-pe-002",
@@ -4899,7 +4899,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.069
+      "seconds": 115.76
     },
     {
       "id": "es-pe-003",
@@ -5005,7 +5005,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.779
+      "seconds": 12.066
     },
     {
       "id": "es-pe-004",
@@ -5048,22 +5048,22 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
           "support": 2,
-          "tp": 0,
-          "fp": 2,
-          "fn": 2
+          "tp": 1,
+          "fp": 1,
+          "fn": 1
         },
         "work.dates": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 1,
+          "recall": 0.5,
+          "f1": 0.6666666666666666,
           "support": 4,
-          "tp": 0,
+          "tp": 2,
           "fp": 0,
-          "fn": 4
+          "fn": 2
         },
         "education.entries": {
           "precision": 1,
@@ -5111,7 +5111,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.551
+      "seconds": 11.761
     },
     {
       "id": "es-pe-005",
@@ -5190,13 +5190,13 @@
           "fn": 0
         },
         "education.level": {
-          "precision": 0.6666666666666666,
-          "recall": 0.6666666666666666,
-          "f1": 0.6666666666666666,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 3,
-          "tp": 2,
-          "fp": 1,
-          "fn": 1
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
         },
         "skills": {
           "precision": 1,
@@ -5217,7 +5217,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.706
+      "seconds": 13.279
     },
     {
       "id": "es-pe-006",
@@ -5323,7 +5323,7 @@
           "fn": 0
         }
       },
-      "seconds": 15.486
+      "seconds": 11.701
     },
     {
       "id": "es-pe-007",
@@ -5366,22 +5366,22 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
           "support": 4,
-          "tp": 0,
-          "fp": 4,
-          "fn": 4
+          "tp": 3,
+          "fp": 1,
+          "fn": 1
         },
         "work.dates": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 1,
+          "recall": 0.75,
+          "f1": 0.8571428571428571,
           "support": 8,
-          "tp": 0,
+          "tp": 6,
           "fp": 0,
-          "fn": 8
+          "fn": 2
         },
         "education.entries": {
           "precision": 1,
@@ -5429,7 +5429,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.746
+      "seconds": 13.988
     },
     {
       "id": "es-pe-008",
@@ -5450,7 +5450,7 @@
           "f1": 0,
           "support": 1,
           "tp": 0,
-          "fp": 1,
+          "fp": 0,
           "fn": 1
         },
         "basics.phone": {
@@ -5535,7 +5535,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.004
+      "seconds": 10.806
     },
     {
       "id": "es-uy-001",
@@ -5641,7 +5641,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.918
+      "seconds": 13.862
     },
     {
       "id": "es-uy-002",
@@ -5747,7 +5747,7 @@
           "fn": 0
         }
       },
-      "seconds": 12.438
+      "seconds": 10.134
     },
     {
       "id": "es-uy-003",
@@ -5853,7 +5853,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.443
+      "seconds": 11.001
     },
     {
       "id": "es-uy-004",
@@ -5959,7 +5959,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.622
+      "seconds": 10.969
     },
     {
       "id": "es-uy-005",
@@ -6065,7 +6065,7 @@
           "fn": 0
         }
       },
-      "seconds": 13.867
+      "seconds": 11.317
     },
     {
       "id": "es-uy-006",
@@ -6154,12 +6154,12 @@
         },
         "skills": {
           "precision": 1,
-          "recall": 0.875,
-          "f1": 0.9333333333333333,
+          "recall": 1,
+          "f1": 1,
           "support": 8,
-          "tp": 7,
+          "tp": 8,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "languages": {
           "precision": 1,
@@ -6171,7 +6171,7 @@
           "fn": 0
         }
       },
-      "seconds": 14.924
+      "seconds": 13.326
     },
     {
       "id": "es-uy-007",
@@ -6277,7 +6277,7 @@
           "fn": 0
         }
       },
-      "seconds": 16.275
+      "seconds": 12.879
     },
     {
       "id": "es-uy-008",
@@ -6383,7 +6383,7 @@
           "fn": 0
         }
       },
-      "seconds": 12.192
+      "seconds": 9.96
     }
   ],
   "fields": {
@@ -6397,12 +6397,12 @@
       "fn": 0
     },
     "basics.email": {
-      "precision": 0.9833333333333333,
+      "precision": 1,
       "recall": 0.9833333333333333,
-      "f1": 0.9833333333333333,
+      "f1": 0.9915966386554621,
       "support": 60,
       "tp": 59,
-      "fp": 1,
+      "fp": 0,
       "fn": 1
     },
     "basics.phone": {
@@ -6424,22 +6424,22 @@
       "fn": 2
     },
     "work.entries": {
-      "precision": 0.9254658385093167,
-      "recall": 0.9254658385093167,
-      "f1": 0.9254658385093167,
+      "precision": 0.9813664596273292,
+      "recall": 0.9813664596273292,
+      "f1": 0.9813664596273292,
       "support": 161,
-      "tp": 149,
-      "fp": 12,
-      "fn": 12
+      "tp": 158,
+      "fp": 3,
+      "fn": 3
     },
     "work.dates": {
-      "precision": 0.9966329966329966,
-      "recall": 0.9192546583850931,
-      "f1": 0.9563812600969306,
+      "precision": 1,
+      "recall": 0.9782608695652174,
+      "f1": 0.989010989010989,
       "support": 322,
-      "tp": 296,
-      "fp": 1,
-      "fn": 26
+      "tp": 315,
+      "fp": 0,
+      "fn": 7
     },
     "education.entries": {
       "precision": 1,
@@ -6451,43 +6451,43 @@
       "fn": 1
     },
     "education.dates": {
-      "precision": 0.9853658536585366,
-      "recall": 0.9950738916256158,
-      "f1": 0.9901960784313727,
+      "precision": 0.9950248756218906,
+      "recall": 0.9852216748768473,
+      "f1": 0.9900990099009901,
       "support": 203,
-      "tp": 202,
-      "fp": 3,
-      "fn": 1
+      "tp": 200,
+      "fp": 1,
+      "fn": 3
     },
     "education.level": {
-      "precision": 0.9732142857142857,
-      "recall": 0.9646017699115044,
-      "f1": 0.9688888888888889,
+      "precision": 0.9910714285714286,
+      "recall": 0.9823008849557522,
+      "f1": 0.9866666666666667,
       "support": 113,
-      "tp": 109,
-      "fp": 3,
-      "fn": 4
+      "tp": 111,
+      "fp": 1,
+      "fn": 2
     },
     "skills": {
-      "precision": 0.9891304347826086,
-      "recall": 0.9891304347826086,
-      "f1": 0.9891304347826086,
+      "precision": 0.9891067538126361,
+      "recall": 0.9869565217391304,
+      "f1": 0.9880304678998911,
       "support": 460,
-      "tp": 455,
+      "tp": 454,
       "fp": 5,
-      "fn": 5
+      "fn": 6
     },
     "languages": {
       "precision": 1,
-      "recall": 1,
-      "f1": 1,
+      "recall": 0.9930555555555556,
+      "f1": 0.9965156794425087,
       "support": 144,
-      "tp": 144,
+      "tp": 143,
       "fp": 0,
-      "fn": 0
+      "fn": 1
     }
   },
-  "overallF1": 0.9806729167375785,
+  "overallF1": 0.9898841466759393,
   "attempted": 60,
   "byLayout": {
     "academic": {
@@ -6498,55 +6498,55 @@
     "functional": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.9539487179487178
+      "overallF1": 0.9858850574712644
     },
     "scanned": {
       "entries": 6,
       "attempted": 6,
-      "overallF1": 0.9819634703196348
+      "overallF1": 0.9834579323448018
     },
     "sidebar": {
       "entries": 8,
       "attempted": 8,
-      "overallF1": 0.9803195488721805
+      "overallF1": 0.9906501831501832
     },
     "single-column": {
       "entries": 17,
       "attempted": 17,
-      "overallF1": 0.9771562429327922
+      "overallF1": 0.9890323260406444
     },
     "table": {
       "entries": 6,
       "attempted": 6,
-      "overallF1": 0.9798432343234322
+      "overallF1": 0.9905241935483872
     },
     "textbox": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.975
+      "overallF1": 0.9719696969696969
     },
     "two-column": {
       "entries": 11,
       "attempted": 11,
-      "overallF1": 0.9960815888352121
+      "overallF1": 0.9987654320987656
     }
   },
   "byFormat": {
     "docx": {
       "entries": 16,
       "attempted": 16,
-      "overallF1": 0.9649002656554198
+      "overallF1": 0.9799461331320295
     },
     "image": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.9729591836734693
+      "overallF1": 0.9745694022289767
     },
     "pdf": {
       "entries": 40,
       "attempted": 40,
-      "overallF1": 0.9883227273911513
+      "overallF1": 0.9952252122535871
     }
   },
-  "totalSeconds": 915.7
+  "totalSeconds": 960.7
 }

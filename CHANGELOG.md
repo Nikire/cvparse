@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -19,6 +19,8 @@ Driven by a real 3-page CV, where llama3.1 8B invented a phone number, a city an
 
 ### Fixed
 
+- Small models no longer get stuck repeating one entry until the output limit: when the output is cut and its tail repeats, cvparse retries once with a frequency penalty, and if that also fails it repairs the cut JSON and returns what was extracted with a warning. Exact-duplicate entries are always removed. `ParseOptions.maxOutputTokens` (default 8192) caps the model output.
+- Removed a prompt rule that made small models put the job title in the employer field; the employer is recovered from the Experience section when it still happens, and a city the model wrote in its own address replaces one that is not in the document.
 - Hallucinated phone numbers, emails, URLs, locations (including the candidate's city copied into every job), skills and skill levels are dropped when they are not in the document.
 - Language fluency and degree / job titles the model rewrote are restored as written next to the language, institution or company ("Computer Engineering", not "Bachelor's degree"); `education[].studyType` keeps the title as written.
 - Entries in the wrong section are moved by the heading they are written under: a university returned in `work[]` goes to `education[]`, a course to `certificates[]`, a job in `education[]` to `work[]`.
