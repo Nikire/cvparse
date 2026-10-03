@@ -16,6 +16,11 @@ import { extractText } from "./extract/index.js";
 import { scannedPageWarning } from "./extract/messages.js";
 import { checkCoverage, groundResume } from "./normalize/grounding.js";
 import { detectLanguage } from "./normalize/language.js";
+import {
+  dedupeResumeEntries,
+  detectRepetitionLoop,
+  repairTruncatedJson,
+} from "./normalize/repetition.js";
 import { normalizeResume } from "./normalize/resume.js";
 import { buildSystemPrompt, buildUserPrompt } from "./prompt.js";
 import {
@@ -41,6 +46,33 @@ const MAX_INPUT_CHARS = 200_000;
  * generating until the HTTP client times out.
  */
 export const DEFAULT_MAX_OUTPUT_TOKENS = 8192;
+
+/**
+ * Frequency penalty for the single retry after the model got stuck repeating itself. Measured on
+ * llama3.1 8B (Ollama): 0.3 breaks the loop deterministically at temperature 0, while applying a
+ * penalty to every call costs 1-2 points on normal CVs (it penalizes the JSON keys every entry
+ * repeats), so it is only used for the retry.
+ */
+export const LOOP_RETRY_FREQUENCY_PENALTY = 0.3;
+
+type Attempt = { kind: "ok"; output: unknown; warnings: string[] } | { kind: "cut"; text: string };
+
+/**
+ * Rebuilds a resume from looping outputs cut by the output limit: repairs the truncated JSON,
+ * removes the repeated (identical or near-identical) entries and checks the extraction schema.
+ * Tries each text in order; returns `undefined` when none can be recovered.
+ */
+export function salvageLoopingOutput(texts: readonly string[]): unknown {
+  for (const text of texts) {
+    const repaired = repairTruncatedJson(text);
+    if (!repaired) continue;
+    // No per-section warnings: the salvage warning already says repeated entries were removed.
+    dedupeResumeEntries(repaired, { similar: true });
+    const parsed = ResumeExtractionSchema.safeParse(repaired);
+    if (parsed.success) return parsed.data;
+  }
+  return undefined;
+}
 
 /** Message for an extraction cut by the output limit. */
 function outputLimitMessage(maxOutputTokens: number): string {
@@ -246,68 +278,131 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
   });
 
   const maxOutputTokens = options.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
-  let raw: unknown;
-  let usage: ParseResult["usage"];
-  try {
-    const result = await generateText({
-      model: options.model,
-      instructions,
-      ...(images.length > 0
-        ? {
-            messages: [
-              {
-                role: "user" as const,
-                content: [
-                  {
-                    type: "text" as const,
-                    text: mixed
-                      ? buildMixedVisionPrompt(cvText, mixed.textPages, mixed.imagePages)
-                      : buildVisionPrompt(images.length),
-                  },
-                  ...images.map((image) => ({
-                    type: "file" as const,
-                    mediaType: image.mediaType,
-                    data: image.data,
-                  })),
-                ],
-              },
-            ],
-          }
-        : { prompt: buildUserPrompt(cvText) }),
-      output: Output.object({
-        // Wire format: strict-friendly JSON schema (all keys required, null allowed).
-        // Validation: lenient Zod schema, so models that omit keys still pass.
-        schema: jsonSchema<ExtractionOutput>(RESUME_EXTRACTION_JSON_SCHEMA as JSONSchema7, {
-          validate: (value) => {
-            const parsed = ResumeExtractionSchema.safeParse(value);
-            return parsed.success
-              ? { success: true, value: parsed.data }
-              : { success: false, error: parsed.error };
-          },
-        }),
-        name: "resume",
-        description: "A resume in JSON Resume format with cvparse extensions.",
-      }),
-      abortSignal: options.abortSignal,
-      maxRetries: options.maxRetries,
-      temperature: options.temperature,
-      maxOutputTokens,
-    });
-    if (result.finishReason === "length") {
-      // A truncated object almost never parses; if it did, it is missing its tail.
-      throw new CvparseError("NO_OBJECT_GENERATED", outputLimitMessage(maxOutputTokens), {
-        rawText: result.text,
-      });
+  const userContent =
+    images.length > 0
+      ? {
+          messages: [
+            {
+              role: "user" as const,
+              content: [
+                {
+                  type: "text" as const,
+                  text: mixed
+                    ? buildMixedVisionPrompt(cvText, mixed.textPages, mixed.imagePages)
+                    : buildVisionPrompt(images.length),
+                },
+                ...images.map((image) => ({
+                  type: "file" as const,
+                  mediaType: image.mediaType,
+                  data: image.data,
+                })),
+              ],
+            },
+          ],
+        }
+      : { prompt: buildUserPrompt(cvText) };
+
+  const usage: ParseResult["usage"] = {
+    inputTokens: undefined,
+    outputTokens: undefined,
+    totalTokens: undefined,
+  };
+  const addUsage = (u: ParseResult["usage"]) => {
+    for (const key of ["inputTokens", "outputTokens", "totalTokens"] as const) {
+      if (u[key] !== undefined) usage[key] = (usage[key] ?? 0) + (u[key] ?? 0);
     }
-    raw = result.output;
-    usage = {
-      inputTokens: result.usage.inputTokens,
-      outputTokens: result.usage.outputTokens,
-      totalTokens: result.usage.totalTokens,
-    };
-    for (const warning of result.warnings ?? []) warnings.push(formatSdkWarning(warning));
-  } catch (error) {
-    throw wrapError(error, { maxOutputTokens });
+  };
+
+  const attempt = async (frequencyPenalty?: number): Promise<Attempt> => {
+    try {
+      const result = await generateText({
+        model: options.model,
+        instructions,
+        ...userContent,
+        output: Output.object({
+          // Wire format: strict-friendly JSON schema (all keys required, null allowed).
+          // Validation: lenient Zod schema, so models that omit keys still pass.
+          schema: jsonSchema<ExtractionOutput>(RESUME_EXTRACTION_JSON_SCHEMA as JSONSchema7, {
+            validate: (value) => {
+              const parsed = ResumeExtractionSchema.safeParse(value);
+              return parsed.success
+                ? { success: true, value: parsed.data }
+                : { success: false, error: parsed.error };
+            },
+          }),
+          name: "resume",
+          description: "A resume in JSON Resume format with cvparse extensions.",
+        }),
+        abortSignal: options.abortSignal,
+        maxRetries: options.maxRetries,
+        temperature: options.temperature,
+        maxOutputTokens,
+        ...(frequencyPenalty === undefined ? {} : { frequencyPenalty }),
+      });
+      addUsage({
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        totalTokens: result.usage.totalTokens,
+      });
+      if (result.finishReason === "length") {
+        // A truncated object almost never parses; if it did, it is missing its tail.
+        return { kind: "cut", text: result.text };
+      }
+      return {
+        kind: "ok",
+        output: result.output,
+        warnings: (result.warnings ?? []).map(formatSdkWarning),
+      };
+    } catch (error) {
+      if (NoObjectGeneratedError.isInstance(error) && error.finishReason === "length") {
+        if (error.usage) {
+          addUsage({
+            inputTokens: error.usage.inputTokens,
+            outputTokens: error.usage.outputTokens,
+            totalTokens: error.usage.totalTokens,
+          });
+        }
+        return { kind: "cut", text: error.text ?? "" };
+      }
+      throw wrapError(error, { maxOutputTokens });
+    }
+  };
+  const lengthError = (text: string) =>
+    new CvparseError("NO_OBJECT_GENERATED", outputLimitMessage(maxOutputTokens), {
+      rawText: text,
+    });
+
+  let raw: unknown;
+  const first = await attempt();
+  if (first.kind === "ok") {
+    raw = first.output;
+    warnings.push(...first.warnings);
+  } else {
+    // Cut by the output limit. A genuinely long CV needs a higher limit (retrying would hit the
+    // same wall); a model stuck repeating itself gets one retry with a frequency penalty.
+    if (!detectRepetitionLoop(first.text)) throw lengthError(first.text);
+    let second: Attempt | undefined;
+    try {
+      second = await attempt(LOOP_RETRY_FREQUENCY_PENALTY);
+    } catch (error) {
+      if (options.abortSignal?.aborted) throw error;
+      // The retry failed in another way: fall back to salvaging the first output.
+    }
+    if (second?.kind === "ok") {
+      raw = second.output;
+      warnings.push(
+        ...second.warnings,
+        `model: the first extraction got stuck repeating itself until the output limit; retried with frequencyPenalty ${LOOP_RETRY_FREQUENCY_PENALTY}.`,
+      );
+    } else {
+      // Both attempts failed: keep what the model got right before it started looping.
+      const texts = second?.kind === "cut" ? [second.text, first.text] : [first.text];
+      raw = salvageLoopingOutput(texts);
+      if (raw === undefined) throw lengthError(first.text);
+      warnings.push(
+        "model: the output was cut by a repetition loop; repeated entries were removed and later sections may be missing",
+      );
+    }
   }
 
   // Only let the heuristic fill in detectedLanguage when the language is not forced; otherwise

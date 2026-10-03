@@ -9,6 +9,7 @@ import {
 import { collectEducationLevels } from "./education.js";
 import { normalizeForMatch } from "./grounding.js";
 import { detectLanguage } from "./language.js";
+import { dedupeResumeEntries } from "./repetition.js";
 import { looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
 
 /** Output of {@link normalizeResume}. */
@@ -314,6 +315,8 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
 /**
  * Deterministic post-processing applied to whatever the model returned:
  * - trims strings and converts empty ones to `null`;
+ * - removes identical repeated entries from every section (and repeated highlights / keywords
+ *   inside an entry), with a `model:` warning ({@link dedupeResumeEntries});
  * - normalizes every date field to ISO (`YYYY`, `YYYY-MM`, `YYYY-MM-DD`), turning
  *   "actualidad" / "present" into `null` and warning on dates it cannot understand;
  * - removes a title glued to its organization (`work[].name` "Freelance — Developer" with
@@ -348,6 +351,9 @@ export function normalizeResume(
   const warnings: string[] = [];
   const tidied = tidyStrings(input);
   const resume: Record<string, unknown> = isRecord(tidied) ? tidied : {};
+
+  // A repeated entry is never valid in a CV: it is the model repeating itself.
+  warnings.push(...dedupeResumeEntries(resume));
 
   for (const { path, obj, key } of collectDateFields(resume)) {
     const raw = obj[key];

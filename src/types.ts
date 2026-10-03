@@ -63,8 +63,15 @@ export interface ParseOptions {
   /**
    * Maximum number of tokens the model may generate for the extraction. Defaults to `8192`,
    * enough for long CVs (a typical one needs 1-4k). It stops a model that loops (repeating
-   * entries or highlights until the HTTP client times out). When the model hits the limit,
-   * `parseResume` throws `NO_OBJECT_GENERATED` saying so; raise it for very long CVs.
+   * entries or highlights until the HTTP client times out). When the model hits the limit:
+   * - if the output ends in a repetition loop (the same block over and over), the extraction is
+   *   retried once with a small frequency penalty (`0.3`, same temperature), adding a `model:`
+   *   warning. If the retry fails too, the looping output is salvaged: the truncated JSON is
+   *   repaired, repeated entries are removed and the result is returned with the warning
+   *   `model: the output was cut by a repetition loop; ...` (later sections may be missing;
+   *   `coverage:` warnings flag them). Usage then covers both calls;
+   * - otherwise (a genuinely long CV) `parseResume` throws `NO_OBJECT_GENERATED` saying so;
+   *   raise the limit for very long CVs.
    */
   maxOutputTokens?: number;
   /**
@@ -132,7 +139,8 @@ export interface ParseResult {
    * issues as `extract: ocr: ...`), `grounding:` (values dropped or replaced by what the document
    * says), `placement:` (entries moved to another section), `coverage:` (document sections that
    * came back empty), `precision:` (invented months / days removed from dates) and `model:` (the
-   * model's own `confidenceNotes`). Provider/AI SDK warnings, dates that could not be
+   * model's own `confidenceNotes`, plus repeated entries removed and repetition-loop retries or
+   * salvage). Provider/AI SDK warnings, dates that could not be
    * normalized and small repairs (organization and title split) carry no prefix.
    */
   warnings: string[];

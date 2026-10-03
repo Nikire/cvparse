@@ -551,3 +551,41 @@ describe("normalizeResume — the whole entry line in work[].name, position empt
     expect(warnings).toEqual([]);
   });
 });
+
+describe("normalizeResume: repeated entries", () => {
+  it("removes exact duplicates the model repeated, with a model: warning", () => {
+    const job = {
+      name: "Banco Andino",
+      position: "Analista",
+      startDate: "marzo 2020",
+      highlights: ["Reportes", "Reportes"],
+    };
+    const { resume, warnings } = normalizeResume({
+      work: [job, { ...job }, { ...job, name: " Banco  Andino " }, { ...job, position: "Jefe" }],
+      languages: [{ language: "Inglés" }, { language: "Inglés" }],
+    });
+    expect(resume.work).toHaveLength(2);
+    expect(resume.work?.[0]?.highlights).toEqual(["Reportes"]);
+    expect(resume.work?.[0]?.startDate).toBe("2020-03");
+    expect(resume.languages).toHaveLength(1);
+    expect(warnings).toContain(
+      "model: removed 2 repeated entries from work (the model repeated itself).",
+    );
+    expect(warnings).toContain(
+      "model: removed 1 repeated entry from languages (the model repeated itself).",
+    );
+    // Dates are normalized once per remaining entry, not once per repeat.
+    expect(warnings.filter((w) => w.includes("startDate"))).toEqual([]);
+  });
+
+  it("keeps entries that only share some fields", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Acme", position: "Dev", startDate: "2020" },
+        { name: "Acme", position: "Dev", startDate: "2018" },
+      ],
+    });
+    expect(resume.work).toHaveLength(2);
+    expect(warnings.some((w) => w.includes("repeated"))).toBe(false);
+  });
+});
