@@ -9,6 +9,7 @@ import {
 import { collectEducationLevels } from "./education.js";
 import { normalizeForMatch } from "./grounding.js";
 import { detectLanguage } from "./language.js";
+import { looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
 
 /** Output of {@link normalizeResume}. */
 export interface NormalizeResult {
@@ -151,6 +152,29 @@ export function splitOrgAndTitle(value: string): [string, string] | null {
 }
 
 /**
+ * Splits "Title, Organization" (or "Organization — Title", any {@link stripTitleFromOrg}
+ * separator, comma included) into `{ title, org }` when exactly one side reads as a job title
+ * ({@link looksLikeJobTitle}) and the other does not; "Científica de Datos, Telecom S.A." ->
+ * title "Científica de Datos", org "Telecom S.A.". Returns `null` when unsure.
+ */
+export function splitTitleAndOrg(value: string): { title: string; org: string } | null {
+  for (const match of value.matchAll(ORG_TITLE_SEPARATOR)) {
+    const before = value.slice(0, match.index).trim();
+    const after = value.slice(match.index + match[0].length).trim();
+    if (before === "" || after === "") continue;
+    const beforeTitle = looksLikeJobTitle(before);
+    const afterTitle = looksLikeJobTitle(after);
+    if (beforeTitle === afterTitle) continue;
+    const [title, org] = beforeTitle ? [before, after] : [after, before];
+    // A comma also separates plain phrases ("Analista de Ventas, Atención al cliente"): there the
+    // other side must carry an organization marker (legal suffix, "Clínica", "Universidad", ...).
+    if (match[0].trim() === "," && !looksLikeOrganization(org)) continue;
+    return { title, org };
+  }
+  return null;
+}
+
+/**
  * Splits a list written as one string ("Agile / Scrum, Code Review; Docs") on ";" and on ", "
  * (comma followed by whitespace), never inside parentheses. "Node.js", "CI/CD", "Agile / Scrum"
  * and "1,000" stay whole.
@@ -254,6 +278,18 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
       if (!isRecord(entry)) return;
       const org = entry[orgKey];
       const title = entry[titleKey];
+      if (section !== "education" && typeof org === "string" && (title ?? null) === null) {
+        // The model copied a whole "Científica de Datos, Telecom S.A." line into name and left
+        // position empty.
+        const parts = splitTitleAndOrg(org);
+        if (!parts) return;
+        entry[orgKey] = parts.org;
+        entry[titleKey] = parts.title;
+        warnings.push(
+          `${section}[${i}].${orgKey}: "${org}" holds the ${titleKey} too; split into ${orgKey} "${parts.org}" and ${titleKey} "${parts.title}".`,
+        );
+        return;
+      }
       if (typeof org !== "string" || typeof title !== "string") return;
       if (normalizeForMatch(org) === normalizeForMatch(title)) {
         // The model copied "Freelance — Full-Stack Developer" into both fields.
@@ -282,8 +318,9 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
  *   "actualidad" / "present" into `null` and warning on dates it cannot understand;
  * - removes a title glued to its organization (`work[].name` "Freelance — Developer" with
  *   position "Developer" -> "Freelance"; same for `volunteer[]` and `education[].institution`),
- *   and splits an organization and title that are the same "Org — Title" string
- *   ({@link splitOrgAndTitle});
+ *   splits an organization and title that are the same "Org — Title" string
+ *   ({@link splitOrgAndTitle}), and splits a `work[]`/`volunteer[]` organization that holds the
+ *   whole "Title, Company" line while the position is empty ({@link splitTitleAndOrg});
  * - splits comma/semicolon-joined `skills[].keywords` and `skills[].name` values into separate
  *   items ({@link splitSkillList});
  * - derives `x_cvparse.normalizedSkills` from `skills` ({@link deriveNormalizedSkills}), ignoring

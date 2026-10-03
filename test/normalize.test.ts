@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { detectLanguage, normalizeResume, ResumeSchema } from "../src/index.js";
-import { splitOrgAndTitle, splitSkillList, stripTitleFromOrg } from "../src/normalize/resume.js";
+import {
+  splitOrgAndTitle,
+  splitSkillList,
+  splitTitleAndOrg,
+  stripTitleFromOrg,
+} from "../src/normalize/resume.js";
+import { looksLikeJobTitle, looksLikeOrganization } from "../src/normalize/titles.js";
 import { fixture, SPANISH_EXTRACTION } from "./helpers.js";
 
 describe("normalizeResume", () => {
@@ -460,6 +466,88 @@ describe("normalizeResume — organization and title copied into both fields", (
       work: [{ name: "Freelance", position: "Freelance" }],
     });
     expect(resume.work?.[0]).toMatchObject({ name: "Freelance", position: "Freelance" });
+    expect(warnings).toEqual([]);
+  });
+});
+
+describe("normalizeResume — the whole entry line in work[].name, position empty", () => {
+  it("tells job titles from employers", () => {
+    expect(looksLikeJobTitle("Científica de Datos")).toBe(true);
+    expect(looksLikeJobTitle("Analista de Datos Sr.")).toBe(true);
+    expect(looksLikeJobTitle("Enfermero Asistencial")).toBe(true);
+    expect(looksLikeJobTitle("Tech Lead Backend")).toBe(true);
+    expect(looksLikeJobTitle("Telecom de los Andes S.A.")).toBe(false);
+    expect(looksLikeJobTitle("Analítica de los Andes S.R.L.")).toBe(false);
+    expect(looksLikeJobTitle("Clínica Santa Brígida del Rímac")).toBe(false);
+    expect(looksLikeJobTitle("Freelance")).toBe(false);
+    expect(looksLikeOrganization("Datos del Litoral S.A.S.")).toBe(true);
+    expect(looksLikeOrganization("Datacenter del Pacífico S.A.C.")).toBe(true);
+    expect(looksLikeOrganization("Universitat del Mediterrani Occidental")).toBe(true);
+    expect(looksLikeOrganization("Analista de Datos")).toBe(false);
+  });
+
+  it("splits 'Title, Company' only when one side is a title and the other an employer", () => {
+    expect(splitTitleAndOrg("Científica de Datos, Telecom de los Andes S.A.")).toEqual({
+      title: "Científica de Datos",
+      org: "Telecom de los Andes S.A.",
+    });
+    expect(splitTitleAndOrg("Analista de Datos Sr., Analítica de los Andes S.R.L.")).toEqual({
+      title: "Analista de Datos Sr.",
+      org: "Analítica de los Andes S.R.L.",
+    });
+    expect(splitTitleAndOrg("Freelance — Full-Stack Developer")).toEqual({
+      title: "Full-Stack Developer",
+      org: "Freelance",
+    });
+    // Unsure: no title word, both titles, or a comma split without an employer marker.
+    expect(splitTitleAndOrg("Acme, Inc.")).toBeNull();
+    expect(splitTitleAndOrg("Globant")).toBeNull();
+    expect(splitTitleAndOrg("Analista, Desarrollador")).toBeNull();
+    expect(splitTitleAndOrg("Analista de Ventas, Atención al cliente")).toBeNull();
+  });
+
+  it("splits the es-ar-008 shape: 'Científica de Datos, Telecom de los Andes S.A.' with position null", () => {
+    // What llama3.1 returned for "septiembre 2021 – actualidad · Científica de Datos, Telecom de
+    // los Andes S.A. (Remoto)".
+    const { resume, warnings } = normalizeResume({
+      work: [
+        {
+          name: "Científica de Datos, Telecom de los Andes S.A.",
+          position: null,
+          location: "Remoto",
+          startDate: "2021-09",
+        },
+        {
+          name: "Analista de Datos Jr., Retail del Sur S.R.L.",
+          position: null,
+          location: "Rosario",
+        },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Telecom de los Andes S.A.", "Científica de Datos"],
+      ["Retail del Sur S.R.L.", "Analista de Datos Jr."],
+    ]);
+    expect(warnings).toContain(
+      'work[0].name: "Científica de Datos, Telecom de los Andes S.A." holds the position too; split into name "Telecom de los Andes S.A." and position "Científica de Datos".',
+    );
+  });
+
+  it("keeps the model's name when it cannot tell the title from the employer", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Acme, Inc.", position: null },
+        { name: "Mercado Libre", position: null },
+      ],
+      education: [{ institution: "Licenciatura en Economía, Universidad del Litoral" }],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Acme, Inc.", null],
+      ["Mercado Libre", null],
+    ]);
+    expect(resume.education?.[0]?.institution).toBe(
+      "Licenciatura en Economía, Universidad del Litoral",
+    );
     expect(warnings).toEqual([]);
   });
 });

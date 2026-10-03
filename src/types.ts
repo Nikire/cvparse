@@ -43,7 +43,12 @@ export interface ParseOptions {
   language?: ParseLanguage;
   /** Extra instructions appended to the system prompt (e.g. domain-specific normalization rules). */
   instructions?: string;
-  /** Optional abort signal forwarded to the model call. */
+  /**
+   * Optional abort signal forwarded to the model call (and to OCR / rasterization). cvparse sets
+   * no request timeout of its own: pass e.g. `AbortSignal.timeout(120_000)` to bound a call.
+   * Without one, a slow local model is only stopped by the HTTP client (Node's fetch gives up
+   * waiting for response headers after 300 s) and by {@link ParseOptions.maxOutputTokens}.
+   */
   abortSignal?: AbortSignal;
   /**
    * Maximum number of retries for the model call on retryable errors (network failures, HTTP 429/5xx).
@@ -55,6 +60,13 @@ export interface ParseOptions {
    * a copying task, so low values (`0` to `0.2`) are usually the right choice.
    */
   temperature?: number;
+  /**
+   * Maximum number of tokens the model may generate for the extraction. Defaults to `8192`,
+   * enough for long CVs (a typical one needs 1-4k). It stops a model that loops (repeating
+   * entries or highlights until the HTTP client times out). When the model hits the limit,
+   * `parseResume` throws `NO_OBJECT_GENERATED` saying so; raise it for very long CVs.
+   */
+  maxOutputTokens?: number;
   /**
    * "Today" for resolving relative dates in the CV ("hace 3 años", "2 years ago"). It is told to
    * the model and used by the deterministic date normalizer. Defaults to `new Date()`; pin it
@@ -68,12 +80,16 @@ export interface ParseOptions {
    * copied into every job); skills, skill keywords and levels not written next to the skill,
    * plus the matching `x_cvparse.normalizedSkills`; and spoken languages. Language fluency,
    * degree types (`education[].studyType`) and job titles (`work[].position`) the model rewrote
-   * are replaced by the text written next to the language, institution or company. Entries the
+   * are replaced by the text written next to the language, institution or company; a job title
+   * the model put in `work[].name` (with `position` empty) is moved to `position` and the
+   * employer written next to it fills `name`; a candidate city that is not in the document is
+   * replaced by the city written in the model's own address / raw location. Entries the
    * model put in the wrong section are first moved to the section whose heading they are written
    * under (`placement: ...` warnings). Every drop or replacement adds a `grounding: ...` warning.
-   * Free text (summaries, highlights, company names) and dates are never grounded. Skipped
-   * automatically in vision mode, where the model reads page images instead of text. Set `false`
-   * to keep the raw model output (section coverage is still checked).
+   * Free text (summaries, highlights), company names (except in the job-title case above) and
+   * dates are never grounded. Skipped automatically in vision mode, where the model reads page
+   * images instead of text. Set `false` to keep the raw model output (section coverage is still
+   * checked).
    */
   grounding?: boolean;
   /**

@@ -1,6 +1,8 @@
 import { APICallError, RetryError } from "ai";
+import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
 import { CvparseError, parseResume, ResumeSchema } from "../src/index.js";
+import { DEFAULT_MAX_OUTPUT_TOKENS } from "../src/parse.js";
 import {
   fixture,
   mockModelThatThrows,
@@ -216,5 +218,54 @@ describe("parseResume", () => {
     const model = mockModelWithObject({});
     await parseResume("Ana Pérez", { model, referenceDate: new Date("2026-10-01T12:00:00Z") });
     expect(systemPromptOf(model)).toContain("2026-10-01");
+  });
+
+  it("caps the output tokens by default and forwards a custom maxOutputTokens", async () => {
+    const model = mockModelWithObject({});
+    await parseResume("Ana Pérez", { model });
+    expect(model.doGenerateCalls[0]?.maxOutputTokens).toBe(DEFAULT_MAX_OUTPUT_TOKENS);
+    expect(DEFAULT_MAX_OUTPUT_TOKENS).toBe(8192);
+    const custom = mockModelWithObject({});
+    await parseResume("Ana Pérez", { model: custom, maxOutputTokens: 2000 });
+    expect(custom.doGenerateCalls[0]?.maxOutputTokens).toBe(2000);
+  });
+
+  /** A model that stops at the output limit, returning `text` (a looping, truncated object). */
+  function modelCutByLength(text: string) {
+    return new MockLanguageModelV4({
+      doGenerate: async () => ({
+        content: [{ type: "text", text }],
+        finishReason: { unified: "length", raw: "length" },
+        usage: {
+          inputTokens: { total: 1200, noCache: 1200, cacheRead: undefined, cacheWrite: undefined },
+          outputTokens: { total: 2000, text: 2000, reasoning: undefined },
+        },
+        warnings: [],
+      }),
+    });
+  }
+
+  it("reports a length-cut extraction as NO_OBJECT_GENERATED naming the output limit", async () => {
+    const looping = `{"basics":{"name":"Ana"},"work":[${'{"name":"Acme","highlights":["x"]},'.repeat(50)}`;
+    const error = await parseResume("Ana Pérez", {
+      model: modelCutByLength(looping),
+      maxOutputTokens: 2000,
+    }).catch((e: unknown) => e);
+    expect(CvparseError.is(error)).toBe(true);
+    const cvError = error as CvparseError;
+    expect(cvError.code).toBe("NO_OBJECT_GENERATED");
+    expect(cvError.message).toContain("hit the output limit (maxOutputTokens=2000)");
+    expect(cvError.message).toContain("the CV may be too long or the model looped");
+    expect(cvError.rawText).toContain('"name":"Acme"');
+  });
+
+  it("rejects a length-cut extraction even when the truncated text happens to parse", async () => {
+    const error = await parseResume("Ana Pérez", {
+      model: modelCutByLength(JSON.stringify({ basics: { name: "Ana" } })),
+    }).catch((e: unknown) => e);
+    expect((error as CvparseError).code).toBe("NO_OBJECT_GENERATED");
+    expect((error as CvparseError).message).toContain(
+      `maxOutputTokens=${DEFAULT_MAX_OUTPUT_TOKENS}`,
+    );
   });
 });

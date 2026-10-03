@@ -906,3 +906,242 @@ describe("parseResume — third real-CV run regressions", () => {
     expect(warnings.some((w) => w.startsWith("coverage:"))).toBe(false);
   });
 });
+
+describe("groundResume — employer recovered when work[].name is the job title", () => {
+  /** es-pe-008 (OCR of a PNG): title line, then "Company — City", then dates. */
+  const PE_008 = `Jhon Ccori Gutiérrez
+
+Enfermero
+Cusco, Perú
+Teléfono: +51 983 742 473 - jhon. ccoriQexample.com
+
+EXPERIENCIA PROFESIONAL
+Enfermero Asistencial
+Clinica Santa Brígida del Rímac — Cusco
+jun. 2022 — actualidad
+- Capacitación al personal en bioseguridad.
+
+Enfermero de Terapia Intensiva
+Clínica del Parque del Pacífico — Cusco
+ago. 2020 — feb. 2022
+- Registro clínico en historia electrónica.
+
+FORMACIÓN
+Licenciatura en Enfermería
+Universidad Andina de Chachani, 2014 — 2020
+`;
+
+  it("es-pe-008: moves the title to position and takes the employer out of location", () => {
+    // What llama3.1 returned: title in name, "Company — City" in location, position null.
+    const { resume, warnings } = groundResume(
+      {
+        basics: {
+          name: "Jhon Ccori Gutiérrez",
+          label: "Enfermero",
+          location: { city: "Cusco", countryCode: "PE" },
+        },
+        work: [
+          {
+            name: "Enfermero Asistencial",
+            position: null,
+            location: "Clinica Santa Brígida del Rímac — Cusco",
+            startDate: "2022-06",
+          },
+          {
+            name: "Enfermero de Terapia Intensiva",
+            position: null,
+            location: "Clínica del Parque del Pacífico — Cusco",
+            startDate: "2020-08",
+          },
+        ],
+      },
+      PE_008,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position, w.location])).toEqual([
+      ["Clinica Santa Brígida del Rímac", "Enfermero Asistencial", "Cusco"],
+      ["Clínica del Parque del Pacífico", "Enfermero de Terapia Intensiva", "Cusco"],
+    ]);
+    expect(warnings).toContain(
+      'grounding: work[0].name "Enfermero Asistencial" is the job title; set position to it and name to the employer "Clinica Santa Brígida del Rímac" as written',
+    );
+  });
+
+  /** es-pe-006 (DOCX): blank lines between title, "Company, City" and dates; the title also in the header and summary. */
+  const PE_006 = `Yesenia Mamani Gutiérrez
+
+Desarrolladora Backend
+
+DATOS DE CONTACTO
+
+Lima, Perú
+
+PERFIL
+
+Desarrolladora Backend con 9 años de experiencia construyendo APIs y sistemas distribuidos. Me interesan la calidad del código, la observabilidad y el trabajo en equipo.
+
+EXPERIENCIA
+
+Tech Lead Backend
+
+Pagos del Rímac S.A., Trujillo
+
+oct. 2024 – dic. 2025
+
+- Migración de un monolito a microservicios con Docker y Kubernetes.
+
+Desarrolladora Backend Sr.
+
+Fintech del Pacífico S.A., Lima
+
+abr. 2020 – jun. 2024
+
+Desarrolladora Backend
+
+Datacenter del Pacífico S.A.C., Lima
+
+feb. 2017 – dic. 2019
+
+EDUCACIÓN
+
+Licenciatura en Informática – Universidad Peruana de Ciencias del Pacífico
+`;
+
+  it("es-pe-006: recovers employers across blank lines, ignoring the header and the summary", () => {
+    const { resume } = groundResume(
+      {
+        basics: { name: "Yesenia Mamani Gutiérrez", label: "Desarrolladora Backend" },
+        work: [
+          // name == position, employer dropped (location kept only the city).
+          { name: "Tech Lead Backend", position: "Tech Lead Backend", location: "Trujillo" },
+          { name: "Desarrolladora Backend Sr.", position: null, location: "Lima" },
+          // The v0.3.0 prompt's shape: "Company, City" in location.
+          {
+            name: "Desarrolladora Backend",
+            position: "Desarrolladora Backend",
+            location: "Datacenter del Pacífico S.A.C., Lima",
+          },
+        ],
+      },
+      PE_006,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position, w.location])).toEqual([
+      ["Pagos del Rímac S.A.", "Tech Lead Backend", "Trujillo"],
+      ["Fintech del Pacífico S.A.", "Desarrolladora Backend Sr.", "Lima"],
+      ["Datacenter del Pacífico S.A.C.", "Desarrolladora Backend", "Lima"],
+    ]);
+  });
+
+  it("es-ar-003 / es-ar-008: title and dates on one line, employer on the same or the next line", () => {
+    const text = `EXPERIENCIA PROFESIONAL
+
+Supervisor de Enfermería agosto 2025 – actualidad
+Clínica del Parque del Litoral, Mendoza
+• Coordinación de turnos de 7 enfermeros.
+
+septiembre 2021 – actualidad · Científica de Datos, Telecom de los Andes S.A. (Remoto)
+`;
+    const { resume } = groundResume(
+      {
+        work: [
+          { name: "Supervisor de Enfermería", position: null, location: null },
+          { name: "Científica de Datos", position: "Científica de Datos", location: "Remoto" },
+        ],
+      },
+      text,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position, w.location])).toEqual([
+      ["Clínica del Parque del Litoral", "Supervisor de Enfermería", null],
+      ["Telecom de los Andes S.A.", "Científica de Datos", "Remoto"],
+    ]);
+  });
+
+  it("keeps the model's entry when the name is an employer or no employer is written", () => {
+    const text = `EXPERIENCE
+Globant
+Senior Developer · 2020 – 2023
+Analista de Datos
+2018 – 2020
+`;
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          // "Company\nTitle" layout with the company in name: never turned into a title.
+          { name: "Globant", position: null },
+          { name: "Analista de Datos", position: null },
+        ],
+      },
+      text,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Globant", null],
+      ["Analista de Datos", null],
+    ]);
+    expect(warnings).toContain(
+      'grounding: work[1].name "Analista de Datos" looks like a job title and position is empty; no employer found next to it (kept)',
+    );
+  });
+});
+
+describe("groundResume — candidate city the model replaced with the prompt's example", () => {
+  it("es-ar-003 / es-ar-008: recovers the written city from the address / raw location", () => {
+    const text = `Ramiro Rossi
+Enfermero
+Mendoza, Argentina · Cel.: +54 9 261 543-7794 · ramiro.rossi@example.org
+`;
+    const { resume, warnings } = groundResume(
+      {
+        basics: {
+          name: "Ramiro Rossi",
+          location: {
+            address: "Mendoza, Argentina",
+            city: "Ciudad Autónoma de Buenos Aires",
+            region: "Buenos Aires",
+            countryCode: "AR",
+          },
+        },
+        x_cvparse: {
+          location: {
+            city: "Ciudad Autónoma de Buenos Aires",
+            adminRegion: "Buenos Aires",
+            countryCode: "AR",
+            raw: "Mendoza, Argentina",
+          },
+        },
+      },
+      text,
+    );
+    expect(resume.basics?.location).toMatchObject({
+      city: "Mendoza",
+      region: null,
+      countryCode: "AR",
+      address: "Mendoza, Argentina",
+    });
+    expect(resume.x_cvparse?.location).toMatchObject({
+      city: "Mendoza",
+      adminRegion: null,
+      raw: "Mendoza, Argentina",
+    });
+    expect(warnings).toContain(
+      'grounding: basics.location.city "Ciudad Autónoma de Buenos Aires" replaced by "Mendoza" as written',
+    );
+  });
+
+  it("es-pe-008: strips a 'Ciudad de' prefix the document does not write", () => {
+    const { resume } = groundResume(
+      { basics: { location: { city: "Ciudad de Cusco", countryCode: "PE" } } },
+      "Jhon Ccori\nEnfermero\nCusco, Perú\n",
+    );
+    expect(resume.basics?.location?.city).toBe("Cusco");
+  });
+
+  it("still drops a city with nothing written to recover", () => {
+    const { resume, warnings } = groundResume(
+      { basics: { location: { city: "Montevideo", address: "Argentina", countryCode: "AR" } } },
+      "Ana Pérez\nArgentina\n",
+    );
+    expect(resume.basics?.location?.city ?? null).toBeNull();
+    expect(warnings).toContain(
+      'grounding: dropped basics.location.city "Montevideo" (not found in the document)',
+    );
+  });
+});

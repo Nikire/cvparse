@@ -1,6 +1,7 @@
 import type { Resume } from "../schema/resume.js";
 import { normalizeDate } from "./dates.js";
 import { collectEducationLevels } from "./education.js";
+import { looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
 
 /**
  * Deterministic grounding: checks the fields a model most often invents (contact data,
@@ -307,6 +308,37 @@ function countryGrounded(src: Source, code: string): boolean {
   return (COUNTRY_NAMES[upper] ?? []).some((name) => hasTerm(src.text, name));
 }
 
+/** "Ciudad de Cusco" -> "Cusco": a generic "city of" prefix the model added. */
+const CITY_PREFIX = /^\s*(?:ciudad de|city of)\s+/iu;
+
+function isCountryName(norm: string): boolean {
+  return Object.values(COUNTRY_NAMES).some((names) => names.includes(norm));
+}
+
+/**
+ * A city that IS in the document, recovered from location values the model wrote: the model's
+ * city without a "Ciudad de" prefix, else the first part of an address / raw location ("Mendoza,
+ * Argentina" -> "Mendoza"). Used when the model's city is not in the document (llama3.1 answers
+ * "Ciudad Autónoma de Buenos Aires" for "Córdoba, Argentina", copying the prompt's example).
+ */
+function recoverCity(
+  src: Source,
+  city: string,
+  sources: readonly (string | null)[],
+): string | null {
+  const candidates = [city.replace(CITY_PREFIX, "").trim()];
+  for (const value of sources) {
+    if (value) candidates.push(value.split(/[,(·|—–]/u)[0]?.trim() ?? "");
+  }
+  for (const candidate of candidates) {
+    const norm = normalizeForMatch(candidate);
+    if (norm === "" || norm === normalizeForMatch(city) || /\d/.test(norm)) continue;
+    if (isCountryName(norm) || WORK_MODES.has(norm)) continue;
+    if (placeGrounded(src, candidate)) return candidate;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------------------------
 // Languages
 
@@ -557,7 +589,26 @@ function groundBasics(resume: Resume, src: Source, warnings: string[]): void {
   const loc = basics.location;
   if (loc) {
     const city = str(loc.city);
-    if (city) {
+    const recovered =
+      city && !placeGrounded(src, city)
+        ? recoverCity(src, city, [str(loc.address), str(resume.x_cvparse?.location?.raw)])
+        : null;
+    if (city && recovered) {
+      loc.city = recovered;
+      warnings.push(
+        `grounding: basics.location.city "${city}" replaced by "${recovered}" as written`,
+      );
+      const region = str(loc.region);
+      if (region && !placeGrounded(src, region)) {
+        loc.region = null;
+        warnings.push(dropped("basics.location.region", region));
+      }
+      const address = str(loc.address);
+      if (address && !placeGrounded(src, address)) {
+        loc.address = null;
+        warnings.push(dropped("basics.location.address", address));
+      }
+    } else if (city) {
       if (!placeGrounded(src, city)) {
         warnings.push(dropped("basics.location.city", city));
         loc.city = null;
@@ -599,7 +650,19 @@ function groundExtensionLocation(resume: Resume, src: Source, warnings: string[]
   const raw = str(loc.raw);
   const label = raw ?? city ?? "";
   if (city) {
-    if (!placeGrounded(src, city) && !(raw && placeGrounded(src, raw))) {
+    if (placeGrounded(src, city)) return;
+    const recovered = recoverCity(src, city, [raw]);
+    if (recovered) {
+      loc.city = recovered;
+      warnings.push(
+        `grounding: x_cvparse.location.city "${city}" replaced by "${recovered}" as written`,
+      );
+      const region = str(loc.adminRegion);
+      if (region && !placeGrounded(src, region)) {
+        loc.adminRegion = null;
+        warnings.push(dropped("x_cvparse.location.adminRegion", region));
+      }
+    } else if (!(raw && placeGrounded(src, raw))) {
       ext.location = null;
       warnings.push(dropped("x_cvparse.location", label, "city not found in the document"));
     }
@@ -903,6 +966,130 @@ export function recoverTitleNearOrg(
   return null;
 }
 
+/** A part of an entry line that can be an employer: like a title, but acronyms are fine. */
+function orgCandidate(part: string, exclude: readonly string[]): boolean {
+  if (!/\p{L}{2,}/u.test(part) || /\d/.test(part) || part.length > 100) return false;
+  const norm = normalizeForMatch(part);
+  if (exclude.includes(norm) || isPlaceName(norm) || WORK_MODES.has(norm)) return false;
+  if (normalizeDate(part).current) return false;
+  if (normalizeDate(`${part} 2000`).value?.startsWith("2000-")) return false;
+  return !looksLikeJobTitle(part);
+}
+
+/** Separators that may sit right before a title written as its own part of a line. */
+const PART_START = /(?:^|[—–|·•,;([\t:]|\s-)$/u;
+
+/**
+ * `true` when the `span` of `raw` is a whole part of the line: preceded by the line start or a
+ * separator, and followed by a separator, the line end or a date ("Enfermero Asistencial febrero
+ * 2024 – julio 2025"). Rules out a title quoted inside a sentence ("Desarrolladora Backend con 9
+ * años de experiencia").
+ */
+function isWholePart(raw: string, span: { start: number; end: number }): boolean {
+  if (!PART_START.test(raw.slice(0, span.start).trimEnd())) return false;
+  const rest = (raw.slice(span.end).split(LINE_PARTS)[0] ?? "").trim();
+  if (rest === "" || /^\d/.test(rest)) return true;
+  return normalizeDate(rest.split(/\s+/).slice(0, 2).join(" ")).value !== null;
+}
+
+/**
+ * The employer written next to a job title: the first employer-like part after it on its line
+ * ("septiembre 2021 – actualidad · Científica de Datos, Telecom S.A. (Remoto)"), else the last one
+ * before it, else the first part of the next non-blank line ("Enfermero Asistencial\nClínica Santa
+ * Brígida — Cusco"). The title must be a whole part of its line, and only lines for which
+ * `within` is true are searched. Parts that read as job titles, places in `exclude`, dates and
+ * work modes are never returned.
+ */
+export function recoverOrgNearTitle(
+  sourceText: string,
+  title: string,
+  exclude: readonly string[] = [],
+  within: (line: number) => boolean = () => true,
+): string | null {
+  const titleNorm = normalizeForMatch(title);
+  if (titleNorm === "") return null;
+  const excluded = [titleNorm, ...exclude.map(normalizeForMatch)];
+  const rawLines = sourceText.split(/\r?\n/);
+  const headings = new Set(detectSectionSpans(sourceText).map((s) => s.start));
+  const isOrg = (part: string) => orgCandidate(part, excluded);
+  for (let i = 0; i < rawLines.length; i++) {
+    if (!within(i)) continue;
+    const raw = rawLines[i] ?? "";
+    const span = findTermSpan(raw, titleNorm);
+    if (!span || !isWholePart(raw, span)) continue;
+    const after = splitLineParts(raw.slice(span.end));
+    const before = splitLineParts(raw.slice(0, span.start));
+    const found = after.find(isOrg) ?? before.reverse().find(isOrg);
+    if (found) return found;
+    let j = i + 1;
+    while (j < rawLines.length && j <= i + 2 && (rawLines[j] ?? "").trim() === "") j++;
+    const next = (rawLines[j] ?? "").trim();
+    if (next === "" || headings.has(j) || /^[-•*·▪●◦]/u.test(next)) continue;
+    // Only the first part of the next line: later parts are its city or dates.
+    const first = splitLineParts(next)[0];
+    if (first && isOrg(first)) return first;
+  }
+  return null;
+}
+
+/**
+ * Work entries whose `name` is the job title (position empty, or the same value in both): the
+ * employer is recovered from the document ({@link recoverOrgNearTitle}), searching the
+ * Experience section when the document has one. The model's `name` must read as a job title
+ * ({@link looksLikeJobTitle}, or contain `basics.label`); otherwise nothing changes. When the
+ * model put the employer in `location` ("Clínica Santa Brígida — Cusco"), it is removed from
+ * there. Entries where nothing can be recovered are kept as the model wrote them.
+ */
+function recoverEmployers(
+  resume: Resume,
+  src: Source,
+  places: readonly string[],
+  warnings: string[],
+) {
+  if (!Array.isArray(resume.work)) return;
+  const spans = detectSectionSpans(src.original).filter((s) => s.key === "work");
+  const within =
+    spans.length > 0
+      ? (line: number) => spans.some((s) => line > s.start && line < s.end)
+      : undefined;
+  const label = str(resume.basics?.label);
+  const labelNorm = label ? normalizeForMatch(label) : "";
+  // The model's entry locations may hold the employer ("Pagos del Rímac S.A., Trujillo").
+  const exclude = places.filter((p) => !looksLikeOrganization(p));
+  resume.work.forEach((entry, i) => {
+    if (!isRecord(entry)) return;
+    const name = str(entry.name);
+    if (!name) return;
+    const position = str(entry.position);
+    if (position && normalizeForMatch(position) !== normalizeForMatch(name)) return;
+    const nameNorm = normalizeForMatch(name);
+    const titleLike =
+      looksLikeJobTitle(name) ||
+      (labelNorm !== "" && !looksLikeOrganization(name) && hasTerm(nameNorm, labelNorm));
+    if (!titleLike) return;
+    const org = recoverOrgNearTitle(src.original, name, exclude, within);
+    if (!org || normalizeForMatch(org) === nameNorm) {
+      if (!position) {
+        warnings.push(
+          `grounding: work[${i}].name "${name}" looks like a job title and position is empty; no employer found next to it (kept)`,
+        );
+      }
+      return;
+    }
+    entry.name = org;
+    entry.position = position ?? name;
+    const loc = str(entry.location);
+    const orgNorm = normalizeForMatch(org);
+    if (loc && hasTerm(normalizeForMatch(loc), orgNorm)) {
+      const rest = splitLineParts(loc).filter((p) => normalizeForMatch(p) !== orgNorm);
+      entry.location = rest.length > 0 ? rest.join(", ") : null;
+    }
+    warnings.push(
+      `grounding: work[${i}].name "${name}" is the job title; set position to it and name to the employer "${org}" as written`,
+    );
+  });
+}
+
 /** Every location string the resume mentions, and its comma-separated parts. */
 function knownPlaces(resume: Resume): string[] {
   const values: unknown[] = [];
@@ -1108,7 +1295,11 @@ function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
  * fluency (replaced by the level written next to the language when there is one). Degree types
  * (`education[].studyType`) and job titles (`work[].position`) that are not in the document are
  * replaced by the title written next to their institution / company; `x_cvparse.educationLevels`
- * is recomputed from the grounded `studyType`s. Before all that, entries the model put in the
+ * is recomputed from the grounded `studyType`s. A candidate city that is not in the document is
+ * replaced by the city the model's own address / raw location writes ("Mendoza, Argentina"), or
+ * the city without a "Ciudad de" prefix, before being dropped. A `work[]` entry whose `name` is a
+ * job title (position empty or equal to it) gets the employer written next to that title (see
+ * `recoverEmployers`). Before all that, entries the model put in the
  * wrong section are moved by the heading their organization is written under (a university in
  * `work[]` that only appears under "Education" goes to `education[]`; see `fixPlacement`), with
  * `placement:` warnings. Both sides are compared after NFKC, diacritic
@@ -1127,6 +1318,8 @@ export function groundResume(resume: Resume, sourceText: string): GroundResult {
   // Titles next: their recovery must not mistake a location for a title, so it needs the
   // locations before grounding drops them.
   const places = knownPlaces(out);
+  // Before the titles: an employer recovered here makes its title a grounded position.
+  recoverEmployers(out, src, places, warnings);
   groundTitles(out.education, "education", src, places, warnings);
   groundTitles(out.work, "work", src, places, warnings);
   groundBasics(out, src, warnings);

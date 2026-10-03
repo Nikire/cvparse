@@ -35,6 +35,18 @@ type ExtractionOutput = z.infer<typeof ResumeExtractionSchema>;
 
 const MAX_INPUT_CHARS = 200_000;
 
+/**
+ * Default cap on the tokens the model may generate for one CV. A long CV in JSON Resume form is
+ * typically 1-4k tokens; the cap stops a model that loops (repeating entries or highlights) from
+ * generating until the HTTP client times out.
+ */
+export const DEFAULT_MAX_OUTPUT_TOKENS = 8192;
+
+/** Message for an extraction cut by the output limit. */
+function outputLimitMessage(maxOutputTokens: number): string {
+  return `The model hit the output limit (maxOutputTokens=${maxOutputTokens}); the CV may be too long or the model looped. Raise ParseOptions.maxOutputTokens if the CV is genuinely long.`;
+}
+
 function formatSdkWarning(warning: Warning): string {
   const w = warning as { type: string; feature?: string; message?: string; details?: string };
   const head = w.feature ? `${w.type}: ${w.feature}` : w.type;
@@ -48,12 +60,12 @@ function formatSdkWarning(warning: Warning): string {
   return text;
 }
 
-function wrapError(error: unknown): CvparseError {
+function wrapError(error: unknown, context: { maxOutputTokens: number }): CvparseError {
   if (error instanceof CvparseError) return error;
 
   // After maxRetries the SDK throws a RetryError; the useful one is the last underlying error.
   if (RetryError.isInstance(error) && error.lastError instanceof Error) {
-    const wrapped = wrapError(error.lastError);
+    const wrapped = wrapError(error.lastError, context);
     return new CvparseError(
       wrapped.code,
       `${wrapped.message} (after ${error.errors.length} attempts)`,
@@ -66,6 +78,12 @@ function wrapError(error: unknown): CvparseError {
   }
 
   if (NoObjectGeneratedError.isInstance(error)) {
+    if (error.finishReason === "length") {
+      return new CvparseError("NO_OBJECT_GENERATED", outputLimitMessage(context.maxOutputTokens), {
+        cause: error,
+        rawText: error.text,
+      });
+    }
     return new CvparseError(
       "NO_OBJECT_GENERATED",
       `The model did not return a valid resume object: ${error.message}`,
@@ -227,6 +245,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     referenceDate,
   });
 
+  const maxOutputTokens = options.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
   let raw: unknown;
   let usage: ParseResult["usage"];
   try {
@@ -272,7 +291,14 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
       abortSignal: options.abortSignal,
       maxRetries: options.maxRetries,
       temperature: options.temperature,
+      maxOutputTokens,
     });
+    if (result.finishReason === "length") {
+      // A truncated object almost never parses; if it did, it is missing its tail.
+      throw new CvparseError("NO_OBJECT_GENERATED", outputLimitMessage(maxOutputTokens), {
+        rawText: result.text,
+      });
+    }
     raw = result.output;
     usage = {
       inputTokens: result.usage.inputTokens,
@@ -281,7 +307,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     };
     for (const warning of result.warnings ?? []) warnings.push(formatSdkWarning(warning));
   } catch (error) {
-    throw wrapError(error);
+    throw wrapError(error, { maxOutputTokens });
   }
 
   // Only let the heuristic fill in detectedLanguage when the language is not forced; otherwise

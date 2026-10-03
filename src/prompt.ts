@@ -63,7 +63,6 @@ export function buildSystemPrompt(options: {
 - Put each skill in its own keywords item; never join several skills into one string with commas.
 - Leave x_cvparse.normalizedSkills and x_cvparse.educationLevels null: cvparse computes them from skills and education.
 - languages: spoken languages only (Español, Inglés, Português), with fluency exactly as written next to the language ("C1", "Native", "avanzado"); null when no level is written. Programming languages are skills.
-- work.name is only the employer: do not append the position to it ("Freelance", not "Freelance — Developer"). The same for education.institution and studyType.
 - Languages often appear in a header or summary line (e.g. "Languages: English (C1), Spanish (Native)") rather than in their own section; extract them wherever they are.`,
 
     `## Confidence
