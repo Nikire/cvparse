@@ -27,6 +27,19 @@ The npm package is `@cvparse/core`; the command it installs is `cvparse` (`npm i
 
 `cvparse` defaults to Ollama at `http://localhost:11434/v1`. Nothing leaves your machine.
 
+**Raise Ollama's context window.** Ollama serves every model with a context window set on the server (4096 tokens in many installs), whatever the model itself supports. A long CV plus the extracted JSON can exceed it, and Ollama then silently drops the start of the conversation, instructions included, so entries go missing. Set `OLLAMA_CONTEXT_LENGTH=16384` in the environment of the Ollama server and restart Ollama:
+
+```bash
+# Windows (then quit and restart Ollama from the tray)
+setx OLLAMA_CONTEXT_LENGTH 16384
+# macOS (Ollama app; then restart it)
+launchctl setenv OLLAMA_CONTEXT_LENGTH 16384
+# Linux (systemd): add Environment="OLLAMA_CONTEXT_LENGTH=16384" under [Service]
+sudo systemctl edit ollama && sudo systemctl restart ollama
+```
+
+After each Ollama call the CLI asks the server for the loaded context length and prints a `warning:` with this hint when the call used 90% or more of the window.
+
 The input can be a PDF, a DOCX, a plain-text file or, with `--ocr`, an image or scanned PDF; the format is detected from the file contents, not the extension. For a PDF or DOCX the CLI prints one `info:` line to stderr saying what it read, e.g. `info: read pdf, 2 page(s), multi-column layout`.
 
 Other providers:
@@ -152,6 +165,7 @@ type ParseOptions = {
   maxRetries?: number;              // retries on retryable provider errors, default 2 (AI SDK default)
   temperature?: number;             // sampling temperature; omit for the provider default, 0 suits copying tasks
   referenceDate?: Date;             // "today" for relative dates ("hace 3 años"); default new Date()
+  grounding?: boolean;              // check the output against the document text; default true (see below)
   ocr?: OcrAdapter | 'vision';      // how to read images and scanned PDFs; without it they fail with OCR_REQUIRED / NO_TEXT_LAYER
   ocrLanguages?: readonly string[]; // OCR language hints (ISO 639-1, e.g. ['es', 'en']); default: `language` when set
 };
@@ -163,8 +177,7 @@ The result:
 type ParseResult = {
   resume: Resume;      // typed, validated against ResumeSchema
   usage: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
-  warnings: string[];  // extraction warnings (prefixed `extract:`), provider warnings,
-                       // dates that could not be normalized, model confidence notes
+  warnings: string[];  // human-readable, one per line; see "Warnings" below
   source: {
     format: 'text' | 'pdf' | 'docx' | 'image';            // what the input was read as
     pages?: number;                                       // PDFs (and vision mode)
@@ -208,6 +221,33 @@ try {
 | `NO_OBJECT_GENERATED` | The model did not return a valid object (`rawText` holds what it did return) |
 | `PROVIDER_ERROR` | The provider call failed: connection refused, auth, rate limit, abort (`statusCode` when available) |
 | `VALIDATION_ERROR` | The normalized result did not pass `ResumeSchema` |
+
+### Warnings
+
+Problems that do not stop the parse go to `ParseResult.warnings` (and to stderr as `warning:` lines in the CLI). Most start with a prefix you can filter on:
+
+| Prefix | Meaning |
+| --- | --- |
+| `extract:` | Reading the document: scanned pages without OCR, DOCX text boxes, fallbacks, and OCR issues (`extract: ocr: low confidence ...`) |
+| `grounding:` | A value not found in the document was dropped, or replaced by what is written there |
+| `placement:` | An entry was moved to the section whose heading it is written under |
+| `coverage:` | The document has a section (e.g. "Projects") that came back empty |
+| `precision:` | A date the model padded with an invented month or day was cut back to what the CV says |
+| `model:` | The model's own confidence notes (`x_cvparse.confidenceNotes`) |
+
+Provider warnings (such as `responseFormat`), dates that could not be normalized and small repairs (an organization and title split apart, several award dates reduced to the latest) are reported without a prefix.
+
+### How cvparse keeps the model honest
+
+LLMs, small local ones in particular, fill gaps with plausible inventions. Testing a real 3-page CV with an 8B model produced a phone number, a city and three skills that were not in the document. So after the model call, cvparse checks the output against the text it read, deterministically:
+
+- **Grounding.** Contact data (email, phone, URLs, profiles), locations (the candidate's and each entry's, including the candidate's city copied into every job), skills and skill levels, and spoken languages are looked up in the document (accent- and case-insensitive). Values that are not there are dropped. Language fluency and degree and job titles the model rewrote are replaced by what is written next to the language, institution or company. Each change adds a `grounding:` warning. Summaries, highlights, company names and dates are not grounded. Set `grounding: false` to keep the raw model output. Grounding is skipped in vision mode, where there is no text to compare against.
+- **Placement.** An entry the model put in the wrong section (a university in `work[]`, a job in `education[]`, a course in `work[]`) is moved to the section whose heading it is written under, with a `placement:` warning.
+- **Coverage.** When the document has a section heading (or an inline "Languages:" label) and the matching array came back empty, a `coverage:` warning says so: usually a model that stopped early.
+- **No invented months.** "2020" padded to "2020-01" is cut back to "2020" when the CV never writes a month for that year (`precision:` warning).
+- **Deterministic skills list.** `x_cvparse.normalizedSkills` is computed by cvparse from `skills`, never taken from the model.
+
+`groundResume` and `checkCoverage` are exported if you want to run them on output from your own pipeline.
 
 ## Scanned CVs and images
 
@@ -313,10 +353,10 @@ Every field is optional and tolerant of `null`, because real CVs are incomplete.
 cvparse adds its own data under the `x_cvparse` key so the JSON Resume part stays clean:
 
 - `detectedLanguage` — ISO 639-1 code of the language the CV is written in (`es`, `en`, `pt`, ...).
-- `normalizedSkills` — a flat, deduplicated list of skills as canonical lowercase names.
+- `normalizedSkills` — a flat, deduplicated, lowercase list derived by cvparse from `skills` (every keyword, plus the names of entries without keywords). Only skills written in the document; no translations or canonical names.
 - `location` — LATAM-friendly structured location: `countryCode` (ISO 3166-1 alpha-2), `adminRegion` (state, province, department, autonomous community), `city`, and `raw` (the location exactly as written in the CV).
 - `confidenceNotes` — short notes about ambiguous or uncertain extractions; also appended to `warnings`.
-- `educationLevels` — one entry per `education[]` item, in the same order: `level` (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course` or `unknown`), the `original` study type and a `canonical` title family ("Licenciatura", "Grado", "Ingeniería", "Tecnicatura", "Máster", "Doctorado", "Diplomado", ...). Computed by cvparse from Spanish, Portuguese and English degree names; `education[].studyType` keeps the original text.
+- `educationLevels` — one entry per `education[]` item, in the same order: `level` (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course` or `unknown`), the `original` study type and a `canonical` title family ("Licenciatura", "Grado", "Ingeniería", "Tecnicatura", "Máster", "Doctorado", "Diplomado", ...). Computed by cvparse from Spanish, Portuguese and English degree names; `education[].studyType` keeps the title as written in the CV (e.g. "Computer Engineering", not an invented "Bachelor's degree").
 
 The Zod schemas (`ResumeSchema`, `BasicsSchema`, `WorkSchema`, `EducationSchema`, `SkillSchema`, `ExtensionSchema` and the rest) are exported so you can validate, extend or reuse them. The authoritative definition is in [`src/schema/resume.ts`](./src/schema/resume.ts).
 

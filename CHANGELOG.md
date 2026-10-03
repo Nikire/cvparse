@@ -8,6 +8,31 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+Driven by a real 3-page CV, where llama3.1 8B invented a phone number, a city and three skills, rewrote degree names and put entries in the wrong sections. The benchmark was re-run with these changes; the numbers are in the README Benchmark section.
+
+### Added
+
+- Grounding: after the model call, `parseResume` checks contact data, locations, skills and skill levels, spoken languages and their fluency, and degree and job titles against the document text (`groundResume`). Each drop or replacement adds a `grounding:` warning; entries moved between sections add a `placement:` warning. New option `ParseOptions.grounding` (default `true`; `false` keeps the raw model output). Skipped in vision mode.
+- Coverage warnings (`coverage:`) when the document has a section heading (Projects, Languages, Certifications, ...) but the matching array came back empty (`checkCoverage`).
+- CLI: after an Ollama call, a warning with an `OLLAMA_CONTEXT_LENGTH` hint when the call used 90% or more of the server's context window (Ollama silently drops the instructions when it overflows).
+- `groundResume` and `checkCoverage` exported from `@cvparse/core`.
+
+### Fixed
+
+- Hallucinated phone numbers, emails, URLs, locations (including the candidate's city copied into every job), skills and skill levels are dropped when they are not in the document.
+- Language fluency and degree / job titles the model rewrote are restored as written next to the language, institution or company ("Computer Engineering", not "Bachelor's degree"); `education[].studyType` keeps the title as written.
+- Entries in the wrong section are moved by the heading they are written under: a university returned in `work[]` goes to `education[]`, a course to `certificates[]`, a job in `education[]` to `work[]`.
+- An organization and title glued together ("Freelance — Full-Stack Developer") are split into `name` and `position` (also for volunteer and education entries).
+- Comma- or semicolon-joined skills are split into separate keywords / entries.
+- `x_cvparse.normalizedSkills` is derived deterministically from `skills` (lowercased, deduplicated, only skills written in the document) instead of taken from the model, which returned translations and stringified objects.
+- Invented months: a date padded to "2020-01" when the CV only says "2020" is reduced back, with a `precision:` warning; the prompt now forbids fake precision.
+- Garbage model confidence notes (hash-like tokens such as "8e51") are dropped.
+- PDF text: accented letters encoded as a dotless "ı" plus a combining mark, typographic ligatures (ﬁ, ﬂ, ...) and no-break spaces are cleaned for every extractor, and the text is NFC-normalized.
+- Single-date fields listing several dates (`awards[].date` "2012, 2019") keep the latest, with a warning.
+- English degree names are classified in `x_cvparse.educationLevels` ("Computer Engineering", "Bachelor of Engineering", "Associate", technical diplomas); "incomplete" / "in progress" markers no longer change the level.
+- "In progress", "en progreso", "cursando", "em andamento" are read as ongoing dates.
+- The prompt asks for every entry of long CVs, projects and certifications sections, and languages written in a header line.
+
 ## [0.3.0] - 2026-10-02
 
 ### Added

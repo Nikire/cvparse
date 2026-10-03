@@ -27,6 +27,19 @@ El paquete npm es `@cvparse/core`; el comando que instala es `cvparse` (`npm i -
 
 `cvparse` usa por defecto Ollama en `http://localhost:11434/v1`. Nada sale de tu máquina.
 
+**Subí la ventana de contexto de Ollama.** Ollama sirve todos los modelos con una ventana de contexto fijada en el servidor (4096 tokens en muchas instalaciones), sin importar lo que soporte el modelo. Un CV largo más el JSON extraído puede superarla, y entonces Ollama descarta en silencio el principio de la conversación, instrucciones incluidas, y se pierden entradas. Definí `OLLAMA_CONTEXT_LENGTH=16384` en el entorno del servidor de Ollama y reinicialo:
+
+```bash
+# Windows (después cerrá y volvé a abrir Ollama desde la bandeja)
+setx OLLAMA_CONTEXT_LENGTH 16384
+# macOS (app de Ollama; después reiniciala)
+launchctl setenv OLLAMA_CONTEXT_LENGTH 16384
+# Linux (systemd): agregá Environment="OLLAMA_CONTEXT_LENGTH=16384" bajo [Service]
+sudo systemctl edit ollama && sudo systemctl restart ollama
+```
+
+Después de cada llamada a Ollama el CLI le pregunta al servidor la ventana de contexto cargada e imprime un `warning:` con esta pista cuando la llamada usó el 90 % o más.
+
 La entrada puede ser un PDF, un DOCX, un archivo de texto plano o, con `--ocr`, una imagen o un PDF escaneado; el formato se detecta por el contenido del archivo, no por la extensión. Para un PDF o DOCX el CLI imprime una línea `info:` por stderr con lo que leyó, p. ej. `info: read pdf, 2 page(s), multi-column layout`.
 
 Otros proveedores:
@@ -152,6 +165,7 @@ type ParseOptions = {
   maxRetries?: number;              // reintentos ante errores recuperables del proveedor, por defecto 2 (el del AI SDK)
   temperature?: number;             // temperatura de muestreo; omitila para el default del proveedor, 0 va bien para copiar
   referenceDate?: Date;             // "hoy" para fechas relativas ("hace 3 años"); por defecto new Date()
+  grounding?: boolean;              // contrasta la salida con el texto del documento; por defecto true (ver más abajo)
   ocr?: OcrAdapter | 'vision';      // cómo leer imágenes y PDF escaneados; sin esto fallan con OCR_REQUIRED / NO_TEXT_LAYER
   ocrLanguages?: readonly string[]; // pistas de idioma para el OCR (ISO 639-1, p. ej. ['es', 'en']); por defecto `language` si se indicó
 };
@@ -163,8 +177,7 @@ El resultado:
 type ParseResult = {
   resume: Resume;      // tipado, validado contra ResumeSchema
   usage: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
-  warnings: string[];  // avisos de extracción (con prefijo `extract:`), avisos del proveedor,
-                       // fechas que no se pudieron normalizar, notas de confianza del modelo
+  warnings: string[];  // legibles, uno por línea; ver "Avisos" más abajo
   source: {
     format: 'text' | 'pdf' | 'docx' | 'image';            // cómo se leyó la entrada
     pages?: number;                                       // PDF (y modo visión)
@@ -208,6 +221,33 @@ try {
 | `NO_OBJECT_GENERATED` | El modelo no devolvió un objeto válido (`rawText` contiene lo que sí devolvió) |
 | `PROVIDER_ERROR` | Falló la llamada al proveedor: conexión rechazada, autenticación, rate limit, abort (`statusCode` cuando está disponible) |
 | `VALIDATION_ERROR` | El resultado normalizado no pasó `ResumeSchema` |
+
+### Avisos
+
+Los problemas que no frenan el parseo van a `ParseResult.warnings` (y en el CLI, por stderr como líneas `warning:`). Los avisos están en inglés y la mayoría empieza con un prefijo por el que se puede filtrar:
+
+| Prefijo | Significado |
+| --- | --- |
+| `extract:` | Lectura del documento: páginas escaneadas sin OCR, cajas de texto de DOCX, fallbacks y problemas de OCR (`extract: ocr: low confidence ...`) |
+| `grounding:` | Un valor que no está en el documento se descartó o se reemplazó por lo que está escrito |
+| `placement:` | Una entrada se movió a la sección bajo cuyo título está escrita |
+| `coverage:` | El documento tiene una sección (p. ej. "Proyectos") que volvió vacía |
+| `precision:` | Una fecha a la que el modelo le inventó mes o día se recortó a lo que dice el CV |
+| `model:` | Las notas de confianza del propio modelo (`x_cvparse.confidenceNotes`) |
+
+Los avisos del proveedor (como `responseFormat`), las fechas que no se pudieron normalizar y las reparaciones menores (organización y título separados, varias fechas de un premio reducidas a la última) van sin prefijo.
+
+### Cómo evita cvparse que el modelo invente
+
+Los LLM, sobre todo los locales chicos, rellenan huecos con invenciones verosímiles. Probando un CV real de 3 páginas con un modelo de 8B aparecieron un teléfono, una ciudad y tres habilidades que no estaban en el documento. Por eso, después de la llamada al modelo, cvparse contrasta la salida con el texto que leyó, de forma determinística:
+
+- **Grounding.** Los datos de contacto (email, teléfono, URLs, perfiles), las ubicaciones (la del candidato y la de cada entrada, incluida la ciudad del candidato copiada en todos los trabajos), las habilidades y sus niveles, y los idiomas se buscan en el documento (sin distinguir tildes ni mayúsculas). Lo que no está se descarta. El nivel de idioma y los títulos de estudios y puestos que el modelo reescribió se reemplazan por lo que está escrito junto al idioma, la institución o la empresa. Cada cambio agrega un aviso `grounding:`. Los resúmenes, logros, nombres de empresas y fechas no se contrastan. Con `grounding: false` se conserva la salida cruda del modelo. En modo visión no se aplica, porque no hay texto contra el cual comparar.
+- **Ubicación en secciones.** Una entrada que el modelo puso en la sección equivocada (una universidad en `work[]`, un trabajo en `education[]`, un curso en `work[]`) se mueve a la sección bajo cuyo título está escrita, con un aviso `placement:`.
+- **Cobertura.** Si el documento tiene un título de sección (o una etiqueta en línea tipo "Idiomas:") y el array correspondiente volvió vacío, un aviso `coverage:` lo indica: suele ser un modelo que cortó antes de tiempo.
+- **Sin meses inventados.** "2020" convertido en "2020-01" vuelve a "2020" cuando el CV nunca escribe un mes para ese año (aviso `precision:`).
+- **Lista de habilidades determinística.** `x_cvparse.normalizedSkills` lo calcula cvparse a partir de `skills`; nunca se toma del modelo.
+
+`groundResume` y `checkCoverage` se exportan por si querés aplicarlos a la salida de tu propio pipeline.
 
 ## CVs escaneados e imágenes
 
@@ -313,10 +353,10 @@ Todos los campos son opcionales y toleran `null`, porque los CVs reales están i
 cvparse agrega sus propios datos bajo la clave `x_cvparse` para que la parte JSON Resume quede limpia:
 
 - `detectedLanguage` — código ISO 639-1 del idioma en el que está escrito el CV (`es`, `en`, `pt`, ...).
-- `normalizedSkills` — lista plana y sin duplicados de habilidades como nombres canónicos en minúsculas.
+- `normalizedSkills` — lista plana, sin duplicados y en minúsculas que cvparse deriva de `skills` (todas las keywords, más el nombre de las entradas sin keywords). Solo habilidades escritas en el documento; sin traducciones ni nombres canónicos.
 - `location` — ubicación estructurada pensada para LATAM: `countryCode` (ISO 3166-1 alpha-2), `adminRegion` (estado, provincia, departamento, comunidad autónoma), `city`, y `raw` (la ubicación tal cual aparece en el CV).
 - `confidenceNotes` — notas breves sobre extracciones ambiguas o inciertas; también se agregan a `warnings`.
-- `educationLevels` — una entrada por cada ítem de `education[]`, en el mismo orden: `level` (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course` o `unknown`), el `original` y una familia de título `canonical` ("Licenciatura", "Grado", "Ingeniería", "Tecnicatura", "Máster", "Doctorado", "Diplomado", ...). Lo calcula cvparse a partir de nombres de títulos en español, portugués e inglés; `education[].studyType` conserva el texto original.
+- `educationLevels` — una entrada por cada ítem de `education[]`, en el mismo orden: `level` (`secondary`, `technical`, `bachelor`, `postgraduate`, `master`, `doctorate`, `course` o `unknown`), el `original` y una familia de título `canonical` ("Licenciatura", "Grado", "Ingeniería", "Tecnicatura", "Máster", "Doctorado", "Diplomado", ...). Lo calcula cvparse a partir de nombres de títulos en español, portugués e inglés; `education[].studyType` conserva el título tal como está escrito en el CV (p. ej. "Ingeniería en Sistemas", no un "Grado" inventado).
 
 Los schemas Zod (`ResumeSchema`, `BasicsSchema`, `WorkSchema`, `EducationSchema`, `SkillSchema`, `ExtensionSchema` y el resto) se exportan para que puedas validar, extender o reutilizarlos. La definición autoritativa está en [`src/schema/resume.ts`](./src/schema/resume.ts).
 

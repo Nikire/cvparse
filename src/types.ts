@@ -66,10 +66,14 @@ export interface ParseOptions {
    * Drops values that are not in the CV: email, phone, URLs and profiles; locations (the
    * candidate's, and per-entry `work`/`education` locations, including the candidate's city
    * copied into every job); skills, skill keywords and levels not written next to the skill,
-   * plus the matching `x_cvparse.normalizedSkills`; and spoken languages. Every drop adds a
-   * `grounding: ...` warning. Free text (summaries, highlights, positions, company names) and
-   * dates are never grounded. Skipped automatically in vision mode, where the model reads page
-   * images instead of text. Set `false` to keep the raw model output.
+   * plus the matching `x_cvparse.normalizedSkills`; and spoken languages. Language fluency,
+   * degree types (`education[].studyType`) and job titles (`work[].position`) the model rewrote
+   * are replaced by the text written next to the language, institution or company. Entries the
+   * model put in the wrong section are first moved to the section whose heading they are written
+   * under (`placement: ...` warnings). Every drop or replacement adds a `grounding: ...` warning.
+   * Free text (summaries, highlights, company names) and dates are never grounded. Skipped
+   * automatically in vision mode, where the model reads page images instead of text. Set `false`
+   * to keep the raw model output (section coverage is still checked).
    */
   grounding?: boolean;
   /**
@@ -108,10 +112,12 @@ export interface ParseResult {
   /** Token usage reported by the provider. */
   usage: ParseUsage;
   /**
-   * Human-readable warnings: provider/AI SDK warnings (unsupported settings), dates that could
-   * not be normalized, heuristic fallbacks, values dropped by grounding (`grounding: ...`),
-   * document sections that came back empty (`coverage: ...`), and the model's own
-   * `confidenceNotes`.
+   * Human-readable warnings, mostly prefixed: `extract:` (reading the document, including OCR
+   * issues as `extract: ocr: ...`), `grounding:` (values dropped or replaced by what the document
+   * says), `placement:` (entries moved to another section), `coverage:` (document sections that
+   * came back empty), `precision:` (invented months / days removed from dates) and `model:` (the
+   * model's own `confidenceNotes`). Provider/AI SDK warnings, dates that could not be
+   * normalized and small repairs (organization and title split) carry no prefix.
    */
   warnings: string[];
   /** How the input was read (format, pages, detected layout). */

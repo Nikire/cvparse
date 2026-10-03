@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!dist", "!node_modules", "!coverage", "!package-lock.json", "!eval/.cache", "!eval/private"]
+    "includes": [
+      "**",
+      "!dist",
+      "!node_modules",
+      "!coverage",
+      "!package-lock.json",
+      "!eval/.cache",
+      "!eval/private"
+    ]
   },
   "formatter": {
     "enabled": true,
