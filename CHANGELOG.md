@@ -8,6 +8,8 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-03
+
 Driven by a real 3-page CV, where llama3.1 8B invented a phone number, a city and three skills, rewrote degree names and put entries in the wrong sections. The benchmark was re-run with these changes; the numbers are in the README Benchmark section.
 
 ### Added
@@ -125,7 +127,8 @@ Initial preview release. Plain-text input only.
 - ESM-only package targeting Node >= 22. Runtime dependencies: `ai`, `zod`, `@ai-sdk/openai-compatible`.
 - English README with Spanish mirror (`README.es.md`), contributing guide, code of conduct (Contributor Covenant 2.1), security policy, MIT license, roadmap.
 
-[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Nikire/cvparse/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Nikire/cvparse/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Nikire/cvparse/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/Nikire/cvparse/compare/v0.1.0...v0.1.1
