@@ -126,6 +126,7 @@ const ORG_WORDS = new Set([
   "ayuntamiento",
   "banco",
   "bank",
+  "centro",
   "clinica",
   "clinic",
   "colegio",
@@ -134,6 +135,8 @@ const ORG_WORDS = new Set([
   "compania",
   "congreso",
   "consultora",
+  "consultorio",
+  "cooperativa",
   "empresa",
   "escuela",
   "estudio",
@@ -151,6 +154,8 @@ const ORG_WORDS = new Set([
   "legislatura",
   "ministerio",
   "municipalidad",
+  "mutual",
+  "policlinico",
   "sanatorio",
   "school",
   "senado",
@@ -165,9 +170,13 @@ const ORG_WORDS = new Set([
   "university",
 ]);
 
-/** Legal-entity suffixes ("S.A.", "S.R.L.", "S.A.S.", "S.A. de C.V.", "Inc.", "GmbH"), at the end. */
+/**
+ * Legal-entity suffixes at the end: "S.A.", "S.R.L.", "S.A.S.", "S.L.", "Inc.", "GmbH", and the
+ * Mexican forms "S.A. de C.V.", "S.A.P.I. de C.V.", "S.A.B. de C.V.", "S.A.S. de C.V.",
+ * "S. de R.L.", "S. de R.L. de C.V.". Matched on normalized text.
+ */
 const LEGAL_SUFFIX =
-  /(?:^|[\s,])(?:s\.?\s?a\.?(?:\s?[sc]\.?)?|s\.?\s?a\.? de c\.?\s?v\.?|s\.?\s?r\.?\s?l\.?|s\.?\s?l\.?|s\.?\s?c\.?|ltda\.?|inc\.?|llc\.?|ltd\.?|gmbh|corp\.?|spa|plc|co\.)$/u;
+  /(?:^|[\s,])(?:s\.?\s?a\.?(?:\s?(?:p\.?\s?i\.?|b\.?|s\.?|c\.?))?(?:\s?de c\.?\s?v\.?)?|s\.?\s?de r\.?\s?l\.?(?:\s?de c\.?\s?v\.?)?|s\.?\s?r\.?\s?l\.?(?:\s?de c\.?\s?v\.?)?|s\.?\s?l\.?|s\.?\s?c\.?|ltda\.?|inc\.?|llc\.?|ltd\.?|gmbh|corp\.?|spa|plc|co\.)$/u;
 
 function words(norm: string): string[] {
   return norm.split(/[\s,./()·|—–-]+/u).filter((w) => w !== "");
@@ -228,4 +237,77 @@ export function looksLikeJobTitle(value: string): boolean {
   if (norm === "" || /\d/.test(norm)) return false;
   if (looksLikeOrganization(value)) return false;
   return words(norm).some((w) => ROLE_WORDS.has(w));
+}
+
+/**
+ * `true` when the FIRST word of `value` is a role word ("Supervisora de Enfermería", "Médico
+ * Cirujano"). Tie-break when two sides of a line both contain a role word: a title starts with
+ * its role; an organization carries it inside ("Residencia Médica San José").
+ */
+export function startsWithRoleWord(value: string): boolean {
+  const first = words(normalizeForMatch(value))[0];
+  return first !== undefined && ROLE_WORDS.has(first);
+}
+
+/**
+ * Words (normalized) that name a degree rather than a job: "Máster en Derecho" is a degree whose
+ * field is "Derecho", never a title at an employer called "Derecho".
+ */
+const DEGREE_WORDS = new Set([
+  "master",
+  "maestria",
+  "magister",
+  "licenciatura",
+  "licenciado",
+  "licenciada",
+  "doctorado",
+  "especializacion",
+  "tecnico",
+  "tecnica",
+  "tecnicatura",
+  "grado",
+  "posgrado",
+  "postgrado",
+  "diplomado",
+  "diplomatura",
+  "bachillerato",
+  "bachelor",
+  "bachelors",
+  "phd",
+  "degree",
+  "mba",
+]);
+
+/**
+ * `true` when `value` is a bare degree word, optionally with one qualifier ("Máster", "Máster
+ * Universitario", "Técnico Superior", "Bachelor's"): the left side of "<degree> en <field>".
+ * Longer phrases ("Técnico de Sistemas") are left to the title rules, and so is a lone word
+ * that is also a role ("Técnico": a job as often as a degree).
+ */
+export function isDegreePhrase(value: string): boolean {
+  const parts = words(normalizeForMatch(value).replace(/'s\b/g, "s"));
+  if (parts.length === 0 || parts.length > 2) return false;
+  const first = parts[0] as string;
+  if (!DEGREE_WORDS.has(first)) return false;
+  return parts.length === 2 || !ROLE_WORDS.has(first);
+}
+
+/**
+ * `true` when the right side of "Title <link> Employer" reads as an employer: never a job
+ * title; an organization marker or legal suffix ({@link looksLikeOrganization}), or a Title Case
+ * name of 2+ words ("Telecom Argentina"; 1 word after "at" / "@" / "with": "Developer at
+ * Globex"). After a bare "de" / "del" (`strict`), which also joins a title to its department
+ * ("Jefe de Proyecto", "Técnico de Laboratorio"), only a legal suffix or an organization marker
+ * with 2+ words on each side counts.
+ */
+export function employerLike(after: string, link: string, before: string): boolean {
+  if (!/\p{L}/u.test(after) || looksLikeJobTitle(after)) return false;
+  const strict = link === "de" || link === "del";
+  if (strict) {
+    if (hasLegalSuffix(after)) return true;
+    const count = (value: string) => value.split(/\s+/).length;
+    return looksLikeOrganization(after) && count(after) >= 2 && count(before) >= 2;
+  }
+  if (looksLikeOrganization(after)) return true;
+  return isTitleCaseName(after, link === "at" || link === "@" || link === "with" ? 1 : 2);
 }

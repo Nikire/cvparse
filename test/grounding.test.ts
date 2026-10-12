@@ -1754,3 +1754,176 @@ Asesor, Concejo Municipal
     expect(twice.warnings.some((w) => w.includes("inferred from the next one"))).toBe(false);
   });
 });
+
+describe("groundResume — audit of the real-CV review fixes", () => {
+  it("item 2: rejects recovered titles that end in a function word or are a place", () => {
+    const position = (line: string) =>
+      groundResume(
+        { work: [{ name: "Acme S.A.", position: "Gerente General", startDate: "2019" }] },
+        `EXPERIENCIA\n${line}`,
+      ).resume.work?.[0]?.position;
+    // A wrapped title cut before its complement.
+    expect(position("Acme S.A. — Jefe de Compras y\nLogística 2019")).toBe("Gerente General");
+    // A city wrapped across lines ("Buenos" / "Aires").
+    expect(position("Acme S.A., Buenos\nAires 2019")).toBe("Gerente General");
+    // A city followed by its country.
+    expect(position("Acme S.A. — Miami USA\n2019")).toBe("Gerente General");
+  });
+
+  it("item 2: in 'Title. Org. Place' lines the title is searched before the organization", () => {
+    const { resume } = groundResume(
+      { work: [{ name: "Universidad del Sur", position: "Docente", startDate: "2019" }] },
+      "EXPERIENCIA\nProfesor Adjunto. Universidad del Sur. Bahía Blanca.\n2019\n",
+    );
+    expect(resume.work?.[0]?.position).toBe("Profesor Adjunto");
+  });
+
+  it("item 2: keeps a model title that shares 2+ words with the written one", () => {
+    const { resume, warnings } = groundResume(
+      { work: [{ name: "Acme S.A.", position: "Jefe de Compras Regional", startDate: "2019" }] },
+      "EXPERIENCIA\nAcme S.A. | Jefe de Compras | 2019\n",
+    );
+    expect(resume.work?.[0]?.position).toBe("Jefe de Compras Regional");
+    expect(warnings.some((w) => w.includes("overlaps the written"))).toBe(true);
+  });
+
+  it("item 3: does not move teaching jobs listed under an education heading", () => {
+    const { resume } = groundResume(
+      {
+        work: [
+          {
+            name: "Escuela de Educación Secundaria N° 5",
+            position: "Preceptor",
+            startDate: "2012",
+            endDate: "2015",
+          },
+          {
+            name: "Instituto Belgrano",
+            position: "Docente de Matemática",
+            startDate: "2016",
+            endDate: "2018",
+          },
+        ],
+        education: [{ institution: "Universidad del Sur", studyType: "Licenciatura en Letras" }],
+      },
+      `FORMACIÓN
+Licenciatura en Letras, Universidad del Sur 2010
+Escuela de Educación Secundaria N° 5
+Preceptor 2012 - 2015
+Instituto Belgrano
+Docente de Matemática 2016 - 2018
+`,
+    );
+    expect(resume.work?.map((w) => w.name)).toEqual([
+      "Escuela de Educación Secundaria N° 5",
+      "Instituto Belgrano",
+    ]);
+    expect(resume.education).toHaveLength(1);
+  });
+
+  it("item 5: a single written year is the end date, not a one-year range", () => {
+    const entry = () => ({
+      work: [
+        {
+          name: "Ministerio de Salud",
+          position: "Secretario Técnico",
+          startDate: "2014",
+          endDate: "2014",
+        },
+      ],
+    });
+    const once = groundResume(
+      entry(),
+      "EXPERIENCIA\nMinisterio de Salud — Secretario Técnico — 2014\n",
+    );
+    expect(once.resume.work?.[0]?.startDate).toBeNull();
+    expect(once.resume.work?.[0]?.endDate).toBe("2014");
+    expect(once.warnings.some((w) => w.includes("writes a single year"))).toBe(true);
+    const twice = groundResume(
+      entry(),
+      "EXPERIENCIA\nMinisterio de Salud — Secretario Técnico — 2014 - 2014\n",
+    );
+    expect(twice.resume.work?.[0]?.startDate).toBe("2014");
+  });
+
+  it("item 6: a position that is a sentence starting with the name becomes the name", () => {
+    const sentence =
+      "Profesor Ayudante doctor en la ETSISI, en el departamento de Sistemas Informáticos";
+    const withEmployer = groundResume(
+      {
+        work: [
+          {
+            name: "Profesor Ayudante Doctor",
+            position: sentence,
+            startDate: "2018",
+            endDate: "2020",
+          },
+        ],
+      },
+      `EXPERIENCIA\n${sentence}. 2018 - 2020\n`,
+    );
+    expect(withEmployer.resume.work?.[0]?.position).toBe("Profesor Ayudante Doctor");
+    expect(withEmployer.resume.work?.[0]?.name).toBe("ETSISI");
+    const withoutEmployer = groundResume(
+      {
+        work: [
+          {
+            name: "Profesor Titular",
+            position: "Profesor Titular en el área de cálculo numérico",
+            startDate: "2018",
+            endDate: "2020",
+          },
+        ],
+      },
+      "EXPERIENCIA\nProfesor Titular en el área de cálculo numérico 2018 - 2020\n",
+    );
+    expect(withoutEmployer.resume.work?.[0]?.position).toBe("Profesor Titular");
+    expect(withoutEmployer.resume.work?.[0]?.name).toBeNull();
+  });
+
+  it("item 7: recovers an employer with a Mexican legal suffix from the location", () => {
+    const { resume } = groundResume(
+      {
+        work: [
+          {
+            name: "Product Designer",
+            position: null,
+            location: "Apps Azteca S.A.P.I. de C.V., Puebla",
+            startDate: "2020",
+            endDate: "2022",
+          },
+        ],
+      },
+      "EXPERIENCIA\nProduct Designer   2020 - 2022\nApps Azteca S.A.P.I. de C.V., Puebla\n",
+    );
+    expect(resume.work?.[0]?.name).toBe("Apps Azteca S.A.P.I. de C.V.");
+    expect(resume.work?.[0]?.position).toBe("Product Designer");
+    expect(resume.work?.[0]?.location).toBe("Puebla");
+  });
+
+  it("item 9: a one-word institution that is a wrapped title tail is replaced by the school next to it", () => {
+    const text =
+      "FORMACIÓN\nBootcamp de Ventas   verano 2019\nConsultivas\nEscuela de Negocios del Sur\n";
+    const weak = groundResume(
+      {
+        education: [
+          { institution: "Consultivas", studyType: "Bootcamp de Ventas", startDate: "2019" },
+        ],
+      },
+      text,
+    );
+    expect(weak.resume.education?.[0]?.institution).toBe("Escuela de Negocios del Sur");
+    expect(weak.warnings.some((w) => w.includes('"Consultivas" replaced'))).toBe(true);
+    const empty = groundResume(
+      { education: [{ institution: null, studyType: "Bootcamp de Ventas", startDate: "2019" }] },
+      text,
+    );
+    expect(empty.resume.education?.[0]?.institution).toBe("Escuela de Negocios del Sur");
+    // A one-word brand stays when no line next to it carries an organization marker.
+    const brand = groundResume(
+      { education: [{ institution: "Platzi", studyType: "Curso de React", startDate: "2021" }] },
+      "FORMACIÓN\nCurso de React 2021\nPlatzi\nDesarrollo Web Avanzado\n",
+    );
+    expect(brand.resume.education?.[0]?.institution).toBe("Platzi");
+  });
+});

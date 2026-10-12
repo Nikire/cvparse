@@ -11,10 +11,11 @@ import { normalizeForMatch } from "./grounding.js";
 import { detectLanguage } from "./language.js";
 import { dedupeResumeEntries } from "./repetition.js";
 import {
-  hasLegalSuffix,
-  isTitleCaseName,
+  employerLike,
+  isDegreePhrase,
   looksLikeJobTitle,
   looksLikeOrganization,
+  startsWithRoleWord,
 } from "./titles.js";
 
 /** Output of {@link normalizeResume}. */
@@ -161,7 +162,9 @@ export function splitOrgAndTitle(value: string): [string, string] | null {
  * Splits "Title, Organization" (or "Organization — Title", any {@link stripTitleFromOrg}
  * separator, comma included) into `{ title, org }` when exactly one side reads as a job title
  * ({@link looksLikeJobTitle}) and the other does not; "Científica de Datos, Telecom S.A." ->
- * title "Científica de Datos", org "Telecom S.A.". Returns `null` when unsure.
+ * title "Científica de Datos", org "Telecom S.A.". When both sides carry a role word
+ * ("Supervisora de Enfermería — Residencia Médica San José"), the side that STARTS with one is
+ * the title ({@link startsWithRoleWord}). Returns `null` when unsure.
  */
 export function splitTitleAndOrg(value: string): { title: string; org: string } | null {
   for (const match of value.matchAll(ORG_TITLE_SEPARATOR)) {
@@ -170,8 +173,16 @@ export function splitTitleAndOrg(value: string): { title: string; org: string } 
     if (before === "" || after === "") continue;
     const beforeTitle = looksLikeJobTitle(before);
     const afterTitle = looksLikeJobTitle(after);
-    if (beforeTitle === afterTitle) continue;
-    const [title, org] = beforeTitle ? [before, after] : [after, before];
+    let titleFirst: boolean;
+    if (beforeTitle && afterTitle) {
+      const beforeStarts = startsWithRoleWord(before);
+      if (beforeStarts === startsWithRoleWord(after)) continue;
+      titleFirst = beforeStarts;
+    } else {
+      if (beforeTitle === afterTitle) continue;
+      titleFirst = beforeTitle;
+    }
+    const [title, org] = titleFirst ? [before, after] : [after, before];
     // A comma also separates plain phrases ("Analista de Ventas, Atención al cliente"): there the
     // other side must carry an organization marker (legal suffix, "Clínica", "Universidad", ...).
     if (match[0].trim() === "," && !looksLikeOrganization(org)) continue;
@@ -288,39 +299,26 @@ const TITLE_ORG_LINK_PROSE =
 /** A lowercase Spanish article starting a phrase (case-sensitive: "La Plata" keeps its article). */
 const LOWERCASE_ARTICLE = /^(?:el|la|los|las)\s+(?=\p{L})/u;
 
-/**
- * `true` when the right side of "Title <link> Employer" reads as an employer: never a job
- * title; an organization marker or legal suffix ({@link looksLikeOrganization}), or a Title Case
- * name of 2+ words ("Telecom Argentina"; 1 word after "at" / "@" / "with": "Developer at
- * Globex"). After a
- * bare "de" / "del" (`strict`), which also joins a title to its department ("Jefe de Proyecto",
- * "Técnico de Laboratorio"), only a legal suffix or an organization marker with 2+ words on each
- * side counts.
- */
-function employerLike(after: string, link: string, before: string): boolean {
-  if (!/\p{L}/u.test(after) || looksLikeJobTitle(after)) return false;
-  const strict = link === "de" || link === "del";
-  if (strict) {
-    if (hasLegalSuffix(after)) return true;
-    const words = (value: string) => value.split(/\s+/).length;
-    return looksLikeOrganization(after) && words(after) >= 2 && words(before) >= 2;
-  }
-  if (looksLikeOrganization(after)) return true;
-  return isTitleCaseName(after, link === "at" || link === "@" || link === "with" ? 1 : 2);
+/** The link of a "Title <link> Employer" match, normalized ("de la", "del", "en", "at", "@"). */
+function linkWord(match: string): string {
+  return match.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 /**
  * Splits "Title en Employer" into `{ title, org }`:
  * - with `title`, when the phrase is exactly "<title> <link> <employer>" (compared after
- *   normalization; the employer is not checked), as in "Asesor de la Dirección Nacional" with
- *   title "Asesor";
+ *   normalization) and the right side reads as an employer ({@link employerLike}), as in "Asesor
+ *   de la Dirección Nacional" with title "Asesor";
  * - else when the left side reads as a job title ({@link looksLikeJobTitle}) that starts with
  *   `title` when given ("Directora de Comunicación del Ministerio de Cultura" with title
- *   "Directora"), and the right side reads as an employer ({@link employerLike}). Of several such
- *   splits the last one wins, so the title keeps its complement ("Directora de Comunicación" /
- *   "Ministerio de Cultura", not "Directora" / "Comunicación del Ministerio de Cultura").
+ *   "Directora"), and the right side reads as an employer. Of several such splits the last one
+ *   wins, so the title keeps its complement ("Directora de Comunicación" / "Ministerio de
+ *   Cultura", not "Directora" / "Comunicación del Ministerio de Cultura").
  *
- * Returns `null` when unsure ("Jefe de Proyecto", "Analista en Jefe", "Sucursal en Rosario").
+ * A left side that names a degree ({@link isDegreePhrase}: "Máster en Derecho Constitucional",
+ * "Licenciatura en Economía") is never split: what follows is the field of study, not an
+ * employer. Returns `null` when unsure ("Jefe de Proyecto", "Analista en Jefe", "Sucursal en
+ * Rosario").
  */
 export function splitTitleFromPhrase(
   phrase: string,
@@ -337,7 +335,8 @@ export function splitTitleFromPhrase(
         .trim()
         .replace(LOWERCASE_ARTICLE, "");
       if (before === "" || after === "" || !/\p{L}/u.test(after)) continue;
-      if (normalizeForMatch(before) === target) return { title: before, org: after };
+      if (normalizeForMatch(before) !== target || isDegreePhrase(before)) continue;
+      if (employerLike(after, linkWord(match[0]), before)) return { title: before, org: after };
     }
   }
   let found: { title: string; org: string } | null = null;
@@ -349,9 +348,8 @@ export function splitTitleFromPhrase(
       const norm = normalizeForMatch(before);
       if (norm !== target && !norm.startsWith(`${target} `)) continue;
     }
-    if (!looksLikeJobTitle(before)) continue;
-    const link = match[0].trim().toLowerCase().replace(/\s+/g, " ");
-    if (employerLike(after, link, before)) found = { title: before, org: after };
+    if (isDegreePhrase(before) || !looksLikeJobTitle(before)) continue;
+    if (employerLike(after, linkWord(match[0]), before)) found = { title: before, org: after };
   }
   return found;
 }
@@ -404,8 +402,11 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
       }
       if (typeof org !== "string" || typeof title !== "string") return;
       if (normalizeForMatch(org) === normalizeForMatch(title)) {
-        // The model copied "Freelance — Full-Stack Developer" into both fields.
-        const parts = splitOrgAndTitle(org);
+        // The model copied "Freelance — Full-Stack Developer" into both fields. The side that
+        // reads as the title wins ("Supervisora de Enfermería — Centro Médico del Plata" is
+        // "Title — Org"); without a title word, "Org — Title" is assumed.
+        const byTitle = splitTitleAndOrg(org);
+        const parts = byTitle ? [byTitle.org, byTitle.title] : splitOrgAndTitle(org);
         if (parts) {
           [entry[orgKey], entry[titleKey]] = parts;
           warnings.push(
@@ -479,43 +480,76 @@ function entryYears(entry: Record<string, unknown>, keys: readonly string[]): Se
   return years;
 }
 
+/** What a certificate or education entry says about an organization: its years and titles. */
+interface KnownOrg {
+  years: Set<string>;
+  /** Normalized certificate names / degree types / areas written for this organization. */
+  titles: Set<string>;
+}
+
 /**
- * Drops `work[]` entries that are a course or a degree written twice: no position, and a name
- * that is the issuer of a `certificates[]` entry or the institution of an `education[]` entry
- * with the same year. A model that recovers from a repetition loop emits the courses under a
- * merged "4. 5. 6." heading as `{ name: issuer, position: null, startDate: 2021 }` work entries
- * on top of the certificates. Run after the dates are ISO.
+ * Drops `work[]` entries that are a course or a degree written twice:
+ * - no position, and a name that is the issuer of a `certificates[]` entry or the institution of
+ *   an `education[]` entry with the same year (a model that recovers from a repetition loop
+ *   emits the courses under a merged "4. 5. 6." heading as `{ name: issuer, position: null,
+ *   startDate: 2021 }` work entries on top of the certificates);
+ * - a position that is the certificate's name or the degree's `studyType` / `area` of that same
+ *   organization, with the same year ("Coursera" / "Machine Learning" listed as a job too).
+ *
+ * Run after the dates are ISO.
  */
 function dropCoursesFromWork(resume: Record<string, unknown>, warnings: string[]): void {
   if (!Array.isArray(resume.work)) return;
-  const known = new Map<string, Set<string>>();
-  const remember = (list: unknown, orgKey: string, dateKeys: readonly string[]) => {
+  const known = new Map<string, KnownOrg>();
+  const remember = (
+    list: unknown,
+    orgKey: string,
+    titleKeys: readonly string[],
+    dateKeys: readonly string[],
+  ) => {
     if (!Array.isArray(list)) return;
     for (const entry of list) {
       if (!isRecord(entry) || typeof entry[orgKey] !== "string") continue;
       const key = normalizeForMatch(entry[orgKey]);
-      const years = known.get(key) ?? new Set<string>();
-      for (const year of entryYears(entry, dateKeys)) years.add(year);
-      known.set(key, years);
+      const org = known.get(key) ?? { years: new Set<string>(), titles: new Set<string>() };
+      for (const year of entryYears(entry, dateKeys)) org.years.add(year);
+      for (const titleKey of titleKeys) {
+        const title = entry[titleKey];
+        if (typeof title === "string" && title.trim() !== "") {
+          org.titles.add(normalizeForMatch(title));
+        }
+      }
+      known.set(key, org);
     }
   };
-  remember(resume.certificates, "issuer", ["date"]);
-  remember(resume.education, "institution", ["startDate", "endDate"]);
+  remember(resume.certificates, "issuer", ["name"], ["date"]);
+  remember(resume.education, "institution", ["studyType", "area"], ["startDate", "endDate"]);
   if (known.size === 0) return;
   const removed: string[] = [];
+  const removedTitled: string[] = [];
   resume.work = resume.work.filter((entry) => {
-    if (!isRecord(entry) || typeof entry.name !== "string" || (entry.position ?? null) !== null)
-      return true;
-    const years = known.get(normalizeForMatch(entry.name));
-    if (!years) return true;
+    if (!isRecord(entry) || typeof entry.name !== "string") return true;
+    const org = known.get(normalizeForMatch(entry.name));
+    if (!org) return true;
     const own = entryYears(entry, ["startDate", "endDate"]);
-    if (![...own].some((year) => years.has(year))) return true;
-    removed.push(entry.name);
+    if (![...own].some((year) => org.years.has(year))) return true;
+    const position = entry.position;
+    if (position === null || position === undefined) {
+      removed.push(entry.name);
+      return false;
+    }
+    if (typeof position !== "string" || !org.titles.has(normalizeForMatch(position))) return true;
+    removedTitled.push(`${entry.name} (${position})`);
     return false;
   });
   if (removed.length > 0) {
     warnings.push(
       `work: dropped ${removed.length} entr${removed.length === 1 ? "y" : "ies"} without position that repeat${removed.length === 1 ? "s" : ""} a certificate or education entry (same organization and year): ${removed.join(", ")}`,
+    );
+  }
+  if (removedTitled.length > 0) {
+    warnings.push(
+      `work: dropped ${removedTitled.length} entr${removedTitled.length === 1 ? "y" : "ies"} that repeat${removedTitled.length === 1 ? "s" : ""} a certificate or education entry (same organization, title and year): ${removedTitled.join(", ")}`,
     );
   }
 }
@@ -539,8 +573,9 @@ function dropCoursesFromWork(resume: Record<string, unknown>, warnings: string[]
  *   employer, and when the position is only the head of the title written in the name
  *   ("Directora de Comunicación del Ministerio de Cultura" with position "Directora"), sets
  *   both fields ({@link splitTitleFromPhrase});
- * - drops `work[]` entries without position that repeat a certificate issuer or an education
- *   institution with the same year (courses a model emitted as jobs);
+ * - drops `work[]` entries that repeat a certificate issuer or an education institution with
+ *   the same year: without position, or with the certificate's name / the degree as position
+ *   (courses a model emitted as jobs);
  * - splits comma/semicolon-joined `skills[].keywords` and `skills[].name` values into separate
  *   items ({@link splitSkillList});
  * - derives `x_cvparse.normalizedSkills` from `skills` ({@link deriveNormalizedSkills}), ignoring

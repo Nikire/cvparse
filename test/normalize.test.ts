@@ -810,3 +810,80 @@ describe("normalizeResume — courses emitted as work entries (review of real CV
     expect(warnings).toEqual([]);
   });
 });
+
+describe("normalizeResume — audit of the fused-title and course fixes", () => {
+  it("item 1: never splits a degree phrase into a degree and an employer", () => {
+    expect(splitTitleFromPhrase("Master en Derecho Constitucional", "Master")).toBeNull();
+    expect(splitTitleFromPhrase("Licenciatura en Economía", "Licenciatura")).toBeNull();
+    expect(splitTitleFromPhrase("Maestría en Administración Pública")).toBeNull();
+    const { resume } = normalizeResume({
+      education: [{ institution: "Master en Derecho Constitucional", studyType: "Master" }],
+    });
+    expect(resume.education?.[0]?.institution).toBe("Master en Derecho Constitucional");
+    expect(resume.education?.[0]?.studyType).toBe("Master");
+  });
+
+  it("item 1: the exact-title branch still splits off a real employer, never a plain phrase", () => {
+    expect(splitTitleFromPhrase("Asesor en Consultora Andina S.A.", "Asesor")).toEqual({
+      title: "Asesor",
+      org: "Consultora Andina S.A.",
+    });
+    expect(splitTitleFromPhrase("Analista en jefe", "Analista")).toBeNull();
+  });
+
+  it("item 4: drops a work entry whose position is the certificate or degree of the same organization and year", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Coursera", position: "Machine Learning", startDate: "2021" },
+        { name: "Universidad de Loja", position: "Economía", startDate: "2014" },
+        // Kept: another year, another title.
+        { name: "Coursera", position: "Machine Learning", startDate: "2018" },
+        { name: "Universidad de Loja", position: "Ayudante de Cátedra", startDate: "2014" },
+      ],
+      certificates: [{ name: "Machine Learning", issuer: "Coursera", date: "2021" }],
+      education: [
+        {
+          institution: "Universidad de Loja",
+          studyType: "Licenciatura",
+          area: "Economía",
+          startDate: "2010",
+          endDate: "2014",
+        },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position, w.startDate])).toEqual([
+      ["Coursera", "Machine Learning", "2018"],
+      ["Universidad de Loja", "Ayudante de Cátedra", "2014"],
+    ]);
+    expect(warnings.some((w) => w.includes("same organization, title and year"))).toBe(true);
+  });
+
+  it("item 7: Mexican legal suffixes and health / cooperative org words mark an organization", () => {
+    for (const org of [
+      "Apps Azteca S.A.P.I. de C.V.",
+      "Grupo Norte S.A.B. de C.V.",
+      "Tienda Fácil S.A.S. de C.V.",
+      "Servicios del Bajío S. de R.L.",
+      "Servicios del Bajío S. de R.L. de C.V.",
+      "Centro de Salud Norte",
+      "Policlínico Central",
+      "Consultorio Ramos",
+      "Cooperativa Obrera",
+      "Mutual Sancor",
+      "Clínica Olivos",
+    ]) {
+      expect(looksLikeOrganization(org), org).toBe(true);
+    }
+  });
+
+  it("item 8: when both sides carry a role word, the side that starts with one is the title", () => {
+    expect(splitTitleAndOrg("Supervisora de Enfermería — Centro Médico del Plata")).toEqual({
+      title: "Supervisora de Enfermería",
+      org: "Centro Médico del Plata",
+    });
+    const fused = "Supervisora de Enfermería — Centro Médico del Plata";
+    const { resume } = normalizeResume({ work: [{ name: fused, position: fused }] });
+    expect(resume.work?.[0]?.name).toBe("Centro Médico del Plata");
+    expect(resume.work?.[0]?.position).toBe("Supervisora de Enfermería");
+  });
+});

@@ -1,7 +1,7 @@
 import type { Resume } from "../schema/resume.js";
 import { normalizeDate } from "./dates.js";
-import { collectEducationLevels } from "./education.js";
-import { looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
+import { collectEducationLevels, normalizeStudyType } from "./education.js";
+import { employerLike, looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
 
 /**
  * Deterministic grounding: checks the fields a model most often invents (contact data,
@@ -1050,12 +1050,45 @@ const FRAGMENT_LEADERS = new Set([
   "&",
 ]);
 
+/** Function words a title or employer never ends with ("Cátedra de", "Jefe de Compras y"). */
+const FRAGMENT_TRAILERS = new Set([
+  "de",
+  "del",
+  "la",
+  "las",
+  "los",
+  "el",
+  "en",
+  "y",
+  "e",
+  "o",
+  "u",
+  "para",
+  "con",
+  "por",
+  "sin",
+  "a",
+  "al",
+  "of",
+  "and",
+  "at",
+  "for",
+  "in",
+  "on",
+  "by",
+  "to",
+  "with",
+  "the",
+  "&",
+]);
+
 /**
  * `true` when a part of a line recovered from the document can stand as a title or an employer.
  * Rejects what the line splitter leaves behind: a fragment that starts with punctuation
  * (". Moreno"), a label ("Categoría profesional:"), a preposition-led tail ("de
- * Telecomunicación"), a sentence end ("Presidencia de la Nación."), anything shorter than 3 or
- * longer than 120 characters, or with no token that starts with a letter.
+ * Telecomunicación"), a wrapped line cut before its complement ("Cátedra de"), a sentence end
+ * ("Presidencia de la Nación."), anything shorter than 3 or longer than 120 characters, or with
+ * no token that starts with a letter.
  */
 export function plausibleRecovered(part: string): boolean {
   const text = part.trim();
@@ -1064,20 +1097,48 @@ export function plausibleRecovered(part: string): boolean {
   const tokens = text.split(/\s+/);
   if (!tokens.some((t) => /^\p{L}/u.test(t))) return false;
   if (FRAGMENT_LEADERS.has(normalizeForMatch(tokens[0] ?? ""))) return false;
+  const last = normalizeForMatch(tokens[tokens.length - 1] ?? "").replace(/[.,;:]+$/u, "");
+  if (FRAGMENT_TRAILERS.has(last)) return false;
   // A word of 4+ letters followed by a period is a sentence end, not an abbreviation ("S.A.",
   // "Inc.", "Sr.").
   if (/\p{L}{4,}\.$/u.test(text) && !looksLikeOrganization(text)) return false;
   return true;
 }
 
-/** A part of an entry line that can be a title: has letters, no digits, is not a date word or a place. */
-function titleCandidate(part: string, exclude: readonly string[]): boolean {
+/**
+ * `true` when a normalized candidate reads as a place: a known city or country, one of the
+ * resume's own locations (`exclude`), a phrase that ends with a country name ("Miami USA",
+ * "Córdoba Argentina"), or a dotted / comma-joined list of such ("Buenos Aires. Argentina").
+ */
+function isPlaceLike(norm: string, exclude: readonly string[]): boolean {
+  const segments = norm
+    .split(/\s*[.,;/]\s*/u)
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+  if (segments.length === 0) return false;
+  return segments.every((segment) => {
+    if (isPlaceName(segment) || exclude.includes(segment)) return true;
+    const words = segment.split(" ");
+    for (let n = 1; n <= 3 && n < words.length; n++) {
+      if (isCountryName(words.slice(-n).join(" "))) return true;
+    }
+    return false;
+  });
+}
+
+/**
+ * A part of an entry line that can be a title: has letters, no digits, is not a date word or a
+ * place. `nextToken` is the first word of the following line when the part ends its line: a
+ * part that only becomes a place with it ("Buenos" + "Aires") is a wrapped location, not a title.
+ */
+function titleCandidate(part: string, exclude: readonly string[], nextToken = ""): boolean {
   if (!/\p{L}{2,}/u.test(part) || /\d/.test(part) || part.length > 100) return false;
   if (!plausibleRecovered(part)) return false;
   // Acronyms are the organization's short name ("Universidad de Buenos Aires (UBA)").
   if (/^[\p{Lu}.&]{2,8}$/u.test(part)) return false;
   const norm = normalizeForMatch(part);
-  if (exclude.includes(norm) || isPlaceName(norm) || WORK_MODES.has(norm)) return false;
+  if (isPlaceLike(norm, exclude) || WORK_MODES.has(norm)) return false;
+  if (nextToken !== "" && isPlaceLike(`${norm} ${nextToken}`, exclude)) return false;
   // Ongoing markers ("Present", "Actualidad") and bare month names ("Marzo").
   if (normalizeDate(part).current) return false;
   if (normalizeDate(`${part} 2000`).value?.startsWith("2000-")) return false;
@@ -1092,10 +1153,27 @@ function splitLineParts(text: string): string[] {
 }
 
 /**
+ * {@link splitLineParts} that also splits at sentence periods: a period after a word of 3+
+ * letters, followed by whitespace or the end ("Profesor Adjunto. Universidad X. Buenos Aires.").
+ * Abbreviations ("S.A.", "Sr.") stay whole.
+ */
+function splitSentenceParts(text: string): string[] {
+  return text.split(/(?<=\p{L}{3})\.(?:\s+|$)/u).flatMap(splitLineParts);
+}
+
+/** The first word of the line after `line`, normalized and without trailing punctuation. */
+function nextLineToken(rawLines: readonly string[], line: number): string {
+  const next = (rawLines[line + 1] ?? "").trim();
+  return normalizeForMatch(next.split(/\s+/)[0] ?? "").replace(/[.,;:]+$/u, "");
+}
+
+/**
  * The title written next to an organization: the first title-like part after it on its line
  * ("UBA — Computer Engineering (2020–2021)"), else the last one before it ("Computer
  * Engineering, UBA"), else the first one on the next line when the organization line has nothing
- * else ("UBA\nComputer Engineering · 2020 – 2021").
+ * else ("UBA\nComputer Engineering · 2020 – 2021"). When the organization ends a sentence-part
+ * ("Profesor Adjunto. Universidad X. Buenos Aires.", the Spanish bullet order), the part before
+ * it is searched first: what follows is the place.
  */
 export function recoverTitleNearOrg(
   sourceText: string,
@@ -1106,19 +1184,26 @@ export function recoverTitleNearOrg(
   if (orgNorm === "") return null;
   const excluded = [orgNorm, ...exclude.map(normalizeForMatch)];
   const rawLines = sourceText.split(/\r?\n/);
+  // The last part of a line may continue on the next one ("Buenos" / "Aires").
+  const candidate = (line: number) => (part: string, k: number, parts: readonly string[]) =>
+    titleCandidate(part, excluded, k === parts.length - 1 ? nextLineToken(rawLines, line) : "");
   for (let i = 0; i < rawLines.length; i++) {
     const raw = rawLines[i] ?? "";
     const span = findTermSpan(raw, orgNorm);
     if (!span) continue;
-    const after = splitLineParts(raw.slice(span.end));
-    const before = splitLineParts(raw.slice(0, span.start));
-    const found =
-      after.find((p) => titleCandidate(p, excluded)) ??
-      before.reverse().find((p) => titleCandidate(p, excluded));
+    const afterRaw = raw.slice(span.end);
+    const beforeRaw = raw.slice(0, span.start);
+    const dotted = /^\s*\.(?:\s|$)/u.test(afterRaw);
+    const split = dotted ? splitSentenceParts : splitLineParts;
+    const after = split(afterRaw);
+    const before = split(beforeRaw).reverse();
+    const fromAfter = () => after.find(candidate(i));
+    const fromBefore = () => before.find((p) => titleCandidate(p, excluded));
+    const found = dotted ? (fromBefore() ?? fromAfter()) : (fromAfter() ?? fromBefore());
     if (found) return found;
     const next = (rawLines[i + 1] ?? "").trim();
     if (next === "" || /^[-•*·▪●◦]/u.test(next)) continue;
-    const fromNext = splitLineParts(next).find((p) => titleCandidate(p, excluded));
+    const fromNext = splitLineParts(next).find(candidate(i + 1));
     if (fromNext) return fromNext;
   }
   return null;
@@ -1217,8 +1302,28 @@ function recoverEmployers(
   const exclude = places.filter((p) => !looksLikeOrganization(p));
   resume.work.forEach((entry, i) => {
     if (!isRecord(entry)) return;
-    const name = str(entry.name);
-    const position = str(entry.position);
+    let name = str(entry.name);
+    let position = str(entry.position);
+    // `name` is the title and `position` a sentence that starts with it ("Profesor Ayudante
+    // Doctor" / "Profesor Ayudante doctor en la ETSISI, en el departamento de..."): the title
+    // is the name; the employer is the phrase after the link when it reads as one.
+    if (name && position && looksLikeJobTitle(name)) {
+      const nameNorm = normalizeForMatch(name);
+      const positionNorm = normalizeForMatch(position);
+      if (positionNorm !== nameNorm && positionNorm.startsWith(`${nameNorm} `)) {
+        const employer = employerInSentence(position, name, src);
+        entry.position = name;
+        entry.name = employer;
+        warnings.push(
+          employer
+            ? `grounding: work[${i}].position "${position}" is a sentence that starts with the name "${name}"; set position to the name and name to the employer "${employer}" as written`
+            : `grounding: work[${i}].position "${position}" is a sentence that starts with the name "${name}"; set position to the name and name to null`,
+        );
+        if (employer) return;
+        position = name;
+        name = null;
+      }
+    }
     // The title to search next to: the name (position empty or equal to it), or the position
     // when the employer is missing (the normalizer nulls a name that equals the position).
     const title = name ?? position;
@@ -1256,6 +1361,30 @@ function recoverEmployers(
         : `grounding: work[${i}].name was empty; set it to the employer "${org}" written next to the position "${title}"`,
     );
   });
+}
+
+/** "Title <link> Employer, ..." inside a sentence: the link and what follows up to a clause end. */
+const EMPLOYER_IN_SENTENCE =
+  /\s(en(?:\s+(?:el|la|los|las))?|de(?:\s+(?:la|los|las))?|del|para(?:\s+(?:el|la|los|las))?|at|@|with)\s+([^,.;:()]+)/iu;
+
+/** An organization's short name ("UBA", "ETSISI", "S&P"). */
+const ACRONYM = /^[\p{Lu}.&]{2,8}$/u;
+
+/**
+ * The employer named in a sentence that starts with the job title ("Profesor Ayudante doctor
+ * en la ETSISI, en el departamento de..."): the phrase after the first link, when it is written
+ * in the document and reads as an employer ({@link employerLike}) or is an acronym. `null`
+ * otherwise.
+ */
+function employerInSentence(sentence: string, title: string, src: Source): string | null {
+  const span = findTermSpan(sentence, normalizeForMatch(title));
+  if (!span) return null;
+  const match = EMPLOYER_IN_SENTENCE.exec(sentence.slice(span.end));
+  const phrase = match?.[2]?.trim();
+  if (!match || !phrase || !plausibleRecovered(phrase)) return null;
+  const link = (match[1] ?? "").toLowerCase().replace(/\s+/g, " ");
+  if (!employerLike(phrase, link, title) && !ACRONYM.test(phrase)) return null;
+  return hasTerm(src.text, normalizeForMatch(phrase)) ? phrase : null;
 }
 
 /**
@@ -1408,6 +1537,35 @@ function groundInferredEndDates(resume: Resume, src: Source, warnings: string[])
   }
 }
 
+/**
+ * Entries whose start and end are the same bare year while the document writes that year only
+ * once on the entry's lines ("Secretario Técnico — 2014"): a single date is the date of the
+ * entry, not a range. The start is set to null and the year kept as the end. Entries that
+ * cannot be located, or whose lines write the year twice ("2014 – 2014"), are left alone.
+ */
+function groundSingleDates(resume: Resume, src: Source, warnings: string[]): void {
+  const record = resume as Record<string, unknown>;
+  for (const [section, orgKey, titleKey] of RANGE_SECTIONS) {
+    const entries = record[section];
+    if (!Array.isArray(entries)) continue;
+    entries.forEach((entry, i) => {
+      if (!isRecord(entry)) return;
+      const start = str(entry.startDate);
+      if (!start || start !== str(entry.endDate) || !/^\d{4}$/.test(start)) return;
+      const own = entryLines(entry, src, orgKey, titleKey);
+      if (own.length === 0) return;
+      const lines = new Set(own.flatMap((line) => [line - 1, line, line + 1]));
+      let written = 0;
+      for (const j of lines) written += countTerm(src.lines[j] ?? "", start);
+      if (written !== 1) return;
+      entry.startDate = null;
+      warnings.push(
+        `grounding: dropped ${section}[${i}].startDate "${start}" (the entry writes a single year; kept as endDate)`,
+      );
+    });
+  }
+}
+
 /** Every location string the resume mentions, and its comma-separated parts. */
 function knownPlaces(resume: Resume): string[] {
   const values: unknown[] = [];
@@ -1425,11 +1583,30 @@ function knownPlaces(resume: Resume): string[] {
   });
 }
 
+/** Content tokens (normalized, 2+ characters, no function words) of a value. */
+function contentTokens(value: string): Set<string> {
+  return new Set(
+    normalizeForMatch(value)
+      .split(/[^\p{L}\p{N}]+/u)
+      .filter((t) => t.length >= 2 && !FRAGMENT_LEADERS.has(t)),
+  );
+}
+
+/** Number of content tokens `a` and `b` share. */
+function sharedTokens(a: string, b: string): number {
+  const own = contentTokens(a);
+  let n = 0;
+  for (const t of contentTokens(b)) if (own.has(t)) n++;
+  return n;
+}
+
 /**
  * A title (`education[].studyType`, `work[].position`) that is not in the document is replaced
- * by the title written next to its organization ({@link recoverTitleNearOrg}). When nothing can
- * be recovered, a degree type is set to null (models invent "Bachelor's degree" for a written
- * "Computer Engineering"), while a job title is kept with a warning (it is the core of the entry).
+ * by the title written next to its organization ({@link recoverTitleNearOrg}), unless the
+ * model's title shares 2+ content words with it: then the model rejoined a wrapped title the
+ * document writes across lines, and its value is kept. When nothing can be recovered, a degree
+ * type is set to null (models invent "Bachelor's degree" for a written "Computer Engineering"),
+ * while a job title is kept with a warning (it is the core of the entry).
  */
 function groundTitles(
   entries: unknown,
@@ -1448,7 +1625,9 @@ function groundTitles(
     const path = `${section}[${i}].${titleKey}`;
     const org = str(entry[orgKey]);
     const recovered = org ? recoverTitleNearOrg(src.original, org, places) : null;
-    if (recovered) {
+    if (recovered && sharedTokens(title, recovered) >= 2) {
+      warnings.push(`grounding: ${path} "${title}" kept (it overlaps the written "${recovered}")`);
+    } else if (recovered) {
       entry[titleKey] = recovered;
       warnings.push(`grounding: ${path} "${title}" replaced by "${recovered}" as written`);
     } else if (section === "education") {
@@ -1457,6 +1636,84 @@ function groundTitles(
     } else {
       warnings.push(`grounding: ${path} "${title}" not found in the document (kept)`);
     }
+  });
+}
+
+/**
+ * `true` when an `education[].institution` cannot be an institution on its own: empty, or a
+ * single word that is neither an acronym ("UBA") nor an organization word ("Universidad");
+ * "Consultivas" is the tail of a wrapped title, not a school.
+ */
+function weakInstitution(value: string | null): boolean {
+  if (value === null) return true;
+  const text = value.trim();
+  if (/\s/.test(text) || ACRONYM.test(text)) return false;
+  return !looksLikeOrganization(text);
+}
+
+/**
+ * `education[].institution` values that cannot name an institution ({@link weakInstitution})
+ * are replaced by the organization written next to the entry: a whole line within 2 lines of
+ * the line naming the entry (its degree / area, or the weak word itself) that carries an
+ * organization marker ("Escuela", "Universidad", a legal suffix), has no digits, no other parts,
+ * is not a heading, a job title, a place or another entry's institution. The nearest such line
+ * wins. A Title Case line without a marker is not taken: it is as often the next course's title.
+ */
+function groundInstitutions(
+  resume: Resume,
+  src: Source,
+  places: readonly string[],
+  warnings: string[],
+): void {
+  if (!Array.isArray(resume.education)) return;
+  const headings = new Set(detectSectionSpans(src.original).map((s) => s.start));
+  const excluded = places.map(normalizeForMatch);
+  const institutions = resume.education
+    .map((e) => (isRecord(e) ? str(e.institution) : null))
+    .filter((v): v is string => v !== null)
+    .map(normalizeForMatch);
+  resume.education.forEach((entry, i) => {
+    if (!isRecord(entry)) return;
+    const institution = str(entry.institution);
+    if (!weakInstitution(institution)) return;
+    const titles = [str(entry.studyType), str(entry.area)].filter((v): v is string => v !== null);
+    const anchors = new Set<number>();
+    for (const value of [...titles, ...(institution ? [institution] : [])]) {
+      for (const line of linesWith(src, normalizeForMatch(value))) anchors.add(line);
+    }
+    if (anchors.size === 0) return;
+    const taken = new Set(
+      [...titles, ...(institution ? [institution] : [])].map(normalizeForMatch),
+    );
+    const isOrgLine = (j: number): boolean => {
+      if (j < 0 || anchors.has(j) || headings.has(j)) return false;
+      const line = (src.rawLines[j] ?? "").trim();
+      if (line === "" || /\d/.test(line) || /^[-•*·▪●◦]/u.test(line)) return false;
+      if (splitLineParts(line).length !== 1 || !plausibleRecovered(line)) return false;
+      // Only an organization marker counts: a Title Case line next to the entry is as often the
+      // next course's title ("Platzi" / "Desarrollo Web Avanzado") as a school.
+      if (!looksLikeOrganization(line) || looksLikeJobTitle(line)) return false;
+      const norm = normalizeForMatch(line);
+      if (taken.has(norm) || isPlaceLike(norm, excluded)) return false;
+      return !institutions.includes(norm);
+    };
+    let found: string | null = null;
+    for (const anchor of [...anchors].sort((a, b) => a - b)) {
+      for (const offset of [1, -1, 2, -2]) {
+        if (isOrgLine(anchor + offset)) {
+          found = (src.rawLines[anchor + offset] ?? "").trim();
+          break;
+        }
+      }
+      if (found) break;
+    }
+    if (!found) return;
+    entry.institution = found;
+    warnings.push(
+      institution
+        ? `grounding: education[${i}].institution "${institution}" replaced by "${found}" as written`
+        : `grounding: education[${i}].institution was empty; set it to "${found}" written next to the entry`,
+    );
   });
 }
 
@@ -1532,6 +1789,37 @@ function moveWarning(from: string, index: number, org: string, to: string, headi
   return `placement: moved ${from}[${index}] "${org}" to ${to} (it is under the "${heading}" heading)`;
 }
 
+let educationHeadingWords: readonly string[] | null = null;
+
+/**
+ * `true` when an organization's own name carries an Education / Certifications heading word
+ * ("Escuela de Educación Secundaria N°5", "Formación Profesional S.L."): a line of such a name,
+ * wrapped on its own, reads as a heading, so "written under Education" proves nothing.
+ */
+function nameHasEducationHeadingWord(name: string): boolean {
+  educationHeadingWords ??= HEADINGS.filter(
+    (rule) => rule.key === "education" || rule.key === "certificates",
+  ).flatMap((rule) => rule.keywords);
+  const norm = normalizeForMatch(name);
+  return educationHeadingWords.some((keyword) => hasTerm(norm, keyword));
+}
+
+/** Academic roles at the start of a title: the jobs CVs list under an education-like heading. */
+const ACADEMIC_ROLE_START =
+  /^(?:profesora?|docente|investigadora?|becari[oa]|ayudante|catedratic[oa]|teacher|lecturer|researcher|instructor|tutora?)(?![\p{L}\p{N}])/u;
+
+/**
+ * `true` when a `work[].position` is a job rather than a degree: it reads as a job title
+ * ({@link looksLikeJobTitle}) and either no degree family is recognized in it or it starts with
+ * an academic role ("Profesor Ayudante Doctor" is a job even though "Doctor" names a degree;
+ * "Electronic Technician" is a technical degree).
+ */
+function positionIsJob(position: string | null): boolean {
+  if (!position || !looksLikeJobTitle(position)) return false;
+  if (ACADEMIC_ROLE_START.test(normalizeForMatch(position))) return true;
+  return normalizeStudyType(position).level === "unknown";
+}
+
 /**
  * Moves entries the model put in the wrong section, judging by the heading their organization is
  * written under: a `work[]` entry whose company only appears under an Education heading becomes an
@@ -1541,7 +1829,12 @@ function moveWarning(from: string, index: number, org: string, to: string, headi
  * entries fill an existing entry of the same organization (or an empty shell) instead of
  * duplicating it. A section ends at the next heading, known or merely heading-like
  * ({@link looksLikeHeadingLine}): an entry under "CARGOS EJERCIDOS" after "Educación" is not
- * under Educación. Entries under a Projects heading are never moved. Does nothing when the
+ * under Educación; only a KNOWN heading justifies a move (a heading-like line opens an `"other"`
+ * span, which never counts as evidence). Entries under a Projects heading are never moved.
+ *
+ * A work entry stays put when its position is a job rather than a degree ({@link positionIsJob}:
+ * teaching work listed under "Formación Profesional" in academic CVs) or when the employer's own
+ * name carries a heading word ({@link nameHasEducationHeadingWord}). Does nothing when the
  * document has no recognizable headings.
  */
 function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
@@ -1559,12 +1852,14 @@ function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
     const kept: unknown[] = [];
     resume.work.forEach((entry, i) => {
       const name = isRecord(entry) ? str(entry.name) : null;
-      const under = name ? writtenUnder(src, spans, name, ["education", "certificates"]) : null;
+      const position = isRecord(entry) ? str(entry.position) : null;
+      const movable =
+        name !== null && !nameHasEducationHeadingWord(name) && !positionIsJob(position);
+      const under = movable ? writtenUnder(src, spans, name, ["education", "certificates"]) : null;
       if (!isRecord(entry) || !name || !under) {
         kept.push(entry);
         return;
       }
-      const position = str(entry.position);
       if (under.key === "education") {
         const candidate = {
           institution: name,
@@ -1654,10 +1949,13 @@ export function groundResume(resume: Resume, sourceText: string): GroundResult {
   // Before the titles: an employer recovered here makes its title a grounded position.
   recoverEmployers(out, src, places, warnings);
   recoverEmployersFromLocation(out, src, warnings);
+  // Before the degree titles: a title is recovered next to its (repaired) institution.
+  groundInstitutions(out, src, places, warnings);
   groundTitles(out.education, "education", src, places, warnings);
   groundTitles(out.work, "work", src, places, warnings);
   // After the titles: an entry is located by its organization and title as written.
   groundInferredEndDates(out, src, warnings);
+  groundSingleDates(out, src, warnings);
   groundBasics(out, src, warnings);
   groundExtensionLocation(out, src, warnings);
   groundEntryLocations(out.work, "work", src, warnings);
