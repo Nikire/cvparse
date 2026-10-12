@@ -683,3 +683,130 @@ describe("normalizeResume: repeated entries", () => {
     expect(warnings.some((w) => w.includes("repeated"))).toBe(false);
   });
 });
+
+describe("normalizeResume — title and employer fused in work[].name (review of real CVs)", () => {
+  it("splits '<title> <link> <organization>' only when the right side reads as an organization", () => {
+    expect(splitTitleFromPhrase("Asesor Legislativo en la Asamblea Nacional")).toEqual({
+      title: "Asesor Legislativo",
+      org: "Asamblea Nacional",
+    });
+    // The last split wins: the title keeps its complement.
+    expect(splitTitleFromPhrase("Directora de Comunicación del Ministerio de Cultura")).toEqual({
+      title: "Directora de Comunicación",
+      org: "Ministerio de Cultura",
+    });
+    expect(splitTitleFromPhrase("Gerente General de Acme S.A.")).toEqual({
+      title: "Gerente General",
+      org: "Acme S.A.",
+    });
+    expect(splitTitleFromPhrase("Coordinador para la Fundación Huésped")).toEqual({
+      title: "Coordinador",
+      org: "Fundación Huésped",
+    });
+    // Title Case name of 2+ words after "en"; 1 word is enough after "at".
+    expect(splitTitleFromPhrase("Ingeniero de Software en Mercado Libre")).toEqual({
+      title: "Ingeniero de Software",
+      org: "Mercado Libre",
+    });
+    expect(splitTitleFromPhrase("Developer at Globex")).toEqual({
+      title: "Developer",
+      org: "Globex",
+    });
+    // A title and its department, a title on both sides, no title, lowercase complement.
+    expect(splitTitleFromPhrase("Jefe de Proyecto")).toBeNull();
+    expect(splitTitleFromPhrase("Técnico de Laboratorio")).toBeNull();
+    expect(splitTitleFromPhrase("Analista en Jefe")).toBeNull();
+    expect(splitTitleFromPhrase("Sucursal en Rosario")).toBeNull();
+    expect(splitTitleFromPhrase("Analista de sistemas embebidos")).toBeNull();
+  });
+
+  it("sets position and name from a fused name, with position null, a copy, or only the head noun", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Asesor Legislativo en la Asamblea Nacional", position: null },
+        { name: "Directora de Comunicación del Ministerio de Cultura", position: "Directora" },
+        {
+          name: "Asesor Legislativo en la Asamblea Nacional",
+          position: "Asesor Legislativo en la Asamblea Nacional",
+        },
+        // Not an organization on the right: untouched / nulled as before.
+        { name: "Jefe de Proyecto", position: null },
+        { name: "Jefe de Proyecto", position: "Jefe de Proyecto" },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Asamblea Nacional", "Asesor Legislativo"],
+      ["Ministerio de Cultura", "Directora de Comunicación"],
+      ["Asamblea Nacional", "Asesor Legislativo"],
+      ["Jefe de Proyecto", null],
+      [null, "Jefe de Proyecto"],
+    ]);
+    expect(warnings).toContain(
+      'work[0].name: "Asesor Legislativo en la Asamblea Nacional" holds the position too; split into name "Asamblea Nacional" and position "Asesor Legislativo".',
+    );
+    expect(warnings).toContain(
+      'work[1].name: "Directora de Comunicación del Ministerio de Cultura" holds the whole position and the name; set position to "Directora de Comunicación" and name to "Ministerio de Cultura".',
+    );
+    expect(warnings).toContain(
+      'work[2]: name and position were both "Asesor Legislativo en la Asamblea Nacional"; split into name "Asamblea Nacional" and position "Asesor Legislativo".',
+    );
+    expect(warnings.filter((w) => w.includes("Jefe de Proyecto"))).toEqual([
+      'work[4].name: it was the same as the position ("Jefe de Proyecto"); set to null.',
+    ]);
+  });
+
+  it("drops a lowercase article after the link when the name starts with the position", () => {
+    expect(splitTitleFromPhrase("Docente en la Universidad de Buenos Aires", "Docente")).toEqual({
+      title: "Docente",
+      org: "Universidad de Buenos Aires",
+    });
+    // A capitalized article is part of the name.
+    expect(splitTitleFromPhrase("Docente en La Plata Software", "Docente")).toEqual({
+      title: "Docente",
+      org: "La Plata Software",
+    });
+  });
+});
+
+describe("normalizeResume — courses emitted as work entries (review of real CVs)", () => {
+  it("drops a work entry without position that repeats a certificate issuer or an institution with the same year", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Coursera", position: null, startDate: "2021" },
+        { name: "Universidad de Loja", position: null, startDate: "2010", endDate: "2014" },
+        // Kept: a position, another year, an organization not in certificates / education.
+        { name: "Coursera", position: "Mentor", startDate: "2021" },
+        { name: "Coursera", position: null, startDate: "2019" },
+        { name: "Acme", position: null, startDate: "2021" },
+      ],
+      // Dates are compared after normalization ("mayo 2021" -> 2021-05).
+      certificates: [{ name: "Machine Learning", issuer: "Coursera", date: "mayo 2021" }],
+      education: [
+        {
+          institution: "Universidad de Loja",
+          studyType: "Licenciatura",
+          startDate: "2010",
+          endDate: "2014",
+        },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position, w.startDate])).toEqual([
+      ["Coursera", "Mentor", "2021"],
+      ["Coursera", null, "2019"],
+      ["Acme", null, "2021"],
+    ]);
+    expect(resume.certificates).toHaveLength(1);
+    expect(resume.education).toHaveLength(1);
+    expect(warnings).toContain(
+      "work: dropped 2 entries without position that repeat a certificate or education entry (same organization and year): Coursera, Universidad de Loja",
+    );
+  });
+
+  it("leaves work[] alone without certificates or education", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [{ name: "Coursera", position: null, startDate: "2021" }],
+    });
+    expect(resume.work).toHaveLength(1);
+    expect(warnings).toEqual([]);
+  });
+});

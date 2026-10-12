@@ -124,21 +124,58 @@ function scoreLocation(truth: GroundTruth, predicted: GroundTruth | null): Count
   return scalar(t.city, p.city, equal);
 }
 
-/** Text similarity used for entry matching: token Jaccard without articles/legal suffixes. */
-function similarity(
-  a: string | null | undefined,
-  b: string | null | undefined,
-): number | undefined {
-  const ta = tokens(a, true);
-  const tb = tokens(b, true);
-  if (ta.size === 0 && tb.size === 0) return undefined;
-  return jaccard(ta, tb);
+/**
+ * Minimum similarity of the components present on both sides for an entry with a component
+ * missing on one side only (predicted `name` null, position present) to match on those alone.
+ */
+export const PARTIAL_MATCH_THRESHOLD = 0.8;
+
+/**
+ * Entry similarity: the mean token Jaccard (without articles / legal suffixes) of the components
+ * (`fields`), leaving out components empty on both sides. A component empty on one side only
+ * counts as 0 in that mean, unless the components present on both sides average
+ * >= {@link PARTIAL_MATCH_THRESHOLD}: then that average is the similarity, so a predicted entry
+ * with no employer but the right position still matches its truth entry.
+ */
+function entrySimilarity<T>(
+  truth: T,
+  predicted: T,
+  fields: ((entry: T) => string | null | undefined)[],
+): number {
+  const shared: number[] = [];
+  let oneSided = 0;
+  for (const field of fields) {
+    const ta = tokens(field(truth), true);
+    const tb = tokens(field(predicted), true);
+    if (ta.size === 0 && tb.size === 0) continue;
+    if (ta.size === 0 || tb.size === 0) oneSided++;
+    else shared.push(jaccard(ta, tb));
+  }
+  if (shared.length === 0) return 0;
+  const partial = shared.reduce((a, b) => a + b, 0) / shared.length;
+  if (oneSided > 0 && partial >= PARTIAL_MATCH_THRESHOLD) return partial;
+  return (partial * shared.length) / (shared.length + oneSided);
 }
 
-/** Mean of the defined similarities; 0 when none is defined. */
-function mean(values: (number | undefined)[]): number {
-  const defined = values.filter((v): v is number => v !== undefined);
-  return defined.length === 0 ? 0 : defined.reduce((a, b) => a + b, 0) / defined.length;
+/**
+ * Weight of the date tie-break added to the similarity of matchable pairs: small enough never to
+ * outweigh a text difference (Jaccard values are ratios of small integers), large enough to order
+ * exact ties, e.g. two terms at the same organization with the same title.
+ */
+const DATE_TIE_BREAK = 1e-7;
+
+function yearOf(value: string | null | undefined): string | null {
+  const normalized = normalizeDateValue(value);
+  return normalized === null ? null : normalized.slice(0, 4);
+}
+
+/** 0-3: 2 when the start years agree, +1 when the end years agree (both ongoing counts). */
+function dateAffinity(truth: Dated, predicted: Dated): number {
+  const ts = yearOf(truth.startDate);
+  const ps = yearOf(predicted.startDate);
+  const te = yearOf(truth.endDate);
+  const pe = yearOf(predicted.endDate);
+  return (ts !== null && ts === ps ? 2 : 0) + (te === pe ? 1 : 0);
 }
 
 /**
@@ -276,8 +313,13 @@ function scoreSection<T extends Dated>(
   fields: ((entry: T) => string | null | undefined)[],
 ): SectionScores {
   if (truth.length === 0 && predicted.length === 0) return { pairs: [] };
+  // Pairs that can match carry a tiny date tie-break, so identical entries (two terms at the same
+  // organization with the same title) are paired by their dates, not by index.
   const matrix = truth.map((t) =>
-    predicted.map((p) => mean(fields.map((field) => similarity(field(t), field(p))))),
+    predicted.map((p) => {
+      const text = entrySimilarity(t, p, fields);
+      return text < ENTRY_MATCH_THRESHOLD ? text : text + DATE_TIE_BREAK * dateAffinity(t, p);
+    }),
   );
   const pairs = assign(matrix);
   const entries: Counts = {

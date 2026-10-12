@@ -70,6 +70,19 @@ maximize total similarity (exact search up to 16 predicted entries, greedy beyon
 and only pairs with similarity >= 0.5 match. TP = matched pairs, FP = unmatched predicted entries,
 FN = unmatched truth entries.
 
+- **Component missing on one side only** (a predicted work entry with `name: null` and a
+  position; a predicted education entry with no institution). The missing component counts as 0
+  in the mean, *unless* the components present on both sides average >= 0.8: then that average
+  alone is the similarity, so an entry whose employer the parser could not extract still matches
+  its truth entry when the position is (nearly) right. The missing employer is not scored
+  separately (`work.entries` counts the entry as a TP); it only costs when the position is also
+  off. A predicted entry with both components empty never matches.
+- **Ties.** When two truth entries read the same (two terms at the same organization with the
+  same title) the text similarity cannot tell the predicted entries apart, and pairing by index
+  would compare their dates cross-wise. Matchable pairs (similarity >= 0.5) therefore carry a tiny
+  tie-break (1e-7 per unit) that prefers the same start year, then the same end year (both
+  ongoing counts as the same). It only orders exact ties; it never outweighs a text difference.
+
 ### Certificates count as education
 
 The truth keeps short courses, bootcamps and diplomas in `education[]` (as printed under

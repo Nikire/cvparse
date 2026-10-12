@@ -22,6 +22,8 @@ const ROLE_WORDS = new Set([
   "architect",
   "arquitecto",
   "arquitecta",
+  "asesor",
+  "asesora",
   "asistente",
   "assistant",
   "auxiliar",
@@ -119,6 +121,9 @@ const ROLE_WORDS = new Set([
 const ORG_WORDS = new Set([
   "agencia",
   "agency",
+  "alcaldia",
+  "asamblea",
+  "ayuntamiento",
   "banco",
   "bank",
   "clinica",
@@ -127,6 +132,7 @@ const ORG_WORDS = new Set([
   "college",
   "company",
   "compania",
+  "congreso",
   "consultora",
   "empresa",
   "escuela",
@@ -139,12 +145,15 @@ const ORG_WORDS = new Set([
   "hospital",
   "institute",
   "instituto",
+  "intendencia",
   "laboratorio",
   "labs",
+  "legislatura",
   "ministerio",
   "municipalidad",
   "sanatorio",
   "school",
+  "senado",
   "services",
   "servicios",
   "solutions",
@@ -164,12 +173,50 @@ function words(norm: string): string[] {
   return norm.split(/[\s,./()·|—–-]+/u).filter((w) => w !== "");
 }
 
+/** `true` when `value` ends with a legal-entity suffix ("Telecom S.A.", "Acme Inc."). */
+export function hasLegalSuffix(value: string): boolean {
+  const norm = normalizeForMatch(value);
+  return norm !== "" && LEGAL_SUFFIX.test(norm);
+}
+
 /** `true` when `value` carries an organization marker (legal suffix or a word like "Universidad"). */
 export function looksLikeOrganization(value: string): boolean {
   const norm = normalizeForMatch(value);
   if (norm === "") return false;
   if (LEGAL_SUFFIX.test(norm)) return true;
   return words(norm).some((w) => ORG_WORDS.has(w));
+}
+
+/** Lowercase connectors a Title Case name may contain ("Ministerio de Cultura", "Bank of Ireland"). */
+const NAME_CONNECTORS = new Set([
+  "de",
+  "del",
+  "la",
+  "las",
+  "los",
+  "el",
+  "y",
+  "e",
+  "&",
+  "of",
+  "the",
+  "and",
+  "for",
+]);
+
+/**
+ * `true` when `value` is written like a proper name: at least `minWords` words starting with a
+ * capital letter, and every other word a connector ("Telecom Argentina", "Ministerio de Cultura";
+ * not "sistemas embebidos" nor "Atención al cliente"). Digits never qualify.
+ */
+export function isTitleCaseName(value: string, minWords = 2): boolean {
+  const words = value.trim().split(/\s+/);
+  let capitalized = 0;
+  for (const word of words) {
+    if (/^[^\p{L}\p{N}]*\p{Lu}/u.test(word)) capitalized++;
+    else if (!NAME_CONNECTORS.has(word.toLowerCase())) return false;
+  }
+  return capitalized >= minWords;
 }
 
 /**

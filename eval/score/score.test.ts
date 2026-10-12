@@ -524,3 +524,55 @@ describe("phones with an extension (review of real CVs)", () => {
     expect(phonesMatch("+54 11 4127-7100 int 5045", "+54 11 4127-7101")).toBe(false);
   });
 });
+
+describe("entry matching (review of real CVs)", () => {
+  it("pairs identical truth entries (two terms at the same organization) by their dates", () => {
+    const twoTerms: GroundTruth = {
+      work: [
+        { name: "Concejo Municipal", position: "Asesor", startDate: "2010", endDate: "2012" },
+        { name: "Concejo Municipal", position: "Asesor", startDate: "2015", endDate: "2017" },
+      ],
+    };
+    const reversed: GroundTruth = {
+      work: [
+        { name: "Concejo Municipal", position: "Asesor", startDate: "2015", endDate: "2017" },
+        { name: "Concejo Municipal", position: "Asesor", startDate: "2010", endDate: "2012" },
+      ],
+    };
+    const scores = scoreEntry(twoTerms, reversed);
+    expect(scores["work.entries"]).toMatchObject({ tp: 2, fp: 0, fn: 0 });
+    expect(scores["work.dates"]).toMatchObject({ tp: 4, fp: 0, fn: 0 });
+    // The tie-break never outweighs the text: the exact position wins over the same dates.
+    const mixed: GroundTruth = {
+      work: [
+        { name: "Concejo Municipal", position: "Asesor Legal", startDate: "2010", endDate: "2012" },
+        { name: "Concejo Municipal", position: "Asesor", startDate: "2010", endDate: "2012" },
+      ],
+    };
+    const mixedScores = scoreEntry(twoTerms, mixed);
+    expect(mixedScores["work.entries"]).toMatchObject({ tp: 2, fp: 0, fn: 0 });
+    // truth[0] (2010-2012) -> mixed[1] "Asesor" (2010-2012): 2 TP; truth[1] -> "Asesor Legal"
+    // with the wrong years: 2 mismatches.
+    expect(mixedScores["work.dates"]).toMatchObject({ tp: 2, fp: 2, fn: 2 });
+  });
+
+  it("matches a predicted entry with a null employer when the position is (nearly) right", () => {
+    const one: GroundTruth = {
+      work: [{ name: "Acme", position: "Analista de Datos", startDate: "2010", endDate: "2012" }],
+    };
+    const nullEmployer: GroundTruth = {
+      work: [{ name: null, position: "Analista de Datos", startDate: "2010", endDate: "2012" }],
+    };
+    const matched = scoreEntry(one, nullEmployer);
+    expect(matched["work.entries"]).toMatchObject({ tp: 1, fp: 0, fn: 0 });
+    expect(matched["work.dates"]).toMatchObject({ tp: 2, fp: 0, fn: 0 });
+    // Position below 0.8 with no employer: the missing component counts as 0, no match.
+    const vague: GroundTruth = {
+      work: [{ name: null, position: "Analista", startDate: "2010", endDate: "2012" }],
+    };
+    expect(scoreEntry(one, vague)["work.entries"]).toMatchObject({ tp: 0, fp: 1, fn: 1 });
+    // Both components empty never matches.
+    const empty: GroundTruth = { work: [{ name: null, position: null, startDate: "2010" }] };
+    expect(scoreEntry(one, empty)["work.entries"]).toMatchObject({ tp: 0, fp: 1, fn: 1 });
+  });
+});

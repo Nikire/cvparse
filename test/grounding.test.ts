@@ -1521,3 +1521,236 @@ describe("groundResume — phones with an extension", () => {
     expect(other.resume.basics?.phone).toBeNull();
   });
 });
+
+describe("groundResume — employer written in work[].location (review of real CVs)", () => {
+  /** A prose CV: the title is not a whole part of any line, so nothing is recovered next to it. */
+  const PROSE = `Ana Pérez
+Comunicadora — Quito
+
+EXPERIENCIA
+Entre 2018 y 2020 me desempeñé como Directora de Comunicación en el Ministerio de Cultura, en Quito.
+Antes trabajé en Globant, en Quito, como analista de medios.
+`;
+
+  it("moves an organization written in the document from location to name, keeping the city", () => {
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          {
+            name: null,
+            position: "Directora de Comunicación",
+            location: "Ministerio de Cultura — Quito",
+            startDate: "2018",
+            endDate: "2020",
+          },
+          // The title in name, position empty: the title moves to position.
+          {
+            name: "Directora de Comunicación",
+            position: null,
+            location: "Ministerio de Cultura, Quito",
+          },
+        ],
+      },
+      PROSE,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position, w.location])).toEqual([
+      ["Ministerio de Cultura", "Directora de Comunicación", "Quito"],
+      ["Ministerio de Cultura", "Directora de Comunicación", "Quito"],
+    ]);
+    expect(warnings).toContain(
+      'grounding: work[0].location "Ministerio de Cultura — Quito" holds the employer; set name to "Ministerio de Cultura", kept "Quito" as location',
+    );
+    expect(warnings).toContain(
+      'grounding: work[1].location "Ministerio de Cultura, Quito" holds the employer; set name to "Ministerio de Cultura" and position to "Directora de Comunicación", kept "Quito" as location',
+    );
+    // No stale "no employer found" warning for the entry repaired from its location.
+    expect(warnings.some((w) => w.includes("no employer found"))).toBe(false);
+  });
+
+  it("does not touch an entry with an employer in name, nor take an organization that is not written", () => {
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          { name: "Globant", position: "Analista", location: "Ministerio de Cultura — Quito" },
+          { name: null, position: "Analista", location: "Ministerio de Economía — Quito" },
+          { name: null, position: "Analista", location: "Quito" },
+        ],
+      },
+      PROSE,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position, w.location])).toEqual([
+      ["Globant", "Analista", null],
+      [null, "Analista", null],
+      [null, "Analista", "Quito"],
+    ]);
+    expect(warnings.some((w) => w.includes("holds the employer"))).toBe(false);
+  });
+});
+
+describe("groundResume — end dates inferred from the next entry (review of real CVs)", () => {
+  const LIST = `EXPERIENCIA LABORAL
+2014: Secretario de Actas, Concejo Municipal de Loja
+2016: Coordinador de Prensa, Concejo Municipal de Loja
+2019: Director de Comunicación, Concejo Municipal de Loja
+
+EDUCACIÓN
+2010 - 2014: Licenciatura en Comunicación, Universidad de Loja
+`;
+
+  it("drops an end year the document writes only as the next entry's start", () => {
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Secretario de Actas",
+            startDate: "2014",
+            endDate: "2016",
+          },
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Coordinador de Prensa",
+            startDate: "2016",
+            endDate: "2019",
+          },
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Director de Comunicación",
+            startDate: "2019",
+            endDate: null,
+          },
+        ],
+        education: [
+          {
+            institution: "Universidad de Loja",
+            studyType: "Licenciatura en Comunicación",
+            startDate: "2010",
+            endDate: "2014",
+          },
+        ],
+      },
+      LIST,
+    );
+    expect(resume.work?.map((w) => [w.startDate, w.endDate])).toEqual([
+      ["2014", null],
+      ["2016", null],
+      ["2019", null],
+    ]);
+    // Education: 2014 is written on its own line.
+    expect(resume.education?.[0]).toMatchObject({ startDate: "2010", endDate: "2014" });
+    expect(warnings).toContain(
+      'grounding: dropped work[0].endDate "2016" (not written for this entry; inferred from the next one)',
+    );
+    expect(warnings).toContain(
+      'grounding: dropped work[1].endDate "2019" (not written for this entry; inferred from the next one)',
+    );
+  });
+
+  it("locates an entry by its organization when the title is paraphrased, skipping the next entry's lines", () => {
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          // The title is not written; the organization is, on every line. The next entry's
+          // line (with its 2016) does not count for this one.
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Secretario Administrativo",
+            startDate: "2014",
+            endDate: "2016",
+          },
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Coordinador de Prensa",
+            startDate: "2016",
+            endDate: null,
+          },
+        ],
+      },
+      LIST,
+    );
+    expect(resume.work?.[0]?.endDate).toBeNull();
+    expect(warnings.some((w) => w.includes("dropped work[0].endDate"))).toBe(true);
+  });
+
+  it("keeps an end year written on the entry's own line, the one before or the one after", () => {
+    const text = `EXPERIENCIA
+Secretario de Actas
+Concejo Municipal, 2014 – 2016
+Coordinador de Prensa
+Concejo Municipal, 2016 – 2019
+
+2019 - 2021
+Director de Comunicación, Concejo Municipal
+2021 - actualidad
+Asesor, Concejo Municipal
+`;
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          {
+            name: "Concejo Municipal",
+            position: "Secretario de Actas",
+            startDate: "2014",
+            endDate: "2016",
+          },
+          {
+            name: "Concejo Municipal",
+            position: "Coordinador de Prensa",
+            startDate: "2016",
+            endDate: "2019",
+          },
+          {
+            name: "Concejo Municipal",
+            position: "Director de Comunicación",
+            startDate: "2019",
+            endDate: "2021",
+          },
+          { name: "Concejo Municipal", position: "Asesor", startDate: "2021", endDate: null },
+        ],
+      },
+      text,
+    );
+    expect(resume.work?.map((w) => w.endDate)).toEqual(["2016", "2019", "2021", null]);
+    expect(warnings.some((w) => w.includes("inferred from the next one"))).toBe(false);
+  });
+
+  it("keeps the end date when the entry cannot be located or the year is written often enough", () => {
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          // Neither the title nor the organization is written: left alone.
+          { name: "Otra Empresa", position: "Gerente", startDate: "2014", endDate: "2016" },
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Coordinador de Prensa",
+            startDate: "2016",
+          },
+        ],
+      },
+      LIST,
+    );
+    expect(resume.work?.[0]?.endDate).toBe("2016");
+    expect(warnings.some((w) => w.includes("inferred from the next one"))).toBe(false);
+    // The year is written as often as the resume claims it (once as a start, once in prose).
+    const twice = groundResume(
+      {
+        work: [
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Secretario de Actas",
+            startDate: "2014",
+            endDate: "2016",
+          },
+          {
+            name: "Concejo Municipal de Loja",
+            position: "Coordinador de Prensa",
+            startDate: "2016",
+          },
+        ],
+      },
+      `${LIST}\nMiembro del colegio de periodistas desde 2016.\n`,
+    );
+    expect(twice.resume.work?.[0]?.endDate).toBe("2016");
+    expect(twice.warnings.some((w) => w.includes("inferred from the next one"))).toBe(false);
+  });
+});

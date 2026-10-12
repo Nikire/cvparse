@@ -10,7 +10,12 @@ import { collectEducationLevels } from "./education.js";
 import { normalizeForMatch } from "./grounding.js";
 import { detectLanguage } from "./language.js";
 import { dedupeResumeEntries } from "./repetition.js";
-import { looksLikeJobTitle, looksLikeOrganization } from "./titles.js";
+import {
+  hasLegalSuffix,
+  isTitleCaseName,
+  looksLikeJobTitle,
+  looksLikeOrganization,
+} from "./titles.js";
 
 /** Output of {@link normalizeResume}. */
 export interface NormalizeResult {
@@ -271,27 +276,84 @@ export function deriveNormalizedSkills(skills: unknown): string[] | null {
 const TITLE_ORG_LINK = /\s+(?:de la|de los|de las|del|en|at|@)\s+/giu;
 
 /**
- * Splits "Title en Employer" into `{ title, org }` when `title` is given (the phrase must start
- * with it, compared after normalization) or, without it, when the left side reads as a job title
- * ({@link looksLikeJobTitle}) and the right side does not. Returns `null` when unsure.
+ * {@link TITLE_ORG_LINK} plus the links of prose CVs: an article after "en" / "para" ("Asesor en
+ * la Asamblea Nacional", "Coordinador para la Fundación X"), a bare "de" ("Directora de
+ * Comunicación del Ministerio de Cultura" splits at "del", "Gerente General de Acme S.A." at
+ * "de") and "with". A bare "de" / "del" is ambiguous ("Jefe de Proyecto"), so the right side
+ * must then be a clear organization; see {@link employerLike}.
+ */
+const TITLE_ORG_LINK_PROSE =
+  /\s+(?:en(?:\s+(?:el|la|los|las))?|de(?:\s+(?:la|los|las))?|del|para(?:\s+(?:el|la|los|las))?|at|@|with)\s+/giu;
+
+/** A lowercase Spanish article starting a phrase (case-sensitive: "La Plata" keeps its article). */
+const LOWERCASE_ARTICLE = /^(?:el|la|los|las)\s+(?=\p{L})/u;
+
+/**
+ * `true` when the right side of "Title <link> Employer" reads as an employer: never a job
+ * title; an organization marker or legal suffix ({@link looksLikeOrganization}), or a Title Case
+ * name of 2+ words ("Telecom Argentina"; 1 word after "at" / "@" / "with": "Developer at
+ * Globex"). After a
+ * bare "de" / "del" (`strict`), which also joins a title to its department ("Jefe de Proyecto",
+ * "Técnico de Laboratorio"), only a legal suffix or an organization marker with 2+ words on each
+ * side counts.
+ */
+function employerLike(after: string, link: string, before: string): boolean {
+  if (!/\p{L}/u.test(after) || looksLikeJobTitle(after)) return false;
+  const strict = link === "de" || link === "del";
+  if (strict) {
+    if (hasLegalSuffix(after)) return true;
+    const words = (value: string) => value.split(/\s+/).length;
+    return looksLikeOrganization(after) && words(after) >= 2 && words(before) >= 2;
+  }
+  if (looksLikeOrganization(after)) return true;
+  return isTitleCaseName(after, link === "at" || link === "@" || link === "with" ? 1 : 2);
+}
+
+/**
+ * Splits "Title en Employer" into `{ title, org }`:
+ * - with `title`, when the phrase is exactly "<title> <link> <employer>" (compared after
+ *   normalization; the employer is not checked), as in "Asesor de la Dirección Nacional" with
+ *   title "Asesor";
+ * - else when the left side reads as a job title ({@link looksLikeJobTitle}) that starts with
+ *   `title` when given ("Directora de Comunicación del Ministerio de Cultura" with title
+ *   "Directora"), and the right side reads as an employer ({@link employerLike}). Of several such
+ *   splits the last one wins, so the title keeps its complement ("Directora de Comunicación" /
+ *   "Ministerio de Cultura", not "Directora" / "Comunicación del Ministerio de Cultura").
+ *
+ * Returns `null` when unsure ("Jefe de Proyecto", "Analista en Jefe", "Sucursal en Rosario").
  */
 export function splitTitleFromPhrase(
   phrase: string,
   title: string | null = null,
 ): { title: string; org: string } | null {
   const target = title ? normalizeForMatch(title) : null;
-  for (const match of phrase.matchAll(TITLE_ORG_LINK)) {
+  if (target !== null) {
+    for (const match of phrase.matchAll(TITLE_ORG_LINK)) {
+      const before = phrase.slice(0, match.index).trim();
+      // A lowercase article after the link belongs to the prose, not to the employer ("Docente
+      // en la Universidad de Buenos Aires"); a capitalized one is part of a name ("La Plata").
+      const after = phrase
+        .slice(match.index + match[0].length)
+        .trim()
+        .replace(LOWERCASE_ARTICLE, "");
+      if (before === "" || after === "" || !/\p{L}/u.test(after)) continue;
+      if (normalizeForMatch(before) === target) return { title: before, org: after };
+    }
+  }
+  let found: { title: string; org: string } | null = null;
+  for (const match of phrase.matchAll(TITLE_ORG_LINK_PROSE)) {
     const before = phrase.slice(0, match.index).trim();
     const after = phrase.slice(match.index + match[0].length).trim();
-    if (before === "" || after === "" || !/\p{L}/u.test(after)) continue;
+    if (before === "" || after === "") continue;
     if (target !== null) {
-      if (normalizeForMatch(before) === target) return { title: before, org: after };
-      continue;
+      const norm = normalizeForMatch(before);
+      if (norm !== target && !norm.startsWith(`${target} `)) continue;
     }
-    if (looksLikeJobTitle(before) && !looksLikeJobTitle(after))
-      return { title: before, org: after };
+    if (!looksLikeJobTitle(before)) continue;
+    const link = match[0].trim().toLowerCase().replace(/\s+/g, " ");
+    if (employerLike(after, link, before)) found = { title: before, org: after };
   }
-  return null;
+  return found;
 }
 
 /** Self-employment written where an employer goes: a valid `work[].name`, never a title. */
@@ -352,6 +414,16 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
           return;
         }
         if (section === "education") return;
+        // "Asesor Legislativo en la Asamblea Nacional" in both fields: title and employer.
+        const phrase = splitTitleFromPhrase(org);
+        if (phrase) {
+          entry[orgKey] = phrase.org;
+          entry[titleKey] = phrase.title;
+          warnings.push(
+            `${section}[${i}]: ${orgKey} and ${titleKey} were both "${org}"; split into ${orgKey} "${phrase.org}" and ${titleKey} "${phrase.title}".`,
+          );
+          return;
+        }
         // Nothing to split: one of the two fields is a copy. An employer-like value ("Freelance",
         // "Acme S.A.") loses the position; anything else is taken as the title and loses the
         // organization (grounding recovers it when it is written next to the title).
@@ -369,9 +441,18 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
         return;
       }
       // "Analista en Acme" with position "Analista": the employer is what follows the title.
+      // "Directora de Comunicación del Ministerio de Cultura" with position "Directora": the
+      // position is only the head of the title; both fields change.
       const phrase = splitTitleFromPhrase(org, title);
       if (phrase) {
         entry[orgKey] = phrase.org;
+        if (normalizeForMatch(phrase.title) !== normalizeForMatch(title)) {
+          entry[titleKey] = phrase.title;
+          warnings.push(
+            `${section}[${i}].${orgKey}: "${org}" holds the whole ${titleKey} and the ${orgKey}; set ${titleKey} to "${phrase.title}" and ${orgKey} to "${phrase.org}".`,
+          );
+          return;
+        }
         warnings.push(
           `${section}[${i}].${orgKey}: "${org}" starts with the ${titleKey}; kept "${phrase.org}".`,
         );
@@ -384,6 +465,58 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
         `${section}[${i}].${orgKey}: removed the ${titleKey} from "${org}"; kept "${stripped}".`,
       );
     });
+  }
+}
+
+/** The years (`YYYY`) of the given ISO date fields of an entry. */
+function entryYears(entry: Record<string, unknown>, keys: readonly string[]): Set<string> {
+  const years = new Set<string>();
+  for (const key of keys) {
+    const value = entry[key];
+    const year = typeof value === "string" ? /^\d{4}/.exec(value)?.[0] : undefined;
+    if (year) years.add(year);
+  }
+  return years;
+}
+
+/**
+ * Drops `work[]` entries that are a course or a degree written twice: no position, and a name
+ * that is the issuer of a `certificates[]` entry or the institution of an `education[]` entry
+ * with the same year. A model that recovers from a repetition loop emits the courses under a
+ * merged "4. 5. 6." heading as `{ name: issuer, position: null, startDate: 2021 }` work entries
+ * on top of the certificates. Run after the dates are ISO.
+ */
+function dropCoursesFromWork(resume: Record<string, unknown>, warnings: string[]): void {
+  if (!Array.isArray(resume.work)) return;
+  const known = new Map<string, Set<string>>();
+  const remember = (list: unknown, orgKey: string, dateKeys: readonly string[]) => {
+    if (!Array.isArray(list)) return;
+    for (const entry of list) {
+      if (!isRecord(entry) || typeof entry[orgKey] !== "string") continue;
+      const key = normalizeForMatch(entry[orgKey]);
+      const years = known.get(key) ?? new Set<string>();
+      for (const year of entryYears(entry, dateKeys)) years.add(year);
+      known.set(key, years);
+    }
+  };
+  remember(resume.certificates, "issuer", ["date"]);
+  remember(resume.education, "institution", ["startDate", "endDate"]);
+  if (known.size === 0) return;
+  const removed: string[] = [];
+  resume.work = resume.work.filter((entry) => {
+    if (!isRecord(entry) || typeof entry.name !== "string" || (entry.position ?? null) !== null)
+      return true;
+    const years = known.get(normalizeForMatch(entry.name));
+    if (!years) return true;
+    const own = entryYears(entry, ["startDate", "endDate"]);
+    if (![...own].some((year) => years.has(year))) return true;
+    removed.push(entry.name);
+    return false;
+  });
+  if (removed.length > 0) {
+    warnings.push(
+      `work: dropped ${removed.length} entr${removed.length === 1 ? "y" : "ies"} without position that repeat${removed.length === 1 ? "s" : ""} a certificate or education entry (same organization and year): ${removed.join(", ")}`,
+    );
   }
 }
 
@@ -403,7 +536,11 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
  * - when `work[].name` equals the position with nothing to split, nulls the copy: the position
  *   for an employer word ("Freelance", "Acme S.A."), the name otherwise (grounding then looks for
  *   the employer next to the title); when the name is "<position> en <employer>", keeps the
- *   employer;
+ *   employer, and when the position is only the head of the title written in the name
+ *   ("Directora de Comunicación del Ministerio de Cultura" with position "Directora"), sets
+ *   both fields ({@link splitTitleFromPhrase});
+ * - drops `work[]` entries without position that repeat a certificate issuer or an education
+ *   institution with the same year (courses a model emitted as jobs);
  * - splits comma/semicolon-joined `skills[].keywords` and `skills[].name` values into separate
  *   items ({@link splitSkillList});
  * - derives `x_cvparse.normalizedSkills` from `skills` ({@link deriveNormalizedSkills}), ignoring
@@ -488,6 +625,7 @@ export function normalizeResume(
   }
 
   stripTitlesFromOrgs(resume, warnings);
+  dropCoursesFromWork(resume, warnings);
 
   if (Array.isArray(resume.skills)) resume.skills = splitSkills(resume.skills);
   // Always derived from skills: what the model writes here is ignored (small models return

@@ -1225,10 +1225,7 @@ function recoverEmployers(
     if (!title) return;
     if (name && position && normalizeForMatch(position) !== normalizeForMatch(name)) return;
     const titleNorm = normalizeForMatch(title);
-    const titleLike =
-      looksLikeJobTitle(title) ||
-      (labelNorm !== "" && !looksLikeOrganization(title) && hasTerm(titleNorm, labelNorm));
-    if (!titleLike) return;
+    if (!nameIsTitleLike(title, labelNorm)) return;
     const org = recoverOrgNearTitle(src.original, title, exclude, within);
     // Without a name to replace, only a clear employer is taken: a short name, or one of up to
     // 8 words with an organization marker (a sentence from the role's description is neither).
@@ -1236,7 +1233,9 @@ function recoverEmployers(
     const clearOrg =
       org !== null && (orgWords <= 4 || (orgWords <= 8 && looksLikeOrganization(org)));
     if (!org || normalizeForMatch(org) === titleNorm || (!name && !clearOrg)) {
-      if (name && !position) {
+      // No warning when the employer sits in `location`: recoverEmployersFromLocation takes it.
+      const loc = str(entry.location);
+      if (name && !position && !(loc && employerInLocation(loc, src))) {
         warnings.push(
           `grounding: work[${i}].name "${name}" looks like a job title and position is empty; no employer found next to it (kept)`,
         );
@@ -1257,6 +1256,156 @@ function recoverEmployers(
         : `grounding: work[${i}].name was empty; set it to the employer "${org}" written next to the position "${title}"`,
     );
   });
+}
+
+/**
+ * `true` when a `work[].name` reads as a job title: {@link looksLikeJobTitle}, or it contains the
+ * candidate's headline (`labelNorm`, normalized) without an organization marker.
+ */
+function nameIsTitleLike(name: string, labelNorm: string): boolean {
+  if (looksLikeJobTitle(name)) return true;
+  return (
+    labelNorm !== "" && !looksLikeOrganization(name) && hasTerm(normalizeForMatch(name), labelNorm)
+  );
+}
+
+/**
+ * The employer a model wrote at the head of an entry's `location` ("Ministerio de Cultura —
+ * Quito"): its first part when that carries an organization marker, is not a job title and is
+ * written in the document; `rest` is what follows it ("Quito"). `null` otherwise.
+ */
+function employerInLocation(loc: string, src: Source): { head: string; rest: string[] } | null {
+  const [head, ...rest] = splitLineParts(loc);
+  if (!head || !plausibleRecovered(head) || !looksLikeOrganization(head)) return null;
+  if (looksLikeJobTitle(head) || !hasTerm(src.text, normalizeForMatch(head))) return null;
+  return { head, rest };
+}
+
+/**
+ * Work entries whose employer the model wrote in `location` ("Ministerio de Cultura — Quito")
+ * while `name` is empty or holds the job title: when the first part of the location carries an
+ * organization marker and is written in the document ({@link employerInLocation}), it becomes
+ * the `name` (a title in `name` moves to `position`) and the rest of the location ("Quito")
+ * stays. Runs after {@link recoverEmployers}, for the entries it could not repair from the text;
+ * without this the location check drops the employer as a place that is not in the document.
+ */
+function recoverEmployersFromLocation(resume: Resume, src: Source, warnings: string[]): void {
+  if (!Array.isArray(resume.work)) return;
+  const label = str(resume.basics?.label);
+  const labelNorm = label ? normalizeForMatch(label) : "";
+  resume.work.forEach((entry, i) => {
+    if (!isRecord(entry)) return;
+    const loc = str(entry.location);
+    if (!loc) return;
+    const name = str(entry.name);
+    const position = str(entry.position);
+    if (name) {
+      // A name that is not the title is the employer already.
+      if (position && normalizeForMatch(position) !== normalizeForMatch(name)) return;
+      if (!nameIsTitleLike(name, labelNorm)) return;
+    }
+    const found = employerInLocation(loc, src);
+    if (!found) return;
+    const { head, rest } = found;
+    entry.name = head;
+    if (name) entry.position = name;
+    entry.location = rest.length > 0 ? rest.join(", ") : null;
+    warnings.push(
+      `grounding: work[${i}].location "${loc}" holds the employer; set name to "${head}"${name ? ` and position to "${name}"` : ""}${entry.location ? `, kept "${entry.location}" as location` : ""}`,
+    );
+  });
+}
+
+/** Date-bearing sections and their start/end keys, for the inferred end date check. */
+const RANGE_SECTIONS: ReadonlyArray<readonly ["work" | "education" | "volunteer", string, string]> =
+  [
+    ["work", "name", "position"],
+    ["education", "institution", "studyType"],
+    ["volunteer", "organization", "position"],
+  ];
+
+/** `true` when `year` ("2016") is written on `line` (normalized), also as a two-digit year ("'16", "16–18"). */
+function lineHasYear(line: string, year: string): boolean {
+  if (hasTerm(line, year)) return true;
+  return new RegExp(`(?<!\\d)${year.slice(2)}(?!\\d)`).test(line);
+}
+
+/**
+ * The lines naming an entry: those with its title (position / studyType) or, when the title is
+ * not found, those with its organization (shared by every entry of one employer, hence second).
+ */
+function entryLines(
+  entry: Record<string, unknown>,
+  src: Source,
+  orgKey: string,
+  titleKey: string,
+): number[] {
+  for (const key of [titleKey, orgKey]) {
+    const value = str(entry[key]);
+    if (!value) continue;
+    const lines = linesWith(src, normalizeForMatch(value));
+    if (lines.length > 0) return lines;
+  }
+  return [];
+}
+
+/**
+ * End dates a model inferred from the next entry: in a list of single-year entries ("2014:
+ * Secretario …", "2016: Coordinador …") the model writes the next entry's start year as the end
+ * of the previous one. For each `work[]` / `education[]` / `volunteer[]` entry whose end year
+ * equals the start year of the next entry of the same section, the end date is dropped when that
+ * year is not written on the entry's own lines (the lines naming it, see {@link entryLines}, the
+ * one before and the one after, minus the lines naming the next entry) AND the document writes
+ * the year fewer times than the resume's date fields claim it. Entries that cannot be located are
+ * left alone, as is an entry whose next entry cannot be located and sits on the adjacent line.
+ */
+function groundInferredEndDates(resume: Resume, src: Source, warnings: string[]): void {
+  const record = resume as Record<string, unknown>;
+  // Every date field claiming a year, across the range sections: a year written once in the
+  // document cannot be both the end of one entry and the start of the next.
+  const claims = new Map<string, number>();
+  for (const [section] of RANGE_SECTIONS) {
+    const entries = record[section];
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      if (!isRecord(entry)) continue;
+      for (const key of ["startDate", "endDate"]) {
+        const year = /^\d{4}/.exec(str(entry[key]) ?? "")?.[0];
+        if (year) claims.set(year, (claims.get(year) ?? 0) + 1);
+      }
+    }
+  }
+  for (const [section, orgKey, titleKey] of RANGE_SECTIONS) {
+    const entries = record[section];
+    if (!Array.isArray(entries)) continue;
+    const anchors = entries.map((entry) =>
+      isRecord(entry) ? entryLines(entry, src, orgKey, titleKey) : [],
+    );
+    entries.forEach((entry, i) => {
+      const next = entries[i + 1];
+      if (!isRecord(entry) || !isRecord(next)) return;
+      const end = str(entry.endDate);
+      const year = end ? /^\d{4}/.exec(end)?.[0] : undefined;
+      if (!year || year !== /^\d{4}/.exec(str(next.startDate) ?? "")?.[0]) return;
+      const start = /^\d{4}/.exec(str(entry.startDate) ?? "")?.[0];
+      if (start === year) return; // the entry's own year
+      const own = anchors[i] ?? [];
+      if (own.length === 0) return;
+      // The next entry's own lines carry its start year by definition: not this entry's.
+      const nextLines = new Set(anchors[i + 1]);
+      const written = own.some((line) =>
+        [line - 1, line, line + 1].some(
+          (j) => !nextLines.has(j) && lineHasYear(src.lines[j] ?? "", year),
+        ),
+      );
+      if (written) return;
+      if (countTerm(src.text, year) >= (claims.get(year) ?? 0)) return;
+      entry.endDate = null;
+      warnings.push(
+        `grounding: dropped ${section}[${i}].endDate "${end}" (not written for this entry; inferred from the next one)`,
+      );
+    });
+  }
 }
 
 /** Every location string the resume mentions, and its comma-separated parts. */
@@ -1473,7 +1622,10 @@ function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
  * replaced by the city the model's own address / raw location writes ("Mendoza, Argentina"), or
  * the city without a "Ciudad de" prefix, before being dropped. A `work[]` entry whose `name` is a
  * job title (position empty or equal to it) gets the employer written next to that title (see
- * `recoverEmployers`). Before all that, entries the model put in the
+ * `recoverEmployers`), or the organization the model wrote in its `location` ("Ministerio de
+ * Cultura — Quito"; see `recoverEmployersFromLocation`). An end date equal to the next entry's
+ * start year that is not written on the entry's own lines is dropped as inferred (see
+ * `groundInferredEndDates`). Before all that, entries the model put in the
  * wrong section are moved by the heading their organization is written under (a university in
  * `work[]` that only appears under "Education" goes to `education[]`; see `fixPlacement`), with
  * `placement:` warnings. Both sides are compared after NFKC, diacritic
@@ -1501,8 +1653,11 @@ export function groundResume(resume: Resume, sourceText: string): GroundResult {
   const places = knownPlaces(out);
   // Before the titles: an employer recovered here makes its title a grounded position.
   recoverEmployers(out, src, places, warnings);
+  recoverEmployersFromLocation(out, src, warnings);
   groundTitles(out.education, "education", src, places, warnings);
   groundTitles(out.work, "work", src, places, warnings);
+  // After the titles: an entry is located by its organization and title as written.
+  groundInferredEndDates(out, src, warnings);
   groundBasics(out, src, warnings);
   groundExtensionLocation(out, src, warnings);
   groundEntryLocations(out.work, "work", src, warnings);
