@@ -38,8 +38,12 @@ export function normalizeForMatch(value: string): string {
 const ALNUM = /[\p{L}\p{N}]/u;
 const SEPARATORS = new Set([" ", ".", "-", "_", "/"]);
 
+/**
+ * Escapes a character for a `u`-mode regex. `-` and `/` are not escaped: outside a character
+ * class they are literal, and `\-` / `\/` are invalid identity escapes under the `u` flag.
+ */
 function escapeRegex(char: string): string {
-  return char.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&");
+  return char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 const termRegexCache = new Map<string, RegExp>();

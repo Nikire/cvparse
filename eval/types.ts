@@ -85,10 +85,11 @@ export interface EntryScore {
   /** Error message when the system failed on this CV (counts as empty output). */
   error?: string;
   /**
-   * Set when the CV was not attempted because the system cannot read its format. Skipped entries
-   * are excluded from every field score (they lower coverage, not F1).
+   * Set when the CV was not attempted: the system cannot read its format, or its ground truth is
+   * still a draft (`_review.status: "draft"`, written by eval/import and not yet reviewed).
+   * Skipped entries are excluded from every field score (they lower coverage, not F1).
    */
-  skipped?: "unsupported-format";
+  skipped?: "unsupported-format" | "draft-truth";
   seconds?: number;
   fields: Partial<Record<ScoredField, FieldScore>>;
 }

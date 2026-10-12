@@ -42,6 +42,7 @@ Selection and execution:
   --limit <n>            only the first n dataset entries (subset runs go to results/partial/)
   --only <id,id>         only these entry ids (subset runs go to results/partial/)
   --concurrency <n>      CVs processed in parallel (default: 1)
+  --include-drafts       score entries whose truth is a draft (_review.status "draft"); skipped by default
   --no-cache             ignore and do not write eval/.cache/predictions
   --dataset <dir>        dataset directory (default: eval/dataset)
   --results <dir>        results directory (default: eval/results)
@@ -60,6 +61,7 @@ export interface EvalCliOptions {
   limit: number | undefined;
   only: string[] | undefined;
   concurrency: number;
+  includeDrafts: boolean;
   cache: boolean;
   datasetDir: string;
   resultsDir: string;
@@ -115,6 +117,7 @@ export function parseEvalArgs(
       limit: { type: "string" },
       only: { type: "string" },
       concurrency: { type: "string", default: "1" },
+      "include-drafts": { type: "boolean", default: false },
       "no-cache": { type: "boolean", default: false },
       dataset: { type: "string" },
       results: { type: "string" },
@@ -158,6 +161,7 @@ export function parseEvalArgs(
     limit: positiveInt(values.limit, "--limit"),
     only: only && only.length > 0 ? only : undefined,
     concurrency: positiveInt(values.concurrency, "--concurrency") ?? 1,
+    includeDrafts: values["include-drafts"],
     cache: !values["no-cache"],
     datasetDir: resolve(values.dataset ?? join(EVAL_DIR, "dataset")),
     resultsDir: resolve(values.results ?? join(EVAL_DIR, "results")),
@@ -302,6 +306,7 @@ export async function main(argv: readonly string[]): Promise<number> {
       limit: options.limit,
       only: options.only,
       concurrency: options.concurrency,
+      includeDrafts: options.includeDrafts,
       cvparseVersion: await packageVersion(),
     });
     process.stdout.write(`${formatSummary(result)}\n\nwrote ${path}\n`);

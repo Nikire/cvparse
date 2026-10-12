@@ -284,6 +284,16 @@ describe("groundResume — skills", () => {
     expect(resume.skills).toHaveLength(2);
   });
 
+  it("handles terms with a dash or slash next to punctuation (no invalid \\- escape in u-mode)", () => {
+    // "(utn) - facultad": the dash sits between a ")" and a space, so it is matched literally.
+    const name = "Universidad Tecnológica Nacional (UTN) - Facultad Regional Buenos Aires";
+    const { resume } = groundResume(
+      { skills: [{ name }, { name: "CI / CD -" }, { name: "/ops" }] },
+      `Estudios: ${name}\nHerramientas: CI / CD -, /ops`,
+    );
+    expect(resume.skills?.map((s) => s.name)).toEqual([name, "CI / CD -", "/ops"]);
+  });
+
   it("filters keywords of grouped skills and keeps the group label", () => {
     const { resume, warnings } = groundResume(
       { skills: [{ name: "Backend", keywords: ["Node.js", "Go", "PostgreSQL"] }] },

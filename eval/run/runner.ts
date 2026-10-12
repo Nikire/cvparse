@@ -164,6 +164,12 @@ export interface RunOptions {
   /** Restrict to these entry ids. */
   only?: readonly string[];
   concurrency: number;
+  /**
+   * Score entries whose truth is still a draft (`_review.status === "draft"`, written by
+   * eval/import). By default they are skipped (`skipped: "draft-truth"`) so an unreviewed
+   * model output never counts as ground truth.
+   */
+  includeDrafts?: boolean;
   /** Version of cvparse recorded in the result and in the cache key. */
   cvparseVersion: string;
   /** Overrides the file slug (default: slug of `system.info.name`). */
@@ -225,6 +231,14 @@ interface CacheRecord {
   key: string;
   seconds: number;
   prediction: Prediction;
+}
+
+/** A truth file as written by eval/import: the ground truth plus review metadata. */
+type TruthFile = GroundTruth & { _review?: { status?: string } };
+
+/** True when the truth file is a model draft that no human has reviewed yet. */
+export function isDraftTruth(truth: unknown): boolean {
+  return (truth as TruthFile | null)?._review?.status === "draft";
 }
 
 function errorMessage(error: unknown): string {
@@ -292,12 +306,24 @@ export async function runEval(
 
   const scored = await mapPool(entries, options.concurrency, async (entry, index) => {
     const prefix = `[${index + 1}/${entries.length}] ${entry.id}`;
-    const truth = await readJson<GroundTruth>(join(options.datasetDir, entry.truth));
+    const truth = await readJson<TruthFile>(join(options.datasetDir, entry.truth));
     const cachePath = join(cacheDir, `${entry.id}.json`);
     let prediction: Prediction | null = null;
     let seconds: number | undefined;
     let error: string | undefined;
     let cached = false;
+
+    if (!options.includeDrafts && isDraftTruth(truth)) {
+      const score: EntryScore = {
+        id: entry.id,
+        ok: false,
+        error: "draft truth (not reviewed; pass --include-drafts to score it)",
+        skipped: "draft-truth",
+        fields: {},
+      };
+      log(`${prefix} SKIPPED (draft truth)`);
+      return { entry, score };
+    }
 
     if (!system.supports.includes(entry.format)) {
       const score: EntryScore = {
@@ -388,9 +414,10 @@ export function formatSummary(result: RunResultFile): string {
   const lines: string[] = [];
   const failed = result.entries.filter((e) => !e.ok && !e.skipped);
   const skipped = result.entries.filter((e) => e.skipped).length;
+  const drafts = result.entries.filter((e) => e.skipped === "draft-truth").length;
   lines.push(`${result.system.name} on dataset ${result.datasetVersion}`);
   lines.push(
-    `${result.entries.length} CVs, ${result.entries.length - skipped} attempted, ${failed.length} failed`,
+    `${result.entries.length} CVs, ${result.entries.length - skipped} attempted, ${failed.length} failed${drafts > 0 ? `, ${drafts} skipped: draft truth` : ""}`,
   );
   lines.push("");
   lines.push(

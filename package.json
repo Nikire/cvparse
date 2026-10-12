@@ -84,6 +84,7 @@
     "fixtures:image": "node scripts/fixtures/make-image-fixtures.mjs",
     "eval:dataset": "tsx eval/generate/index.ts",
     "eval": "tsx eval/run/index.ts",
+    "eval:import": "tsx eval/import/index.ts",
     "eval:report": "tsx eval/report/index.ts",
     "eval:baselines:setup": "tsx eval/baselines/setup.ts"
   },
