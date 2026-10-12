@@ -26,6 +26,7 @@ function makeIo(overrides: Partial<CliIo> = {}): Captured {
     },
     readStdin: async () => "",
     checkContext: async () => null,
+    contextLength: async () => null,
     ...overrides,
   };
   return io;
@@ -149,6 +150,30 @@ describe("cli main", () => {
     });
     expect(await main([file, "--provider", "openai", "--api-key", "k"], {}, openai)).toBe(EXIT_OK);
     expect(openai.err.join("")).not.toContain("OLLAMA_CONTEXT_LENGTH");
+  });
+
+  it("passes the loaded Ollama context length to parseResume, and nothing for other providers", async () => {
+    const file = tmpFile("cv.txt", "Ana Pérez");
+    const seen: Array<number | undefined> = [];
+    const lookups: string[] = [];
+    const capture: typeof parseResume = async (input, options) => {
+      seen.push(options.contextLengthTokens);
+      return fakeParse(input, options);
+    };
+    const io = makeIo({
+      parse: capture,
+      contextLength: async (baseUrl, model) => {
+        lookups.push(`${baseUrl} ${model}`);
+        return 16384;
+      },
+    });
+    expect(await main([file], {}, io)).toBe(EXIT_OK);
+    expect(lookups).toEqual(["http://localhost:11434/v1 llama3.1"]);
+    expect(await main([file, "--provider", "openai", "--api-key", "k"], {}, io)).toBe(EXIT_OK);
+    expect(lookups).toHaveLength(1);
+    const unknown = makeIo({ parse: capture, contextLength: async () => null });
+    expect(await main([file], {}, unknown)).toBe(EXIT_OK);
+    expect(seen).toEqual([16384, undefined, undefined]);
   });
 
   describe("--extract-only", () => {

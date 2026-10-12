@@ -14,7 +14,12 @@ import type { z } from "zod";
 import { CvparseError } from "./errors.js";
 import { extractText } from "./extract/index.js";
 import { scannedPageWarning } from "./extract/messages.js";
-import { checkCoverage, groundResume } from "./normalize/grounding.js";
+import {
+  checkCoverage,
+  detectSectionSpans,
+  groundResume,
+  normalizeForMatch,
+} from "./normalize/grounding.js";
 import { detectLanguage } from "./normalize/language.js";
 import {
   dedupeResumeEntries,
@@ -55,6 +60,216 @@ export const DEFAULT_MAX_OUTPUT_TOKENS = 8192;
  * repeats), so it is only used for the retry.
  */
 export const LOOP_RETRY_FREQUENCY_PENALTY = 0.3;
+
+/**
+ * Default input budget (estimated tokens of CV text sent to the model). Fits API models with a
+ * 32k+ window; the CLI derives a tighter one for Ollama from the loaded context length.
+ */
+export const DEFAULT_INPUT_BUDGET_TOKENS = 24_000;
+
+/** Characters per token used for the budget estimate (Spanish/English prose with punctuation). */
+export const CHARS_PER_TOKEN = 3.3;
+
+/**
+ * Tokens reserved for the system prompt (~1.6k) plus the message framing when the budget is
+ * derived from a context length.
+ */
+export const INSTRUCTIONS_RESERVE_TOKENS = 2_000;
+
+/** Fraction of the budget the input is cut to on the retry after an output-limit cut. */
+export const RETRY_INPUT_FRACTION = 0.6;
+
+/** Rough token count of a text: characters / {@link CHARS_PER_TOKEN}. */
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / CHARS_PER_TOKEN);
+}
+
+/**
+ * Headings of sections dropped first when the CV exceeds the input budget: what an academic CV
+ * pads itself with and no resume field captures (publications, talks, committees, reviews...).
+ */
+const LOW_VALUE_HEADING_REGEX = new RegExp(
+  "^(?:(?:otros|otras|mis|principales|other|selected|recent)\\s+)?(?:" +
+    [
+      "publicaciones",
+      "publications",
+      "congresos",
+      "conferences",
+      "ponencias",
+      "comunicaciones",
+      "proyectos de investigacion",
+      "research projects",
+      "comites",
+      "committees",
+      "revisiones",
+      "reviews",
+      "referencias",
+      "references",
+      "intereses",
+      "interests",
+      "hobbies",
+      "otros meritos",
+      "meritos",
+      "merits",
+      "actividades academicas",
+      "academic activities",
+      "tribunales",
+      "estancias",
+      "research stays",
+    ]
+      .sort((a, b) => b.length - a.length)
+      .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|") +
+    ")(?:\\s+\\p{L}+){0,3}$",
+  "u",
+);
+
+/** `true` when a heading (as written) names a low-value section. */
+function isLowValueHeading(heading: string): boolean {
+  const line = normalizeForMatch(heading)
+    .replace(/^[^\p{L}\p{N}]+/u, "")
+    // Numbered headings: "4. Publicaciones", "4.2 Congresos", "IV. Ponencias".
+    .replace(/^(?:\d+(?:\.\d+)*|[ivx]+)[.)]?\s+/u, "")
+    .replace(/[\s:.\-–—|]+$/u, "");
+  if (line === "" || line.length > 60 || /[,;()"]/u.test(line)) return false;
+  return LOW_VALUE_HEADING_REGEX.test(line);
+}
+
+/**
+ * A single-word (or very short) low-value heading the generic detector does not know
+ * ("CONGRESOS", "Ponencias y comunicaciones"): at most four words, not a bullet.
+ */
+function isStandaloneLowValueHeading(rawLine: string): boolean {
+  const trimmed = rawLine.trim();
+  if (trimmed === "" || /^[-•*·▪◦]/u.test(trimmed)) return false;
+  if (trimmed.split(/\s+/).length > 4) return false;
+  return isLowValueHeading(trimmed);
+}
+
+/** A section of the document as the budget cut sees it: heading line to the next heading. */
+export interface InputSection {
+  /** The heading as written (trimmed, without leading bullets / trailing punctuation). */
+  heading: string;
+  /** Line index of the heading. */
+  start: number;
+  /** Line index right after the section. */
+  end: number;
+  /** Dropped first when the document exceeds the budget. */
+  lowValue: boolean;
+}
+
+/**
+ * Splits the lines of a document into sections: the spans of {@link detectSectionSpans}
+ * (generic headings included) plus standalone low-value headings it does not know. Lines before
+ * the first heading belong to no section.
+ */
+export function splitInputSections(lines: readonly string[]): InputSection[] {
+  const starts = new Map<number, string>();
+  for (const span of detectSectionSpans(lines.join("\n"), { genericHeadings: true })) {
+    starts.set(span.start, span.heading);
+  }
+  lines.forEach((line, i) => {
+    if (!starts.has(i) && isStandaloneLowValueHeading(line)) {
+      starts.set(
+        i,
+        line
+          .trim()
+          .replace(/^[^\p{L}\p{N}]+/u, "")
+          .replace(/[\s:.\-–—|]+$/u, ""),
+      );
+    }
+  });
+  const sorted = [...starts.entries()].sort(([a], [b]) => a - b);
+  return sorted.map(([start, heading], index) => ({
+    heading,
+    start,
+    end: sorted[index + 1]?.[0] ?? lines.length,
+    lowValue: isLowValueHeading(heading),
+  }));
+}
+
+/** Result of {@link fitInputToBudget}. */
+export interface InputFit {
+  /** The text to send to the model. */
+  text: string;
+  /** Estimated tokens of the original text. */
+  estimatedTokens: number;
+  /** Budget the text was fitted to. */
+  budgetTokens: number;
+  /** Headings of the sections dropped, in document order. */
+  droppedSections: string[];
+  /** `true` when the tail had to be cut after dropping every low-value section. */
+  tailCut: boolean;
+}
+
+/**
+ * Fits the document text to a token budget by section: low-value sections are dropped first
+ * (largest first, until the text fits), then the tail is cut at a line break. The lines before
+ * the first heading (name and contact details) are always kept.
+ */
+export function fitInputToBudget(text: string, budgetTokens: number): InputFit {
+  const estimatedTokens = estimateTokens(text);
+  const base = { estimatedTokens, budgetTokens, droppedSections: [], tailCut: false };
+  if (estimatedTokens <= budgetTokens) return { ...base, text };
+
+  const budgetChars = Math.floor(budgetTokens * CHARS_PER_TOKEN);
+  const lines = text.split("\n");
+  const sections = splitInputSections(lines);
+  const dropped = new Set<InputSection>();
+  let length = text.length;
+  const candidates = sections
+    .filter((section) => section.lowValue)
+    .map((section) => ({
+      section,
+      // +1 for the line break that goes with each line.
+      chars: lines.slice(section.start, section.end).reduce((n, l) => n + l.length + 1, 0),
+    }))
+    .sort((a, b) => b.chars - a.chars);
+  for (const candidate of candidates) {
+    if (length <= budgetChars) break;
+    dropped.add(candidate.section);
+    length -= candidate.chars;
+  }
+
+  let kept: string[] = [];
+  if (dropped.size === 0) {
+    kept = lines;
+  } else {
+    const droppedLines = new Set<number>();
+    for (const section of dropped) {
+      for (let i = section.start; i < section.end; i++) droppedLines.add(i);
+    }
+    kept = lines.filter((_, i) => !droppedLines.has(i));
+  }
+  let fitted = kept.join("\n").trim();
+  let tailCut = false;
+  if (fitted.length > budgetChars) {
+    const head = fitted.slice(0, budgetChars);
+    const lastBreak = head.lastIndexOf("\n");
+    fitted = (lastBreak > budgetChars / 2 ? head.slice(0, lastBreak) : head).trimEnd();
+    tailCut = true;
+  }
+  return {
+    ...base,
+    text: fitted,
+    droppedSections: sections.filter((s) => dropped.has(s)).map((s) => s.heading),
+    tailCut,
+  };
+}
+
+/** The "; dropped sections: ...; the tail was cut" part of an input-budget warning. */
+function describeFit(fit: InputFit): string {
+  const parts: string[] = [];
+  if (fit.droppedSections.length > 0) {
+    parts.push(`dropped sections: ${fit.droppedSections.join(", ")}`);
+  }
+  if (fit.tailCut) parts.push("the tail was cut");
+  return parts.join("; ");
+}
+
+function inputBudgetWarning(fit: InputFit): string {
+  return `input: the document exceeds the input budget (${fit.estimatedTokens} tokens est., budget ${fit.budgetTokens}); ${describeFit(fit)}`;
+}
 
 type Attempt = { kind: "ok"; output: unknown; warnings: string[] } | { kind: "cut"; text: string };
 
@@ -274,7 +489,20 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
       `Input is ${text.length} characters; only the first ${MAX_INPUT_CHARS} were sent to the model.`,
     );
   }
-  const cvText = text.slice(0, MAX_INPUT_CHARS);
+  const fullText = text.slice(0, MAX_INPUT_CHARS);
+
+  const maxOutputTokens = options.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
+  const budgetTokens = Math.max(
+    1,
+    options.inputBudgetTokens ??
+      (options.contextLengthTokens === undefined
+        ? DEFAULT_INPUT_BUDGET_TOKENS
+        : options.contextLengthTokens - maxOutputTokens - INSTRUCTIONS_RESERVE_TOKENS),
+  );
+  const fit = fitInputToBudget(fullText, budgetTokens);
+  if (fit.text !== fullText) warnings.push(inputBudgetWarning(fit));
+  /** The text the model reads; replaced when the retry cuts the input further. */
+  let cvText = fit.text;
 
   const language = options.language ?? "auto";
   const heuristicLanguage = language === "auto" && cvText ? detectLanguage(cvText) : null;
@@ -287,8 +515,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     referenceDate,
   });
 
-  const maxOutputTokens = options.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS;
-  const userContent =
+  const userContentFor = (text: string) =>
     images.length > 0
       ? {
           messages: [
@@ -298,7 +525,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
                 {
                   type: "text" as const,
                   text: mixed
-                    ? buildMixedVisionPrompt(cvText, mixed.textPages, mixed.imagePages)
+                    ? buildMixedVisionPrompt(text, mixed.textPages, mixed.imagePages)
                     : buildVisionPrompt(images.length),
                 },
                 ...images.map((image) => ({
@@ -310,7 +537,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
             },
           ],
         }
-      : { prompt: buildUserPrompt(cvText) };
+      : { prompt: buildUserPrompt(text) };
 
   const usage: ParseResult["usage"] = {
     inputTokens: undefined,
@@ -323,12 +550,16 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     }
   };
 
-  const attempt = async (frequencyPenalty?: number): Promise<Attempt> => {
+  const attempt = async (
+    text: string,
+    tuning: { frequencyPenalty?: number; maxOutputTokens: number } = { maxOutputTokens },
+  ): Promise<Attempt> => {
+    const { frequencyPenalty } = tuning;
     try {
       const result = await generateText({
         model: options.model,
         instructions,
-        ...userContent,
+        ...userContentFor(text),
         output: Output.object({
           // Wire format: strict-friendly JSON schema (all keys required, null allowed).
           // Validation: lenient Zod schema, so models that omit keys still pass.
@@ -346,7 +577,7 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
         abortSignal: options.abortSignal,
         maxRetries: options.maxRetries,
         temperature: options.temperature,
-        maxOutputTokens,
+        maxOutputTokens: tuning.maxOutputTokens,
         ...(frequencyPenalty === undefined ? {} : { frequencyPenalty }),
       });
       addUsage({
@@ -383,32 +614,75 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     });
 
   let raw: unknown;
-  const first = await attempt();
+  const first = await attempt(cvText);
   if (first.kind === "ok") {
     raw = first.output;
     warnings.push(...first.warnings);
   } else {
-    // Cut by the output limit. A genuinely long CV needs a higher limit (retrying would hit the
-    // same wall); a model stuck repeating itself gets one retry with a frequency penalty.
-    if (!detectRepetitionLoop(first.text)) throw lengthError(first.text);
+    // Cut by the output limit. With the input sent at the budget (within 10% of it) the cause is
+    // almost always the context window (Ollama shifts the instructions and the head of the CV
+    // out, the model degenerates into repetition), so a frequency penalty would not help: retry
+    // with less input. Only the text actually sent counts: a document cut well under the budget
+    // by the section drop does not overflow. Otherwise a genuinely long CV needs a higher limit
+    // (retrying would hit the same wall) and a model stuck repeating itself gets one retry with
+    // a frequency penalty.
+    const inputTokens = estimateTokens(cvText);
+    const atBudget = inputTokens >= budgetTokens * 0.9;
     let second: Attempt | undefined;
-    try {
-      second = await attempt(LOOP_RETRY_FREQUENCY_PENALTY);
-    } catch (error) {
-      if (options.abortSignal?.aborted) throw error;
-      // The retry failed in another way: fall back to salvaging the first output.
+    let retryWarning: string;
+    if (atBudget) {
+      const retryFit = fitInputToBudget(fullText, Math.floor(budgetTokens * RETRY_INPUT_FRACTION));
+      cvText = retryFit.text;
+      let retryMaxOutputTokens = maxOutputTokens;
+      if (options.contextLengthTokens !== undefined) {
+        const promptTokens = estimateTokens(instructions) + estimateTokens(buildUserPrompt(cvText));
+        retryMaxOutputTokens = Math.max(
+          512,
+          Math.min(maxOutputTokens, options.contextLengthTokens - promptTokens - 256),
+        );
+      }
+      const detail = describeFit(retryFit);
+      retryWarning =
+        `input: the first extraction hit the output limit with the input at the budget (${inputTokens} tokens est., budget ${budgetTokens}); ` +
+        `retried with the input cut to ${Math.round(RETRY_INPUT_FRACTION * 100)}% of the budget (${estimateTokens(cvText)} tokens est.)` +
+        (detail ? `; ${detail}` : "") +
+        (retryMaxOutputTokens !== maxOutputTokens
+          ? `; maxOutputTokens ${retryMaxOutputTokens}`
+          : "");
+      try {
+        second = await attempt(cvText, { maxOutputTokens: retryMaxOutputTokens });
+      } catch (error) {
+        if (options.abortSignal?.aborted) throw error;
+        // The retry failed in another way: fall back to salvaging the first output.
+      }
+    } else {
+      if (!detectRepetitionLoop(first.text)) throw lengthError(first.text);
+      retryWarning = `model: the first extraction got stuck repeating itself until the output limit; retried with frequencyPenalty ${LOOP_RETRY_FREQUENCY_PENALTY}.`;
+      try {
+        second = await attempt(cvText, {
+          frequencyPenalty: LOOP_RETRY_FREQUENCY_PENALTY,
+          maxOutputTokens,
+        });
+      } catch (error) {
+        if (options.abortSignal?.aborted) throw error;
+        // The retry failed in another way: fall back to salvaging the first output.
+      }
     }
     if (second?.kind === "ok") {
       raw = second.output;
-      warnings.push(
-        ...second.warnings,
-        `model: the first extraction got stuck repeating itself until the output limit; retried with frequencyPenalty ${LOOP_RETRY_FREQUENCY_PENALTY}.`,
-      );
+      warnings.push(...second.warnings, retryWarning);
     } else {
-      // Both attempts failed: keep what the model got right before it started looping.
-      const texts = second?.kind === "cut" ? [second.text, first.text] : [first.text];
+      if (atBudget) warnings.push(retryWarning);
+      // Both attempts failed: keep what the model got right before it started looping. The
+      // retry's output is tried first; grounding then runs against the text that output read.
       const salvageWarnings: string[] = [];
-      raw = salvageLoopingOutput(texts, { referenceDate, warnings: salvageWarnings });
+      if (second?.kind === "cut") {
+        raw = salvageLoopingOutput([second.text], { referenceDate, warnings: salvageWarnings });
+      }
+      if (raw === undefined) {
+        cvText = fit.text;
+        raw = salvageLoopingOutput([first.text], { referenceDate, warnings: salvageWarnings });
+      }
       if (raw === undefined) throw lengthError(first.text);
       warnings.push(
         "model: the output was cut by a repetition loop; repeated entries were removed and later sections may be missing",

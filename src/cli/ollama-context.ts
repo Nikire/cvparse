@@ -13,9 +13,14 @@ export interface ContextCheck {
   usedTokens: number;
 }
 
-type FetchLike = (
+export type FetchLike = (
   url: string,
-  init?: { signal?: AbortSignal },
+  init?: {
+    signal?: AbortSignal;
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+  },
 ) => Promise<{
   ok: boolean;
   json(): Promise<unknown>;
@@ -24,6 +29,58 @@ type FetchLike = (
 /** `http://host:11434/v1` → `http://host:11434`. */
 export function ollamaRoot(baseUrl: string): string {
   return baseUrl.replace(/\/+$/, "").replace(/\/v1$/, "");
+}
+
+/**
+ * Context length of `model` as currently loaded in the Ollama server (`GET /api/ps`), or `null`
+ * when the model is not loaded, the server does not answer or any error occurs.
+ */
+export async function ollamaContextLength(
+  baseUrl: string,
+  model: string,
+  fetchImpl: FetchLike = fetch as unknown as FetchLike,
+): Promise<number | null> {
+  try {
+    const response = await fetchImpl(`${ollamaRoot(baseUrl)}/api/ps`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!response.ok) return null;
+    const body = (await response.json()) as {
+      models?: Array<{ name?: string; model?: string; context_length?: number }>;
+    };
+    const wanted = model.includes(":") ? model : `${model}:latest`;
+    const loaded = body.models?.find((m) => m.name === wanted || m.model === wanted);
+    const contextLength = loaded?.context_length;
+    return typeof contextLength === "number" && contextLength > 0 ? contextLength : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Loads `model` into the Ollama server (an empty `POST /api/generate` only loads it; the
+ * extraction call would do the same load a moment later) and returns its context length, so the
+ * CLI can size the input before the first call. `null` on any error.
+ */
+export async function loadedOllamaContextLength(
+  baseUrl: string,
+  model: string,
+  fetchImpl: FetchLike = fetch as unknown as FetchLike,
+): Promise<number | null> {
+  const known = await ollamaContextLength(baseUrl, model, fetchImpl);
+  if (known !== null) return known;
+  try {
+    const response = await fetchImpl(`${ollamaRoot(baseUrl)}/api/generate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ model }),
+      signal: AbortSignal.timeout(120_000),
+    });
+    if (!response.ok) return null;
+  } catch {
+    return null;
+  }
+  return ollamaContextLength(baseUrl, model, fetchImpl);
 }
 
 /**
@@ -37,22 +94,9 @@ export async function checkOllamaContext(
   fetchImpl: FetchLike = fetch as unknown as FetchLike,
 ): Promise<ContextCheck | null> {
   if (!usedTokens) return null;
-  try {
-    const response = await fetchImpl(`${ollamaRoot(baseUrl)}/api/ps`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!response.ok) return null;
-    const body = (await response.json()) as {
-      models?: Array<{ name?: string; model?: string; context_length?: number }>;
-    };
-    const wanted = model.includes(":") ? model : `${model}:latest`;
-    const loaded = body.models?.find((m) => m.name === wanted || m.model === wanted);
-    const contextLength = loaded?.context_length;
-    if (!contextLength) return null;
-    return usedTokens >= contextLength * 0.9 ? { contextLength, usedTokens } : null;
-  } catch {
-    return null;
-  }
+  const contextLength = await ollamaContextLength(baseUrl, model, fetchImpl);
+  if (contextLength === null) return null;
+  return usedTokens >= contextLength * 0.9 ? { contextLength, usedTokens } : null;
 }
 
 export function contextWarning(check: ContextCheck): string {

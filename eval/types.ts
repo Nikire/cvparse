@@ -79,6 +79,20 @@ export interface FieldScore {
   support: number;
 }
 
+/** Token usage of one prediction, when the system reports it (cvparse does; baselines do not). */
+export interface PredictionUsage {
+  inputTokens?: number | undefined;
+  outputTokens?: number | undefined;
+  totalTokens?: number | undefined;
+}
+
+/** A prediction with what the system said about it: `parseResume` warnings and token usage. */
+export interface DetailedPrediction {
+  prediction: Prediction;
+  warnings?: string[] | undefined;
+  usage?: PredictionUsage | undefined;
+}
+
 export interface EntryScore {
   id: string;
   ok: boolean;
@@ -91,6 +105,12 @@ export interface EntryScore {
    */
   skipped?: "unsupported-format" | "draft-truth";
   seconds?: number;
+  /** `true` when the prediction came from the cache of an earlier run with the same key. */
+  cached?: boolean;
+  /** Warnings the system reported for this CV (cvparse: `ParseResult.warnings`). */
+  warnings?: string[];
+  /** Token usage the system reported for this CV. */
+  usage?: PredictionUsage;
   fields: Partial<Record<ScoredField, FieldScore>>;
 }
 
@@ -126,5 +146,10 @@ export interface EvalSystem {
   /** Formats the system can read; entries in other formats are skipped (see EntryScore.skipped). */
   supports: readonly DatasetFormat[];
   predict(file: string, entry: DatasetEntry): Promise<Prediction>;
+  /**
+   * Like `predict`, also returning the system's warnings and token usage. The runner prefers it
+   * when present and stores both next to the prediction (cache file and {@link EntryScore}).
+   */
+  predictDetailed?(file: string, entry: DatasetEntry): Promise<DetailedPrediction>;
   dispose?(): Promise<void>;
 }

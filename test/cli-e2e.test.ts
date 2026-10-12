@@ -83,6 +83,8 @@ function makeIo() {
       io.err.push(t);
     },
     readStdin: async () => "",
+    // The Ollama context lookup would POST /api/generate on this fake server; tested separately.
+    contextLength: async () => null,
   } satisfies CliIo & { out: string[]; err: string[] };
   return io;
 }

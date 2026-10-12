@@ -15,7 +15,7 @@ import {
   unsupportedExtensionMessage,
 } from "./args.js";
 import { createCliOcr } from "./ocr.js";
-import { checkOllamaContext, contextWarning } from "./ollama-context.js";
+import { checkOllamaContext, contextWarning, loadedOllamaContextLength } from "./ollama-context.js";
 import { createCliModel } from "./provider.js";
 
 export const EXIT_OK = 0;
@@ -32,6 +32,11 @@ export interface CliIo {
   parse?: typeof parseResume;
   /** Overridable for tests; defaults to querying the Ollama server. */
   checkContext?: typeof checkOllamaContext;
+  /**
+   * Overridable for tests; defaults to loading the model in the Ollama server and reading its
+   * context length, which sizes the input budget before the call.
+   */
+  contextLength?: typeof loadedOllamaContextLength;
 }
 
 async function readProcessStdin(): Promise<Uint8Array> {
@@ -90,6 +95,16 @@ async function run(options: RunOptions, io: CliIo): Promise<number> {
   const parse = io.parse ?? parseResume;
   // No retries in the CLI: a missing local Ollama should fail immediately instead of after ~7s.
   const ocr = await createCliOcr(options.ocr, options.ocrLanguages);
+  // Ollama serves every model with a fixed context window; knowing it lets parseResume size the
+  // CV text so prompt + output fit instead of overflowing (which makes the model loop).
+  let contextLengthTokens: number | undefined;
+  if (options.provider === "ollama") {
+    const length = await (io.contextLength ?? loadedOllamaContextLength)(
+      options.baseUrl,
+      options.model,
+    );
+    if (length !== null) contextLengthTokens = length;
+  }
   let result: Awaited<ReturnType<typeof parseResume>>;
   try {
     result = await parse(input, {
@@ -98,6 +113,7 @@ async function run(options: RunOptions, io: CliIo): Promise<number> {
       maxRetries: 0,
       ocr,
       ocrLanguages: options.ocrLanguages,
+      ...(contextLengthTokens === undefined ? {} : { contextLengthTokens }),
     });
   } finally {
     if (ocr && ocr !== "vision") await ocr.dispose?.();

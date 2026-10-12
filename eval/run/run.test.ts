@@ -162,6 +162,86 @@ describe("runEval", () => {
     expect(noCache.calls.length).toBe(2);
   });
 
+  it("never reads the cache with cache: false, and keys the cache by system name", async () => {
+    const warm = fakeSystem();
+    await runEval(warm, options());
+    expect(warm.calls).toHaveLength(2);
+    expect(existsSync(join(dir, "cache", "fake-system-test", "es-ar-001.json"))).toBe(true);
+
+    // --no-cache: live calls although a valid record exists, and the record is not touched.
+    const before = await readFile(join(dir, "cache", "fake-system-test", "es-ar-001.json"), "utf8");
+    const live = fakeSystem();
+    const { result } = await runEval(live, { ...options(), cache: false });
+    expect(live.calls.sort()).toEqual(["es-ar-001", "es-mx-002"]);
+    expect(result.cacheHits).toBe(0);
+    expect(result.entries.every((e) => e.cached === undefined)).toBe(true);
+    expect(await readFile(join(dir, "cache", "fake-system-test", "es-ar-001.json"), "utf8")).toBe(
+      before,
+    );
+    expect(formatSummary(result)).toContain("predictions: 0 cached, 2 live");
+
+    // Same cache directory (slug pinned), different --name: a different run.
+    const renamed = fakeSystem();
+    renamed.info.name = "Fake System (test) run 2";
+    const second = await runEval(renamed, { ...options(), slug: "fake-system-test" });
+    expect(renamed.calls).toHaveLength(2);
+    expect(second.result.cacheHits).toBe(0);
+    const again = fakeSystem();
+    again.info.name = "Fake System (test) run 2";
+    const third = await runEval(again, { ...options(), slug: "fake-system-test" });
+    expect(again.calls).toEqual([]);
+    expect(third.result.cacheHits).toBe(2);
+    expect(third.result.entries.every((e) => e.cached === true)).toBe(true);
+    expect(formatSummary(third.result)).toContain(
+      "2 attempted, 0 failed; predictions: 2 cached, 0 live",
+    );
+  });
+
+  it("stores the system's warnings and usage next to the prediction, in the cache too", async () => {
+    const detailed: EvalSystem & { calls: string[] } = {
+      ...fakeSystem(),
+      async predictDetailed(_file, entry) {
+        this.calls.push(entry.id);
+        return entry.id === "es-ar-001"
+          ? {
+              prediction: structuredClone(truthA),
+              warnings: [
+                "input: the document exceeds the input budget (9000 tokens est., budget 6192); dropped sections: Publicaciones",
+              ],
+              usage: { inputTokens: 6000, outputTokens: 900, totalTokens: undefined },
+            }
+          : { prediction: { basics: { name: "Luis Gomez" } }, warnings: [], usage: {} };
+      },
+    };
+    const logs: string[] = [];
+    const { result, path } = await runEval(detailed, { ...options(), log: (l) => logs.push(l) });
+    expect(detailed.calls.sort()).toEqual(["es-ar-001", "es-mx-002"]);
+    const first = result.entries.find((e) => e.id === "es-ar-001");
+    expect(first?.warnings).toEqual([expect.stringContaining("dropped sections: Publicaciones")]);
+    expect(first?.usage).toEqual({ inputTokens: 6000, outputTokens: 900 });
+    const other = result.entries.find((e) => e.id === "es-mx-002");
+    expect(other?.warnings).toBeUndefined();
+    expect(other?.usage).toBeUndefined();
+    expect(logs.some((l) => l.includes("es-ar-001") && l.includes("(1 warnings)"))).toBe(true);
+    const written = JSON.parse(await readFile(path, "utf8")) as RunResultFile;
+    expect(written.entries.find((e) => e.id === "es-ar-001")?.usage?.inputTokens).toBe(6000);
+
+    const record = JSON.parse(
+      await readFile(join(dir, "cache", "fake-system-test", "es-ar-001.json"), "utf8"),
+    ) as { prediction: unknown; warnings?: string[]; usage?: unknown };
+    expect(record.warnings).toHaveLength(1);
+    expect(record.usage).toEqual({ inputTokens: 6000, outputTokens: 900 });
+
+    // A cache hit brings the warnings and usage back.
+    const replay: EvalSystem = { ...fakeSystem(), predictDetailed: detailed.predictDetailed };
+    const cached = await runEval(replay, options());
+    const hit = cached.result.entries.find((e) => e.id === "es-ar-001");
+    expect(hit?.cached).toBe(true);
+    expect(hit?.warnings).toHaveLength(1);
+    expect(hit?.usage).toEqual({ inputTokens: 6000, outputTokens: 900 });
+    expect(cached.result.cacheHits).toBe(2);
+  });
+
   it("records a failing CV without aborting the run", async () => {
     const { result } = await runEval(fakeSystem("throw-second"), { ...options(), cache: false });
     const failed = result.entries.find((e) => e.id === "es-mx-002");

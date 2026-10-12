@@ -64,9 +64,14 @@ export interface ParseOptions {
    * Maximum number of tokens the model may generate for the extraction. Defaults to `8192`,
    * enough for long CVs (a typical one needs 1-4k). It stops a model that loops (repeating
    * entries or highlights until the HTTP client times out). When the model hits the limit:
-   * - if the output ends in a repetition loop (the same block over and over), the extraction is
-   *   retried once with a small frequency penalty (`0.3`, same temperature), adding a `model:`
-   *   warning. If the retry fails too, the looping output is salvaged: the truncated JSON is
+   * - if the text sent was at {@link ParseOptions.inputBudgetTokens} (within 10% of it), the
+   *   loop is most likely the context window overflowing, so the extraction is retried once with
+   *   the input cut to 60% of the budget (same section-based cut, no frequency penalty) and, when
+   *   {@link ParseOptions.contextLengthTokens} is known, with the output capped to what is left
+   *   of the window; an `input:` warning says so;
+   * - otherwise, if the output ends in a repetition loop (the same block over and over), the
+   *   extraction is retried once with a small frequency penalty (`0.3`, same temperature), adding
+   *   a `model:` warning. If the retry fails too, the looping output is salvaged: the truncated JSON is
    *   repaired, repeated entries are removed and the result is returned with the warning
    *   `model: the output was cut by a repetition loop; ...` (later sections may be missing;
    *   `coverage:` warnings flag them). Usage then covers both calls;
@@ -74,6 +79,27 @@ export interface ParseOptions {
    *   raise the limit for very long CVs.
    */
   maxOutputTokens?: number;
+  /**
+   * Maximum size of the CV text sent to the model, in estimated tokens (characters / 3.3).
+   * Defaults to `24_000` (fits API models), or to `contextLengthTokens - maxOutputTokens - 2_000`
+   * when {@link ParseOptions.contextLengthTokens} is given. A document over the budget is cut by
+   * section, not by characters: sections under a low-value heading (publications, conferences,
+   * talks, research projects, committees, reviews, references, interests, other merits, academic
+   * activities, examination boards, research stays) are dropped first, largest first, and only if
+   * the text still does not fit is the tail cut. The lines before the first heading (name and
+   * contact details) are always kept. Every cut adds an `input: the document exceeds the input
+   * budget (...)` warning naming the dropped sections. Without a budget, a long CV overflows a
+   * local model's context window: Ollama then drops the instructions and the head of the CV while
+   * generating and the model degenerates into repetition.
+   */
+  inputBudgetTokens?: number;
+  /**
+   * Context window of the model (prompt + output), in tokens, when known: for Ollama, the loaded
+   * context length reported by `/api/ps` (the `cvparse` CLI looks it up). Used to derive
+   * {@link ParseOptions.inputBudgetTokens} and to cap the output of the retry after an output-limit
+   * cut to what is left of the window. Optional; API models need no value.
+   */
+  contextLengthTokens?: number;
   /**
    * "Today" for resolving relative dates in the CV ("hace 3 años", "2 years ago"). It is told to
    * the model and used by the deterministic date normalizer. Defaults to `new Date()`; pin it

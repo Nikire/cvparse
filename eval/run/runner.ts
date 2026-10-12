@@ -13,10 +13,12 @@ import { aggregate, SCORED_FIELDS, scoreEntry } from "../score/index.js";
 import type {
   DatasetEntry,
   DatasetFormat,
+  DetailedPrediction,
   EntryScore,
   EvalSystem,
   GroundTruth,
   Prediction,
+  PredictionUsage,
   RunResult,
   ScoredField,
 } from "../types.js";
@@ -46,6 +48,8 @@ export type RunResultFile = RunResult & {
   attempted?: number;
   byLayout?: Record<string, SliceScore>;
   byFormat?: Partial<Record<DatasetFormat, SliceScore>>;
+  /** Attempted CVs whose prediction came from the cache instead of a live call. */
+  cacheHits?: number;
   totalSeconds?: number;
 };
 
@@ -129,9 +133,11 @@ export interface Provenance {
 }
 
 /**
- * Prediction cache key: system kind, details (minus display-only ones such as hardware and the
- * command line) and provenance. Any change to the dataset truth, the cvparse sources or commit,
- * the model (id or digest), temperature or referenceDate invalidates cached predictions.
+ * Prediction cache key: system name and kind, details (minus display-only ones such as hardware
+ * and the command line) and provenance. Any change to the dataset truth, the cvparse sources or
+ * commit, the model (id or digest), temperature or referenceDate invalidates cached predictions.
+ * The name (`--name`) acts as a nonce: runs under different names are different runs, so three
+ * named runs of the same setup measure the model's variance instead of replaying one cache.
  */
 export function cacheKey(
   system: EvalSystem,
@@ -143,7 +149,13 @@ export function cacheKey(
       .filter(([k]) => !CACHE_IGNORED_DETAILS.has(k) && !(k in provenance))
       .sort(([a], [b]) => a.localeCompare(b)),
   );
-  return JSON.stringify({ kind: system.info.kind, details, cvparseVersion, ...provenance });
+  return JSON.stringify({
+    name: system.info.name,
+    kind: system.info.kind,
+    details,
+    cvparseVersion,
+    ...provenance,
+  });
 }
 
 export interface RunOptions {
@@ -153,7 +165,10 @@ export interface RunOptions {
   resultsDir: string;
   /** Prediction cache root; predictions go to `<cacheDir>/<slug>/<id>.json`. */
   cacheDir: string;
-  /** Read and write the prediction cache. */
+  /**
+   * Read and write the prediction cache. `false` (`--no-cache`) neither reads an existing record
+   * nor writes one: every CV is a live call.
+   */
   cache: boolean;
   /** cvparse `src/` directory hashed into the cache key (default: <repo>/src). */
   srcDir?: string;
@@ -231,6 +246,28 @@ interface CacheRecord {
   key: string;
   seconds: number;
   prediction: Prediction;
+  warnings?: string[];
+  usage?: PredictionUsage;
+}
+
+/** Calls `predictDetailed` when the system has it, else wraps `predict`. */
+async function predictEntry(
+  system: EvalSystem,
+  file: string,
+  entry: DatasetEntry,
+): Promise<DetailedPrediction> {
+  if (system.predictDetailed) return system.predictDetailed(file, entry);
+  return { prediction: await system.predict(file, entry) };
+}
+
+/** Drops the `undefined` values so the usage is stored compactly (and round-trips JSON). */
+function compactUsage(usage: PredictionUsage | undefined): PredictionUsage | undefined {
+  if (!usage) return undefined;
+  const out: PredictionUsage = {};
+  for (const key of ["inputTokens", "outputTokens", "totalTokens"] as const) {
+    if (usage[key] !== undefined) out[key] = usage[key];
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 /** A truth file as written by eval/import: the ground truth plus review metadata. */
@@ -312,6 +349,8 @@ export async function runEval(
     let seconds: number | undefined;
     let error: string | undefined;
     let cached = false;
+    let warnings: string[] | undefined;
+    let usage: PredictionUsage | undefined;
 
     if (!options.includeDrafts && isDraftTruth(truth)) {
       const score: EntryScore = {
@@ -337,12 +376,15 @@ export async function runEval(
       return { entry, score };
     }
 
+    // --no-cache: never read an existing record (a run that must be live stays live).
     if (options.cache && existsSync(cachePath)) {
       try {
         const record = await readJson<CacheRecord>(cachePath);
         if (record.key === key) {
           prediction = record.prediction;
           seconds = record.seconds;
+          warnings = record.warnings;
+          usage = record.usage;
           cached = true;
         }
       } catch {
@@ -353,12 +395,16 @@ export async function runEval(
     if (!cached) {
       const t0 = performance.now();
       try {
-        const raw = await system.predict(join(options.datasetDir, entry.file), entry);
-        prediction = toGroundTruth(raw);
+        const raw = await predictEntry(system, join(options.datasetDir, entry.file), entry);
+        prediction = toGroundTruth(raw.prediction);
+        warnings = raw.warnings && raw.warnings.length > 0 ? [...raw.warnings] : undefined;
+        usage = compactUsage(raw.usage);
         seconds = (performance.now() - t0) / 1000;
         if (options.cache) {
           await mkdir(cacheDir, { recursive: true });
           const record: CacheRecord = { key, seconds, prediction };
+          if (warnings) record.warnings = warnings;
+          if (usage) record.usage = usage;
           await writeFile(cachePath, `${JSON.stringify(record, null, 2)}\n`);
         }
       } catch (e) {
@@ -371,10 +417,13 @@ export async function runEval(
     const score: EntryScore = { id: entry.id, ok: error === undefined, fields };
     if (error !== undefined) score.error = error;
     if (seconds !== undefined) score.seconds = Math.round(seconds * 1000) / 1000;
+    if (cached) score.cached = true;
+    if (warnings && warnings.length > 0) score.warnings = warnings;
+    if (usage) score.usage = usage;
     const f1 = aggregate([score]).overallF1;
-    log(
-      `${prefix} ${error ? `FAILED (${error})` : `F1 ${f1.toFixed(3)}`}${cached ? " (cached)" : seconds !== undefined ? ` ${seconds.toFixed(1)}s` : ""}`,
-    );
+    const timing = cached ? " (cached)" : seconds !== undefined ? ` ${seconds.toFixed(1)}s` : "";
+    const noted = warnings && warnings.length > 0 ? ` (${warnings.length} warnings)` : "";
+    log(`${prefix} ${error ? `FAILED (${error})` : `F1 ${f1.toFixed(3)}`}${timing}${noted}`);
     return { entry, score };
   });
 
@@ -396,6 +445,7 @@ export async function runEval(
     attempted: entryScores.filter((e) => !e.skipped).length,
     byLayout,
     byFormat,
+    cacheHits: entryScores.filter((e) => e.cached).length,
     totalSeconds: Math.round(totalSeconds * 10) / 10,
   };
   const outDir = partial ? join(options.resultsDir, "partial") : options.resultsDir;
@@ -415,9 +465,11 @@ export function formatSummary(result: RunResultFile): string {
   const failed = result.entries.filter((e) => !e.ok && !e.skipped);
   const skipped = result.entries.filter((e) => e.skipped).length;
   const drafts = result.entries.filter((e) => e.skipped === "draft-truth").length;
+  const attempted = result.entries.length - skipped;
+  const cached = result.cacheHits ?? result.entries.filter((e) => e.cached).length;
   lines.push(`${result.system.name} on dataset ${result.datasetVersion}`);
   lines.push(
-    `${result.entries.length} CVs, ${result.entries.length - skipped} attempted, ${failed.length} failed${drafts > 0 ? `, ${drafts} skipped: draft truth` : ""}`,
+    `${result.entries.length} CVs, ${attempted} attempted, ${failed.length} failed${drafts > 0 ? `, ${drafts} skipped: draft truth` : ""}; predictions: ${cached} cached, ${attempted - cached} live`,
   );
   lines.push("");
   lines.push(
