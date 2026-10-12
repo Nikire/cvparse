@@ -5,10 +5,14 @@
  * extractor that yields `TextItem`s. The algorithm is a recursive XY-cut tuned for CVs:
  *
  * 1. Look for a vertical whitespace gutter across the whole region (two columns, sidebar).
- * 2. If none, retry after peeling a few lines off the top (full-width header: name/contact)
- *    and/or the bottom (full-width footer), since those lines cross the gutter.
+ * 2. If none, retry after peeling lines off the top (full-width header: name/contact) and/or
+ *    the bottom (full-width footer), since those lines cross the gutter. A few lines may be
+ *    peeled off both ends at once; one end alone may be peeled to any depth, which is how a
+ *    single-column body followed by two short blocks side by side ("IDIOMAS" next to
+ *    "HABILIDADES") gets its bottom band split even without a vertical gap above it.
  * 3. If still none, split the region into horizontal bands at large vertical gaps and recurse.
  * 4. A region with no gutter and no gap is a leaf: group items into lines, lines into text.
+ *    Words hyphenated at a line break are joined back (`dehyphenate`).
  *
  * Trying the gutter before the bands matters: two columns that share a blank line at the same
  * height would otherwise be cut horizontally first and the columns would interleave.
@@ -76,11 +80,27 @@ const PAGE_GUTTER_MIN_WIDTH_RATIO = 0.05;
 const MIN_LINES_PER_SIDE = 2;
 /** Each side of a gutter accepted only by the page-relative floor needs this many lines. */
 const PAGE_GUTTER_MIN_LINES = 4;
-/** How many leading/trailing lines may be peeled off to find a gutter under a header/footer. */
+/**
+ * How many leading/trailing lines may be peeled off BOTH ends at once to find a gutter under a
+ * header and above a footer. One end alone may be peeled to any depth (a single-column body
+ * followed by two short blocks side by side); the other end stays within this cap.
+ */
 const MAX_PEEL_LINES = 8;
 const MAX_PEEL_RATIO = 0.4;
-/** Items with the same text closer than this (pt) are one overprinted glyph run (fake bold). */
-const OVERPRINT_TOLERANCE = 1;
+/**
+ * Items with the same text closer than this are one overprinted glyph run (fake bold, drop
+ * shadow): at least this many points, or `OVERPRINT_HEIGHT_RATIO` × the glyph height.
+ */
+const OVERPRINT_TOLERANCE = 2;
+const OVERPRINT_HEIGHT_RATIO = 0.15;
+/** A side-by-side block heading: this many letters, none lowercase... */
+const HEADING_MIN_LETTERS = 3;
+/** ...or a first line taller than the rest of its block by this factor. */
+const HEADING_HEIGHT_RATIO = 1.15;
+/** Top-aligned blocks of different length: the longer one has this many unpaired trailing lines. */
+const BLOCK_MIN_TRAILING_LINES = 2;
+/** De-hyphenation at a line break needs this many letters before the hyphen and after the break. */
+const HYPHEN_MIN_LETTERS = 3;
 /** Sides are columns when walking the items in stream order switches side at most this often. */
 const COLUMN_MAX_SWITCHES = 2;
 const COLUMN_MAX_SWITCH_RATIO = 0.1;
@@ -128,7 +148,7 @@ export function orderTextItems(items: TextItem[], page: PageSize): OrderedPage {
   };
   const blocks = cut(usable, state);
   const text = blocks
-    .map((lines) => lines.join("\n"))
+    .map((lines) => dehyphenate(lines).join("\n"))
     .filter((block) => block.length > 0)
     .join("\n\n")
     .trim();
@@ -145,27 +165,59 @@ interface CutState {
 
 /**
  * Drops items that repeat the same text at (almost) the same position: producers overprint a
- * run slightly offset to fake bold, which would otherwise render as "NOMBRENOMBRE".
+ * run slightly offset to fake bold or a drop shadow, which would otherwise render as
+ * "NOMBRENOMBRE". The offset tolerance scales with the glyph height (a shadow on a 30 pt name is
+ * offset further than one on 10 pt body text). Runs the shadow pass split differently are caught
+ * later, per line, by `renderLine`.
  */
 function dropOverprint(items: TextItem[]): TextItem[] {
   const kept: TextItem[] = [];
   const byText = new Map<string, TextItem[]>();
   for (const item of items) {
-    const same = byText.get(item.str) ?? [];
-    const duplicate = same.some(
-      (other) =>
-        Math.abs(other.x - item.x) < OVERPRINT_TOLERANCE &&
-        Math.abs(other.y - item.y) < OVERPRINT_TOLERANCE,
-    );
+    const key = item.str.trim();
+    const same = byText.get(key) ?? [];
+    const duplicate = same.some((other) => isOverprint(other, item));
     if (duplicate) {
       continue;
     }
     same.push(item);
-    byText.set(item.str, same);
+    byText.set(key, same);
     kept.push(item);
   }
   return kept;
 }
+
+/** Two items with the same text sit within the overprint tolerance of each other on both axes. */
+function isOverprint(a: TextItem, b: TextItem): boolean {
+  const tolerance = overprintTolerance(a, b);
+  return Math.abs(a.x - b.x) < tolerance && Math.abs(a.y - b.y) < tolerance;
+}
+
+function overprintTolerance(a: TextItem, b: TextItem): number {
+  return Math.max(OVERPRINT_TOLERANCE, Math.max(a.height, b.height) * OVERPRINT_HEIGHT_RATIO);
+}
+
+/**
+ * Joins a word hyphenated at a line break ("Comunica-" / "ción efectiva" -> "Comunicación
+ * efectiva"). Conservative: the fragment before the hyphen and the continuation must both be at
+ * least `HYPHEN_MIN_LETTERS` letters and the continuation must be lowercase, so "Full-" / "Stack"
+ * and "2019-" / "2020" are left alone.
+ */
+export function dehyphenate(lines: string[]): string[] {
+  const out: string[] = [];
+  for (const line of lines) {
+    const prev = out[out.length - 1];
+    if (prev !== undefined && HYPHENATED_LINE_END.test(prev) && LOWERCASE_CONTINUATION.test(line)) {
+      out[out.length - 1] = prev.slice(0, -1) + line;
+      continue;
+    }
+    out.push(line);
+  }
+  return out;
+}
+
+const HYPHENATED_LINE_END = new RegExp(`\\p{L}{${HYPHEN_MIN_LETTERS},}[-‐]$`, "u");
+const LOWERCASE_CONTINUATION = new RegExp(`^\\p{Ll}{${HYPHEN_MIN_LETTERS},}`, "u");
 
 /** Recursive XY-cut. Returns blocks (arrays of rendered lines) in reading order. */
 function cut(items: TextItem[], state: CutState): string[][] {
@@ -182,30 +234,23 @@ function cut(items: TextItem[], state: CutState): string[][] {
   }
 
   // 2. Gutter under a full-width header and/or above a full-width footer. Pairs (top, bottom)
-  //    are tried by total peeled lines, fewest first, top-heavy first within a total.
+  //    are tried by total peeled lines, fewest first, top-heavy first within a total. One end
+  //    may be peeled to any depth (a single-column body followed by two blocks side by side);
+  //    the other end stays within `maxPeel`, which bounds the search to O(lines × maxPeel).
   const maxPeel = Math.min(MAX_PEEL_LINES, Math.floor(lines.length * MAX_PEEL_RATIO));
-  for (let total = 1; total <= maxPeel * 2; total++) {
-    if (lines.length - total < MIN_LINES_PER_SIDE) {
-      break;
-    }
-    for (let top = Math.min(total, maxPeel); top >= 0; top--) {
-      const bottom = total - top;
-      if (bottom > maxPeel) {
-        break;
-      }
-      const header = lines.slice(0, top).flatMap((line) => line.items);
-      const footer = lines.slice(lines.length - bottom).flatMap((line) => line.items);
-      const rest = lines.slice(top, lines.length - bottom).flatMap((line) => line.items);
-      const split = findGutter(rest, state);
-      if (split) {
-        state.multiColumn = true;
-        return [
-          ...cut(header, state),
-          ...cut(split.left, state),
-          ...cut(split.right, state),
-          ...cut(footer, state),
-        ];
-      }
+  for (const [top, bottom] of peelCandidates(lines, maxPeel, state)) {
+    const header = lines.slice(0, top).flatMap((line) => line.items);
+    const footer = lines.slice(lines.length - bottom).flatMap((line) => line.items);
+    const rest = lines.slice(top, lines.length - bottom).flatMap((line) => line.items);
+    const split = findGutter(rest, state);
+    if (split) {
+      state.multiColumn = true;
+      return [
+        ...cut(header, state),
+        ...cut(split.left, state),
+        ...cut(split.right, state),
+        ...cut(footer, state),
+      ];
     }
   }
 
@@ -264,57 +309,9 @@ function findGutter(items: TextItem[], state: CutState): GutterSplit | undefined
     return undefined;
   }
 
-  let x0 = Number.POSITIVE_INFINITY;
-  let x1 = Number.NEGATIVE_INFINITY;
-  for (const item of items) {
-    x0 = Math.min(x0, item.x);
-    x1 = Math.max(x1, item.x + item.width);
-  }
-  const regionWidth = x1 - x0;
-  if (regionWidth <= 0) {
-    return undefined;
-  }
-
   // Merge x-intervals; the holes between merged intervals are the zero-coverage columns.
-  const intervals = items
-    .map((item) => ({ start: item.x, end: item.x + item.width }))
-    .sort((a, b) => a.start - b.start);
-  const merged: { start: number; end: number }[] = [];
-  for (const interval of intervals) {
-    const last = merged[merged.length - 1];
-    if (last && interval.start <= last.end) {
-      last.end = Math.max(last.end, interval.end);
-    } else {
-      merged.push({ ...interval });
-    }
-  }
-
-  const minWidth = Math.max(state.pageWidth * GUTTER_MIN_WIDTH_RATIO, 1);
-  const pageFloorWidth = state.pageWidth * PAGE_GUTTER_MIN_WIDTH_RATIO;
-  const minCenter = x0 + regionWidth * GUTTER_MIN_POSITION;
-  const maxCenter = x0 + regionWidth * GUTTER_MAX_POSITION;
-  const candidates: GutterCandidate[] = [];
-  for (let i = 1; i < merged.length; i++) {
-    const prev = merged[i - 1];
-    const next = merged[i];
-    if (!prev || !next) {
-      continue;
-    }
-    const width = next.start - prev.end;
-    const center = prev.end + width / 2;
-    const positioned = width >= minWidth && center >= minCenter && center <= maxCenter;
-    // A narrow sidebar leaves the gutter outside the position window relative to the text
-    // extent; a hole that is wide relative to the page is accepted anywhere, with more lines.
-    const wide = width >= pageFloorWidth;
-    if (positioned || wide) {
-      candidates.push({
-        start: prev.end,
-        end: next.start,
-        width,
-        minLines: positioned ? MIN_LINES_PER_SIDE : PAGE_GUTTER_MIN_LINES,
-      });
-    }
-  }
+  const merged = mergeIntervals(items.map((item) => ({ start: item.x, end: item.x + item.width })));
+  const candidates = gutterCandidates(merged, state);
   candidates.sort((a, b) => b.width - a.width);
 
   for (const candidate of candidates) {
@@ -334,6 +331,128 @@ function findGutter(items: TextItem[], state: CutState): GutterSplit | undefined
     return { left, right };
   }
   return undefined;
+}
+
+interface Interval {
+  start: number;
+  end: number;
+}
+
+/** Sorts intervals and merges the overlapping/touching ones. */
+function mergeIntervals(intervals: Interval[]): Interval[] {
+  const sorted = [...intervals].sort((a, b) => a.start - b.start);
+  const merged: Interval[] = [];
+  for (const interval of sorted) {
+    const last = merged[merged.length - 1];
+    if (last && interval.start <= last.end) {
+      last.end = Math.max(last.end, interval.end);
+    } else {
+      merged.push({ ...interval });
+    }
+  }
+  return merged;
+}
+
+/**
+ * Holes between merged x-intervals that may be gutters: wide enough and inside the position
+ * window of the region's extent, or wide relative to the page (narrow sidebars leave the
+ * gutter outside the window; those need more lines per side).
+ */
+function gutterCandidates(merged: Interval[], state: CutState): GutterCandidate[] {
+  const first = merged[0];
+  const last = merged[merged.length - 1];
+  if (!first || !last) {
+    return [];
+  }
+  const x0 = first.start;
+  const regionWidth = last.end - x0;
+  if (regionWidth <= 0) {
+    return [];
+  }
+  const minWidth = Math.max(state.pageWidth * GUTTER_MIN_WIDTH_RATIO, 1);
+  const pageFloorWidth = state.pageWidth * PAGE_GUTTER_MIN_WIDTH_RATIO;
+  const minCenter = x0 + regionWidth * GUTTER_MIN_POSITION;
+  const maxCenter = x0 + regionWidth * GUTTER_MAX_POSITION;
+  const candidates: GutterCandidate[] = [];
+  for (let i = 1; i < merged.length; i++) {
+    const prev = merged[i - 1];
+    const next = merged[i];
+    if (!prev || !next) {
+      continue;
+    }
+    const width = next.start - prev.end;
+    const center = prev.end + width / 2;
+    const positioned = width >= minWidth && center >= minCenter && center <= maxCenter;
+    const wide = width >= pageFloorWidth;
+    if (positioned || wide) {
+      candidates.push({
+        start: prev.end,
+        end: next.start,
+        width,
+        minLines: positioned ? MIN_LINES_PER_SIDE : PAGE_GUTTER_MIN_LINES,
+      });
+    }
+  }
+  return candidates;
+}
+
+/**
+ * (top, bottom) peel pairs worth a `findGutter` call, by total peeled lines, fewest first,
+ * top-heavy first within a total. One end may be peeled to any depth while the other stays
+ * within `maxPeel`. A pair is kept only when the x-coverage of the remaining lines leaves a hole
+ * that passes `gutterCandidates`; the coverage is accumulated incrementally per line, so a dense
+ * single-column page rejects every pair without sorting its items O(lines × maxPeel) times.
+ * A deep peel (beyond `maxPeel`) must also remove a line that crosses that hole: peeling lines
+ * that leave the hole open cannot expose a gutter the shallower pairs already rejected (a long
+ * table whose rows are all interleaved would otherwise be re-tested at every depth).
+ */
+function peelCandidates(lines: Line[], maxPeel: number, state: CutState): [number, number][] {
+  const n = lines.length;
+  const coverage = lines.map((line) =>
+    mergeIntervals(line.items.map((item) => ({ start: item.x, end: item.x + item.width }))),
+  );
+  const pairs: [number, number][] = [];
+  const consider = (top: number, bottom: number, union: Interval[], peeled: Interval[]) => {
+    if (n - bottom - top < MIN_LINES_PER_SIDE) {
+      return;
+    }
+    const holes = gutterCandidates(union, state);
+    if (holes.length === 0) {
+      return;
+    }
+    if (Math.max(top, bottom) > maxPeel && !crossesAny(peeled, holes)) {
+      return;
+    }
+    pairs.push([top, bottom]);
+  };
+
+  // rest = lines[top .. n-1-bottom]; walking `top` down (deep top) or `bottom` down (deep
+  // bottom) adds one line to the rest each step, so its coverage union grows incrementally.
+  for (let bottom = 0; bottom <= maxPeel; bottom++) {
+    let union: Interval[] = [];
+    for (let top = n - 1 - bottom; top >= 0; top--) {
+      union = mergeIntervals([...union, ...(coverage[top] ?? [])]);
+      if (top + bottom > 0) {
+        consider(top, bottom, union, coverage[top - 1] ?? []);
+      }
+    }
+  }
+  for (let top = 0; top <= maxPeel; top++) {
+    let union: Interval[] = [];
+    for (let bottom = n - 1 - top; bottom > maxPeel; bottom--) {
+      union = mergeIntervals([...union, ...(coverage[n - 1 - bottom] ?? [])]);
+      consider(top, bottom, union, coverage[n - bottom] ?? []);
+    }
+  }
+
+  return pairs.sort((a, b) => a[0] + a[1] - (b[0] + b[1]) || b[0] - a[0]);
+}
+
+/** Some interval in `intervals` overlaps some hole. */
+function crossesAny(intervals: Interval[], holes: GutterCandidate[]): boolean {
+  return intervals.some((interval) =>
+    holes.some((hole) => interval.start < hole.end && interval.end > hole.start),
+  );
 }
 
 /**
@@ -373,7 +492,55 @@ function isColumnSplit(
   if (isValueColumn(leftLines, rightLines) || isValueColumn(rightLines, leftLines)) {
     return false;
   }
+  if (looksLikeSideBySideBlocks(leftLines, rightLines)) {
+    return true;
+  }
   return looksLikeFreeTextColumns(leftLines, rightLines, gutterWidth, state.pageWidth);
+}
+
+/**
+ * Interleaved sides that are two short blocks placed side by side ("IDIOMAS" with three lines
+ * next to "HABILIDADES" with six, at the bottom of a Canva page) rather than table rows. Both
+ * blocks start on the same baseline and their first `min(lines)` lines pair up one to one; then
+ * either both open with a heading (all caps, or taller than the rest of the block: side-by-side
+ * section titles are never a table row) or the longer block runs on for at least
+ * `BLOCK_MIN_TRAILING_LINES` lines with nothing beside them. A table whose rows have multi-line
+ * cells leaves its unpaired lines BETWEEN the other side's lines, so it does not match.
+ */
+function looksLikeSideBySideBlocks(leftLines: Line[], rightLines: Line[]): boolean {
+  const paired = Math.min(leftLines.length, rightLines.length);
+  for (let i = 0; i < paired; i++) {
+    const a = leftLines[i];
+    const b = rightLines[i];
+    if (!a || !b || Math.abs(a.y - b.y) > lineTolerance(a.height, b.height)) {
+      return false;
+    }
+  }
+  if (isHeadingLine(leftLines, 0) && isHeadingLine(rightLines, 0)) {
+    return true;
+  }
+  const trailing = Math.max(leftLines.length, rightLines.length) - paired;
+  return trailing >= BLOCK_MIN_TRAILING_LINES;
+}
+
+/** Line `index` reads as a section heading of its block: all caps, or taller than the others. */
+function isHeadingLine(lines: Line[], index: number): boolean {
+  const line = lines[index];
+  if (!line) {
+    return false;
+  }
+  const text = lineText(line);
+  const letters = text.match(/\p{L}/gu) ?? [];
+  if (letters.length >= HEADING_MIN_LETTERS && !/\p{Ll}/u.test(text)) {
+    return true;
+  }
+  const others = lines.filter((_, i) => i !== index).map((other) => other.height);
+  const reference = median(others.filter((h) => h > 0));
+  return reference > 0 && line.height >= reference * HEADING_HEIGHT_RATIO;
+}
+
+function lineText(line: Line): string {
+  return line.items.map((item) => item.str).join(" ");
 }
 
 /** Number of times the side changes when walking both sides' items in stream order. */
@@ -532,17 +699,29 @@ function percentile(values: number[], p: number): number {
 /**
  * Renders a baseline line to text. Items are joined with a space when the horizontal gap is
  * wider than a third of a character; an item flagged `hasEOL` ends the output line early.
+ *
+ * A second copy of the previous item's text starting (almost) where it starts is a shadow or
+ * fake-bold pass that `dropOverprint` missed because its vertical offset was larger (still on
+ * the same baseline line) or because the producer split the run differently; it is dropped.
  */
 function renderLine(line: Line): string[] {
   const out: string[] = [];
   let parts: string[] = [];
+  const items = line.items.filter((item, i) => {
+    const prev = line.items[i - 1];
+    return !(
+      prev &&
+      prev.str.trim() === item.str.trim() &&
+      Math.abs(item.x - prev.x) < overprintTolerance(prev, item)
+    );
+  });
 
-  for (let i = 0; i < line.items.length; i++) {
-    const item = line.items[i];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
     if (!item) {
       continue;
     }
-    const prev = line.items[i - 1];
+    const prev = items[i - 1];
     if (prev) {
       const gap = item.x - (prev.x + prev.width);
       const charWidth = averageCharWidth(prev) || averageCharWidth(item) || item.height * 0.5 || 1;
@@ -551,7 +730,7 @@ function renderLine(line: Line): string[] {
       }
     }
     parts.push(item.str);
-    if (item.hasEOL && i < line.items.length - 1) {
+    if (item.hasEOL && i < items.length - 1) {
       out.push(flush(parts));
       parts = [];
     }

@@ -436,3 +436,32 @@ describe("normalizeDate: 'in progress' markers", () => {
     });
   });
 });
+
+describe("reduceDatePrecision — end-date padding (review of real CVs)", () => {
+  it("treats YYYY-12-31, YYYY-12 and the last day of a month like -01 padding", () => {
+    const text = "Analista — Acme (2018 – 2020)";
+    expect(reduceDatePrecision("2020-12-31", text)).toEqual({ value: "2020", reason: "month" });
+    expect(reduceDatePrecision("2020-12", text)).toEqual({ value: "2020", reason: "month" });
+    expect(reduceDatePrecision("2020-06-30", text)).toEqual({ value: "2020-06", reason: "day" });
+    expect(reduceDatePrecision("2020-02-29", text)).toEqual({ value: "2020-02", reason: "day" });
+    expect(reduceDatePrecision("2020-01-31", text)).toEqual({ value: "2020", reason: "month" });
+  });
+
+  it("keeps a written month or day next to the year", () => {
+    expect(reduceDatePrecision("2020-12-31", "Diciembre 2020")).toEqual({
+      value: "2020-12",
+      reason: "day",
+    });
+    expect(reduceDatePrecision("2020-12", "dic. 2020")).toBeNull();
+    expect(reduceDatePrecision("2020-12-31", "31/12/2020")).toBeNull();
+    expect(reduceDatePrecision("2020-06-30", "30 de junio de 2020")).toBeNull();
+  });
+
+  it("leaves days that are neither the first nor the last of the month alone", () => {
+    const text = "2020";
+    expect(reduceDatePrecision("2020-12-15", text)).toBeNull();
+    expect(reduceDatePrecision("2020-06-29", text)).toBeNull();
+    expect(reduceDatePrecision("2020-02-30", text)).toBeNull();
+    expect(reduceDatePrecision("2020-11", text)).toBeNull();
+  });
+});

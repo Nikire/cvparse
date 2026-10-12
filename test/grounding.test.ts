@@ -6,7 +6,11 @@ import { checkCoverage, groundResume, parseResume, type Resume } from "../src/in
 import {
   detectSectionHeadings,
   detectSectionSpans,
+  isLanguageLevel,
+  looksLikeHeadingLine,
   normalizeForMatch,
+  plausibleRecovered,
+  stripPhoneExtension,
 } from "../src/normalize/grounding.js";
 import { fakeOcrAdapter, mockModelWithObject } from "./helpers.js";
 
@@ -1153,5 +1157,367 @@ Mendoza, Argentina · Cel.: +54 9 261 543-7794 · ramiro.rossi@example.org
     expect(warnings).toContain(
       'grounding: dropped basics.location.city "Montevideo" (not found in the document)',
     );
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// Review of 23 real CVs (private set): placement, recovered values, fluency, phones
+
+describe("detectSectionSpans — headings from the real-CV review", () => {
+  it("recognizes non-standard work and education headings in Spanish and English", () => {
+    const work = [
+      "CARGOS EJERCIDOS",
+      "Cargos",
+      "Función pública",
+      "Trayectoria",
+      "Trayectoria profesional",
+      "Trayectoria laboral",
+      "Antecedentes laborales",
+      "Antecedentes profesionales",
+      "Actividad profesional",
+      "Experiencia profesional",
+      "Experiencia laboral",
+      "Historial laboral",
+      "Employment",
+      "Career",
+      "Professional background",
+      "Work history",
+      "Positions held",
+    ];
+    for (const heading of work) {
+      expect(
+        detectSectionSpans(`${heading}\nAcme — Dev`).map((s) => s.key),
+        heading,
+      ).toEqual(["work"]);
+    }
+    const education = [
+      "Formación académica",
+      "Estudios",
+      "Antecedentes académicos",
+      "Títulos",
+      "TÍTULOS OBTENIDOS",
+      "Academic background",
+    ];
+    for (const heading of education) {
+      expect(
+        detectSectionSpans(`${heading}\nUBA`).map((s) => s.key),
+        heading,
+      ).toEqual(["education"]);
+    }
+    for (const heading of ["Proyectos", "Projects", "Proyectos académicos"]) {
+      expect(
+        detectSectionSpans(`${heading}\nApp`).map((s) => s.key),
+        heading,
+      ).toEqual(["projects"]);
+    }
+  });
+
+  it("only takes a whole line for a heading, never a heading word inside an entry", () => {
+    expect(
+      detectSectionSpans("Formación Profesional, Universidad de Palermo\nEDUCACIÓN\nUBA").map(
+        (s) => [s.key, s.start],
+      ),
+    ).toEqual([["education", 1]]);
+    expect(detectSectionSpans("Instituto de Formación Profesional N°5\nUBA")).toEqual([]);
+    expect(detectSectionSpans("Experiencia y formación en ventas\nAcme")).toEqual([]);
+    // Two sections joined on one line are still a heading.
+    expect(detectSectionSpans("Courses & Certifications\nX").map((s) => s.key)).toEqual([
+      "certificates",
+    ]);
+    expect(detectSectionSpans("Habilidades e Intereses\nX").map((s) => s.key)).toEqual(["skills"]);
+    expect(detectSectionSpans("Skills & Tools\nX").map((s) => s.key)).toEqual(["skills"]);
+  });
+
+  it("ends a span at an unknown heading-like line only when asked (placement)", () => {
+    const text =
+      "EDUCACIÓN\nUBA\nOTROS ANTECEDENTES\nMinisterio — Asesor\nDatos Complementarios\nX";
+    expect(detectSectionSpans(text).map((s) => [s.key, s.start, s.end])).toEqual([
+      ["education", 0, 6],
+    ]);
+    expect(
+      detectSectionSpans(text, { genericHeadings: true }).map((s) => [s.key, s.heading, s.end]),
+    ).toEqual([
+      ["education", "EDUCACIÓN", 2],
+      ["other", "OTROS ANTECEDENTES", 4],
+      ["other", "Datos Complementarios", 6],
+    ]);
+  });
+
+  it("tells heading-like lines from names, employers, titles and sentences", () => {
+    for (const line of ["CARGOS EJERCIDOS", "OTROS DATOS DE INTERÉS", "Datos Complementarios"]) {
+      expect(looksLikeHeadingLine(line), line).toBe(true);
+    }
+    for (const line of [
+      "TELECOM ARGENTINA S.A.",
+      "UNIVERSIDAD DE BUENOS AIRES",
+      "UBA",
+      "SAP FI",
+      "Acme Staffing",
+      "Senior Developer",
+      "Jefe de Compras",
+      "Actividad Docente",
+      "Ingeniería en Sistemas",
+      "Juan Pérez Gómez de la Serna y Castro",
+      "RESUMEN 2020",
+      "Cocinar a fuego lento.",
+      "Buenos Aires, Argentina",
+      "Universidad de la República — Abogado",
+      "AB",
+    ]) {
+      expect(looksLikeHeadingLine(line), line).toBe(false);
+    }
+  });
+});
+
+describe("groundResume — placement regressions from the real-CV review", () => {
+  it("does not move a work entry written under an unknown heading that follows Education", () => {
+    const text = `EDUCACIÓN
+Universidad de la República — Abogado (2005)
+
+OTROS ANTECEDENTES
+Ministerio de Economía — Asesor Legal (2015 - 2020)
+`;
+    const { resume, warnings } = groundResume(
+      {
+        work: [{ name: "Ministerio de Economía", position: "Asesor Legal", startDate: "2015" }],
+        education: [{ institution: "Universidad de la República", studyType: "Abogado" }],
+      },
+      text,
+    );
+    expect(resume.work?.map((w) => w.name)).toEqual(["Ministerio de Economía"]);
+    expect(resume.education).toHaveLength(1);
+    expect(warnings.filter((w) => w.startsWith("placement:"))).toEqual([]);
+  });
+
+  it("keeps a work entry written under 'CARGOS EJERCIDOS' after the Education heading", () => {
+    const text = `EDUCACION
+Abogado — Universidad de la República
+CARGOS EJERCIDOS
+Ministerio de Economía — Asesor Legal (2015 - 2020)
+`;
+    const { resume, warnings } = groundResume(
+      { work: [{ name: "Ministerio de Economía", position: "Asesor Legal" }], education: [] },
+      text,
+    );
+    expect(resume.work).toHaveLength(1);
+    expect(warnings.filter((w) => w.startsWith("placement:"))).toEqual([]);
+    // And an education entry written there is moved to work, as under any experience heading.
+    const moved = groundResume(
+      { education: [{ institution: "Ministerio de Economía", studyType: "Asesor Legal" }] },
+      text,
+    );
+    expect(moved.resume.work?.[0]).toMatchObject({
+      name: "Ministerio de Economía",
+      position: "Asesor Legal",
+    });
+    expect(moved.warnings).toContain(
+      'placement: moved education[0] "Ministerio de Economía" to work (it is under the "CARGOS EJERCIDOS" heading)',
+    );
+  });
+
+  it("never moves entries of a Projects section into work", () => {
+    const text = `EXPERIENCIA
+Acme — Desarrollador (2020 - 2022)
+PROYECTOS ACADÉMICOS
+Bootcamp Final Project — App de delivery (2023)
+`;
+    const { resume, warnings } = groundResume(
+      {
+        work: [{ name: "Acme", position: "Desarrollador" }],
+        education: [{ institution: "Bootcamp Final Project", studyType: "App de delivery" }],
+        projects: [{ name: "Bootcamp Final Project" }],
+      },
+      text,
+    );
+    expect(resume.work).toHaveLength(1);
+    expect(resume.education).toHaveLength(1);
+    expect(warnings.filter((w) => w.startsWith("placement:"))).toEqual([]);
+  });
+});
+
+describe("groundResume — recovered titles and employers are gated", () => {
+  it("rejects fragments the line splitter leaves behind", () => {
+    for (const bad of [
+      ". Moreno",
+      "Categoría profesional:",
+      "de Telecomunicación",
+      "y Finanzas",
+      "of Things",
+      "Presidencia de la Nación.",
+      "AB",
+      "x".repeat(121),
+      "123 456",
+      "- - -",
+    ]) {
+      expect(plausibleRecovered(bad), bad).toBe(false);
+    }
+    for (const good of [
+      "Ingeniería de Telecomunicación",
+      "Telecom S.A.",
+      "Analista Sr.",
+      "Acme Ltda.",
+      "Jefe de Compras",
+    ]) {
+      expect(plausibleRecovered(good), good).toBe(true);
+    }
+  });
+
+  it("does not replace a degree with '. Moreno' nor a job title with a label or a tail", () => {
+    const text = `EDUCACIÓN
+Universidad de Morón . Moreno
+2010 - 2015
+Escuela Técnica Superior de Ingeniería de Telecomunicación
+Ingeniero Técnico
+2005 - 2010
+
+EXPERIENCIA
+Telefónica\tCategoría profesional:\tTécnico Superior de Telecomunicación
+Jefatura de Gabinete. Presidencia de la Nación.
+`;
+    const { resume, warnings } = groundResume(
+      {
+        education: [
+          { institution: "Universidad de Morón", studyType: "Diploma" },
+          { institution: "Escuela Técnica Superior de Ingeniería", studyType: "Grado" },
+        ],
+        work: [
+          { name: "Telefónica", position: "Ingeniero de Redes" },
+          { name: "Jefatura de Gabinete", position: "Director" },
+        ],
+      },
+      text,
+    );
+    expect(resume.education?.map((e) => e.studyType)).toEqual([null, "Ingeniero Técnico"]);
+    expect(resume.work?.map((w) => w.position)).toEqual([
+      "Técnico Superior de Telecomunicación",
+      "Director",
+    ]);
+    expect(warnings).toContain(
+      'grounding: dropped education[0].studyType "Diploma" (not found in the document)',
+    );
+    expect(warnings).toContain(
+      'grounding: work[1].position "Director" not found in the document (kept)',
+    );
+    const garbage =
+      /"\. Moreno"|"de Telecomunicación"|"Categoría profesional:"|"Presidencia de la Nación\."/;
+    expect(warnings.some((w) => garbage.test(w))).toBe(false);
+  });
+
+  it("does not take a fragment for an employer either", () => {
+    const text = `EXPERIENCIA
+Analista de Sistemas
+. Moreno
+2018 - 2020
+`;
+    const { resume } = groundResume(
+      { work: [{ name: "Analista de Sistemas", position: null }] },
+      text,
+    );
+    expect(resume.work?.[0]).toMatchObject({ name: "Analista de Sistemas", position: null });
+  });
+
+  it("recovers the employer next to the position when the name was nulled by the normalizer", () => {
+    const text = `EXPERIENCIA PROFESIONAL
+Enfermero Asistencial
+Clínica Santa Brígida — Cusco
+jun. 2022 — actualidad
+- Capacitación al personal en bioseguridad y registro clínico.
+
+Analista de Datos
+Desarrollo de reportes mensuales para la gerencia comercial de la empresa
+2018 - 2020
+`;
+    const { resume, warnings } = groundResume(
+      {
+        work: [
+          { name: null, position: "Enfermero Asistencial" },
+          // The only candidate is a sentence: not taken as an employer.
+          { name: null, position: "Analista de Datos" },
+        ],
+      },
+      text,
+    );
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Clínica Santa Brígida", "Enfermero Asistencial"],
+      [null, "Analista de Datos"],
+    ]);
+    expect(warnings).toContain(
+      'grounding: work[0].name was empty; set it to the employer "Clínica Santa Brígida" written next to the position "Enfermero Asistencial"',
+    );
+  });
+});
+
+describe("groundResume — fluency must be a language level", () => {
+  it("tells levels from sentences", () => {
+    for (const level of [
+      "C1",
+      "B2+",
+      "Native",
+      "nativo",
+      "Nivel avanzado",
+      "lectura técnica",
+      "Intermedio alto",
+      "Native or bilingual proficiency",
+      "Profesional",
+      "C1 - Advanced",
+      "Bilingüe",
+      "Conversacional",
+    ]) {
+      expect(isLanguageLevel(level), level).toBe(true);
+    }
+    for (const text of [
+      "Certificación avalada por Cambridge",
+      "Curso en el Instituto Británico",
+      "Cambridge",
+      "Certificado First Certificate in English del año 2015",
+    ]) {
+      expect(isLanguageLevel(text), text).toBe(false);
+    }
+  });
+
+  it("sets a fluency that is not a level to null even when it is written next to the language", () => {
+    const text = "IDIOMAS\nInglés: Certificación avalada por Cambridge\nPortugués - avanzado\n";
+    const { resume, warnings } = groundResume(
+      {
+        languages: [
+          { language: "Inglés", fluency: "Certificación avalada por Cambridge" },
+          { language: "Portugués", fluency: "avanzado" },
+        ],
+      },
+      text,
+    );
+    expect(resume.languages?.map((l) => l.fluency)).toEqual([null, "avanzado"]);
+    expect(warnings).toContain(
+      'grounding: dropped languages[0].fluency "Certificación avalada por Cambridge" (not a language level)',
+    );
+  });
+
+  it("prefers the level written after the language over a non-level value", () => {
+    const { resume } = groundResume(
+      { languages: [{ language: "Inglés", fluency: "Certificación avalada por Cambridge" }] },
+      "Inglés (C1) — Certificación avalada por Cambridge",
+    );
+    expect(resume.languages?.[0]?.fluency).toBe("C1");
+  });
+});
+
+describe("groundResume — phones with an extension", () => {
+  it("keeps a phone whose extension stops the digit run in the document", () => {
+    const text = "Juan Pérez\nTel: +54 11 4127-7100 int 5045\njuan@example.com";
+    for (const phone of [
+      "+54 11 4127-7100 int 5045",
+      "+54 11 4127-7100",
+      "11 4127-7100 interno 5045",
+      "+54 11 4127-7100 ext. 5045",
+    ]) {
+      const { resume, warnings } = groundResume({ basics: { phone } }, text);
+      expect(resume.basics?.phone, phone).toBe(phone);
+      expect(warnings, phone).toEqual([]);
+    }
+    expect(stripPhoneExtension("+54 11 4127-7100 int 5045")).toBe("+54 11 4127-7100");
+    expect(stripPhoneExtension("+54 11 4127-7100")).toBe("+54 11 4127-7100");
+    // A different main number is still dropped.
+    const other = groundResume({ basics: { phone: "+54 11 4127-7101 int 5045" } }, text);
+    expect(other.resume.basics?.phone).toBeNull();
   });
 });

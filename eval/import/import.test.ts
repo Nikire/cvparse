@@ -13,11 +13,13 @@ import {
   formatImportSummary,
   idPrefix,
   manifestLayout,
+  notCvReason,
   type PrivateDatasetEntry,
   parseImportArgs,
   parseInboxName,
   rejectReason,
   runImport,
+  SUSPECT_NOT_CV_TAG,
   toDraftTruth,
 } from "./index.js";
 
@@ -394,5 +396,72 @@ describe("runEval with draft truths", () => {
     expect(sys.calls).toEqual(["a-xx-001", "a-xx-002"]);
     expect(result.entries.every((e) => e.ok && !e.skipped)).toBe(true);
     expect(result.attempted).toBe(2);
+  });
+});
+
+describe("notCvReason", () => {
+  it("flags text without contact data, dates or a CV heading", () => {
+    expect(
+      notCvReason("Receta de locro\nIngredientes: maíz, zapallo, carne.\nCocinar 3 horas."),
+    ).toMatch(/no email, no phone number, no date and no experience\/education heading/);
+    expect(
+      notCvReason("Certificado\nSe deja constancia de que la persona aprobó el curso en 2019."),
+    ).toMatch(/only one date/);
+  });
+
+  it("accepts text with any one CV signal", () => {
+    expect(notCvReason("Contacto: ana@example.com")).toBeUndefined();
+    expect(notCvReason("Tel: +54 11 4127-7100")).toBeUndefined();
+    expect(notCvReason("Analista, 2018 - 2020")).toBeUndefined();
+    expect(notCvReason("EXPERIENCIA LABORAL\nAcme")).toBeUndefined();
+    expect(notCvReason("Cargos ejercidos\nMinisterio")).toBeUndefined();
+    expect(notCvReason("Work Experience:\nAcme")).toBeUndefined();
+  });
+});
+
+describe("runImport — documents that are not CVs", () => {
+  let dir: string;
+  beforeEach(async () => {
+    dir = await mkdtemp(join(tmpdir(), "cvparse-import-notcv-"));
+    await mkdir(join(dir, "inbox"), { recursive: true });
+    await writeFile(join(dir, "inbox", "consent-cv.txt"), CV_TEXT);
+    await writeFile(
+      join(dir, "inbox", "fake-recipe.txt"),
+      "Receta de locro\n\nIngredientes: maíz blanco, zapallo, carne y chorizo colorado.\nCocinar a fuego lento durante tres horas y servir con salsa picante.\n",
+    );
+  });
+  afterEach(async () => {
+    await rm(dir, { recursive: true, force: true });
+  });
+
+  it("tags the manifest entry, notes it in the draft truth and warns", async () => {
+    const log: string[] = [];
+    const files = await runImport({
+      datasetDir: dir,
+      model: mockModelWithObject(MODEL_OUTPUT),
+      modelName: "fake-model",
+      log: (l) => log.push(l),
+    });
+    const recipe = files.find((f) => f.originalName === "fake-recipe.txt");
+    const cv = files.find((f) => f.originalName === "consent-cv.txt");
+    expect(recipe?.status).toBe("imported");
+    expect(recipe?.suspect).toMatch(/no email/);
+    expect(cv?.suspect).toBeUndefined();
+    expect(log.some((l) => /WARNING: does not look like a CV/.test(l))).toBe(true);
+
+    const manifest = JSON.parse(
+      await readFile(join(dir, "manifest.json"), "utf8"),
+    ) as PrivateDatasetEntry[];
+    const entry = manifest.find((e) => e.originalName === "fake-recipe.txt");
+    expect(entry?.tags).toContain(SUSPECT_NOT_CV_TAG);
+    expect(manifest.find((e) => e.originalName === "consent-cv.txt")?.tags).not.toContain(
+      SUSPECT_NOT_CV_TAG,
+    );
+    const truth = JSON.parse(
+      await readFile(join(dir, entry?.truth as string), "utf8"),
+    ) as DraftTruth;
+    expect(truth._review.status).toBe("draft");
+    expect(truth._review.warnings[0]).toMatch(/^import: does not look like a CV/);
+    expect(formatImportSummary(files)).toContain(`[${SUSPECT_NOT_CV_TAG}]`);
   });
 });

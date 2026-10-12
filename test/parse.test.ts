@@ -1,7 +1,7 @@
 import { APICallError, RetryError } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, it } from "vitest";
-import { CvparseError, parseResume, ResumeSchema } from "../src/index.js";
+import { buildSystemPrompt, CvparseError, parseResume, ResumeSchema } from "../src/index.js";
 import { DEFAULT_MAX_OUTPUT_TOKENS, LOOP_RETRY_FREQUENCY_PENALTY } from "../src/parse.js";
 import {
   fixture,
@@ -341,5 +341,27 @@ describe("parseResume", () => {
     expect((error as CvparseError).code).toBe("NO_OBJECT_GENERATED");
     expect((error as CvparseError).message).toContain("hit the output limit");
     expect(model.doGenerateCalls).toHaveLength(2);
+  });
+});
+
+describe("buildSystemPrompt — no concrete example values to copy (review of real CVs)", () => {
+  it("describes formats abstractly and marks the remaining examples as illustrative", () => {
+    const prompt = buildSystemPrompt({ language: "auto", detectedLanguage: "es" });
+    for (const leaked of [
+      "Ciudad Autónoma de Buenos Aires",
+      "Ciudad de México",
+      "Antioquia",
+      "+54 for Argentina",
+      "+52",
+      "Node.js",
+      "PostgreSQL",
+      "English (C1)",
+      "Two email addresses found",
+    ]) {
+      expect(prompt, leaked).not.toContain(leaked);
+    }
+    expect(prompt).toContain("illustrative only");
+    expect(prompt).toContain("exactly as written");
+    expect(prompt).toContain("Do not add a country code the CV does not write");
   });
 });

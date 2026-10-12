@@ -19,6 +19,7 @@ import { detectLanguage } from "./normalize/language.js";
 import {
   dedupeResumeEntries,
   detectRepetitionLoop,
+  pruneSalvagedEntries,
   repairTruncatedJson,
 } from "./normalize/repetition.js";
 import { normalizeResume } from "./normalize/resume.js";
@@ -62,14 +63,23 @@ type Attempt = { kind: "ok"; output: unknown; warnings: string[] } | { kind: "cu
  * removes the repeated (identical or near-identical) entries and checks the extraction schema.
  * Tries each text in order; returns `undefined` when none can be recovered.
  */
-export function salvageLoopingOutput(texts: readonly string[]): unknown {
+export function salvageLoopingOutput(
+  texts: readonly string[],
+  options: { referenceDate?: Date | undefined; warnings?: string[] | undefined } = {},
+): unknown {
   for (const text of texts) {
     const repaired = repairTruncatedJson(text);
     if (!repaired) continue;
     // No per-section warnings: the salvage warning already says repeated entries were removed.
     dedupeResumeEntries(repaired, { similar: true });
+    // What the loop fabricated and the identity check cannot catch: implausible dates, entries
+    // drifting their dates in a fixed step, endless arrays.
+    const pruned = pruneSalvagedEntries(repaired, options.referenceDate);
     const parsed = ResumeExtractionSchema.safeParse(repaired);
-    if (parsed.success) return parsed.data;
+    if (parsed.success) {
+      options.warnings?.push(...pruned);
+      return parsed.data;
+    }
   }
   return undefined;
 }
@@ -397,10 +407,12 @@ export async function parseResume(input: ResumeInput, options: ParseOptions): Pr
     } else {
       // Both attempts failed: keep what the model got right before it started looping.
       const texts = second?.kind === "cut" ? [second.text, first.text] : [first.text];
-      raw = salvageLoopingOutput(texts);
+      const salvageWarnings: string[] = [];
+      raw = salvageLoopingOutput(texts, { referenceDate, warnings: salvageWarnings });
       if (raw === undefined) throw lengthError(first.text);
       warnings.push(
         "model: the output was cut by a repetition loop; repeated entries were removed and later sections may be missing",
+        ...salvageWarnings,
       );
     }
   }

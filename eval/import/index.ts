@@ -219,6 +219,32 @@ export function parseLanguageFor(language: ManifestLanguage): ParseLanguage {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Non-CV detection
+
+/** Manifest tag for a document that does not read as a CV. */
+export const SUSPECT_NOT_CV_TAG = "suspect-not-cv";
+
+const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/u;
+const PHONE_RUN = /\+?\(?\d[\d\s().\-/]{5,}\d/u;
+/** A year, a month/year or a day/month/year, each a separate token ("2019", "03/2020", "15-03-2020"). */
+const DATE_TOKEN = /(?<!\d)(?:\d{1,2}[/.-])?(?:\d{1,2}[/.-])?(?:19[5-9]\d|20\d\d)(?!\d)/gu;
+const SECTION_HEADING =
+  /^\s*[^\p{L}\p{N}]*(?:experiencia(?:\s+(?:laboral|profesional))?|empleos?|trayectoria(?:\s+(?:laboral|profesional))?|antecedentes\s+(?:laborales|profesionales)|cargos(?:\s+ejercidos)?|historial\s+laboral|(?:work|professional)?\s*experience|employment(?:\s+history)?|work\s+history|career|educaci[oó]n|formaci[oó]n(?:\s+acad[eé]mica)?|estudios|antecedentes\s+acad[eé]micos|t[ií]tulos|education|academic\s+background)\s*:?\s*$/imu;
+
+/**
+ * Why the extracted text does not read as a CV, or `undefined` when it does. A CV has at least
+ * one of: an email, a phone-like digit run, two or more date-like tokens, an experience /
+ * education heading. A document with none of them (a cover letter, a certificate, a form) is
+ * imported anyway, but flagged for review.
+ */
+export function notCvReason(text: string): string | undefined {
+  if (EMAIL.test(text) || PHONE_RUN.test(text)) return undefined;
+  const dates = text.match(DATE_TOKEN)?.length ?? 0;
+  if (dates >= 2 || SECTION_HEADING.test(text)) return undefined;
+  return `no email, no phone number, ${dates === 0 ? "no" : "only one"} date and no experience/education heading in the text`;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Truth and manifest shapes
 
 export interface TruthReview {
@@ -330,6 +356,8 @@ export interface ImportedFile {
   seconds?: number;
   /** Number of parse warnings recorded in the draft. */
   warnings?: number;
+  /** Set when the text does not read as a CV (see {@link notCvReason}); the entry is tagged. */
+  suspect?: string;
 }
 
 async function readManifest(path: string): Promise<PrivateDatasetEntry[]> {
@@ -463,6 +491,13 @@ export async function runImport(options: ImportOptions): Promise<ImportedFile[]>
       const layout = manifestLayout(doc);
       const language = detectManifestLanguage(doc.text);
       Object.assign(base, { layout, language });
+      const suspect = notCvReason(doc.text);
+      if (suspect) {
+        base.suspect = suspect;
+        log(
+          `${prefix} WARNING: does not look like a CV (${suspect}); tagged "${SUSPECT_NOT_CV_TAG}"`,
+        );
+      }
       if (options.dryRun) return { ...base, status: "dry-run" as const };
 
       await writeFile(join(datasetDir, "text", `${item.id}.txt`), doc.text);
@@ -484,7 +519,13 @@ export async function runImport(options: ImportOptions): Promise<ImportedFile[]>
           maxRetries: 1,
         });
         base.seconds = Math.round((performance.now() - t0) / 100) / 10;
-        const warnings = [...doc.warnings.map((w) => `extract: ${w}`), ...result.warnings];
+        const warnings = [
+          ...(suspect
+            ? [`import: does not look like a CV (${suspect}); review before scoring`]
+            : []),
+          ...doc.warnings.map((w) => `extract: ${w}`),
+          ...result.warnings,
+        ];
         base.warnings = warnings.length;
         await writeJson(
           truthPath,
@@ -498,6 +539,7 @@ export async function runImport(options: ImportOptions): Promise<ImportedFile[]>
       const tags = [...(real ? ["real"] : []), item.parsed.source];
       if (layout === "scanned") tags.push("ocr");
       if (layout === "two-column") tags.push("two-columns");
+      if (suspect) tags.push(SUSPECT_NOT_CV_TAG);
       await appendEntry({
         id: item.id,
         country: item.parsed.cc.toUpperCase(),
@@ -591,7 +633,7 @@ export function formatImportSummary(files: readonly ImportedFile[]): string {
     f.format ?? "-",
     f.layout ?? "-",
     f.language ?? "-",
-    f.status + (f.error ? ` (${f.error})` : ""),
+    f.status + (f.error ? ` (${f.error})` : "") + (f.suspect ? ` [${SUSPECT_NOT_CV_TAG}]` : ""),
   ]);
   const header = ["id", "original name", "format", "layout", "language", "status"];
   const widths = header.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i]?.length ?? 0)));

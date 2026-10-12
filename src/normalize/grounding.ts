@@ -174,13 +174,30 @@ interface Source {
   original: string;
 }
 
+/** An extension written after a phone number: "int 5045", "int. 5045", "interno 5045", "ext. 12", "x12". */
+const PHONE_EXTENSION =
+  /\s*(?:[,;(]\s*)?(?:int\.?|interno|ext\.?|extension|extensi[oó]n|x)\s*\.?\s*\d{1,6}\)?\s*$/iu;
+
+/** A phone-like span, optionally followed by an extension. */
+const PHONE_SPAN =
+  /\+?\(?\d[\d\s().\-/]{4,}\d(?:\s*(?:[,;(]\s*)?(?:int\.?|interno|ext\.?|extension|extensi[oó]n|x)\s*\.?\s*\d{1,6}\)?)?/giu;
+
+/** The phone without its extension ("+54 11 4127-7100 int 5045" -> "+54 11 4127-7100"). */
+export function stripPhoneExtension(value: string): string {
+  const main = value.replace(PHONE_EXTENSION, "").trim();
+  return main.replace(/\D/g, "").length >= 5 ? main : value.trim();
+}
+
 function buildSource(sourceText: string): Source {
   const text = normalizeForMatch(sourceText);
   const urls = text.replace(/\bhttps?:\/\//g, "").replace(/\bwww\./g, "");
   const digitRuns: string[] = [];
-  for (const match of sourceText.matchAll(/\+?\(?\d[\d\s().\-/]{4,}\d/g)) {
-    const digits = match[0].replace(/\D/g, "");
-    if (digits.length >= 5) digitRuns.push(digits);
+  for (const match of sourceText.matchAll(PHONE_SPAN)) {
+    // Both the main number and the full span (extension included) ground a phone.
+    for (const span of new Set([stripPhoneExtension(match[0]), match[0]])) {
+      const digits = span.replace(/\D/g, "");
+      if (digits.length >= 5) digitRuns.push(digits);
+    }
   }
   return {
     text,
@@ -223,7 +240,8 @@ function commonSuffixLength(a: string, b: string): number {
  * (the model may add a country code or drop a trunk prefix). Short numbers must match whole.
  */
 function phoneGrounded(src: Source, value: string): boolean {
-  const digits = value.replace(/\D/g, "");
+  // Compared on the main number: an extension ("int 5045") is not part of the digit run.
+  const digits = stripPhoneExtension(value).replace(/\D/g, "");
   if (digits.length === 0) return false;
   const needed = Math.min(7, digits.length);
   return src.digitRuns.some(
@@ -449,6 +467,79 @@ function leadingLevel(text: string): string | null {
   return written === "" ? null : written;
 }
 
+/**
+ * Words (normalized) that describe a language level besides {@link LEVEL_WORDS}: qualifiers a CV
+ * adds around the level ("nivel avanzado", "lectura técnica", "inglés profesional").
+ */
+const LEVEL_CONTEXT_WORDS = [
+  "nivel",
+  "level",
+  "profesional",
+  "professional",
+  "tecnico",
+  "tecnica",
+  "technical",
+  "lectura",
+  "lectura tecnica",
+  "comprension",
+  "escritura",
+  "escrito",
+  "oral",
+  "hablado",
+  "reading",
+  "writing",
+  "speaking",
+  "listening",
+  "spoken",
+  "written",
+  "medio",
+  "media",
+  "alto",
+  "alta",
+  "bajo",
+  "baja",
+  "bueno",
+  "buena",
+  "buen",
+  "muy bueno",
+  "good",
+  "excelente",
+  "excellent",
+  "dominio",
+  "competente",
+  "competent",
+  "limited",
+  "limitado",
+  "working",
+  "proficiency",
+  "mother tongue",
+  "lengua materna",
+  "regular",
+  "notions",
+  "nociones",
+  "escolar",
+  "en curso",
+  "cursando",
+] as const;
+
+const CEFR_CODE = /(?<![\p{L}\p{N}])[abc][12]\+?(?![\p{L}\p{N}])/u;
+
+/**
+ * `true` when `value` reads as a language level: a CEFR code, a level word ("nativo", "C1 -
+ * Advanced"), or a phrase of at most 4 words that contains one ("nivel avanzado", "lectura
+ * técnica"). Rules out sentences the model copied from a certificate or a course description
+ * ("Certificación avalada por...").
+ */
+export function isLanguageLevel(value: string): boolean {
+  const norm = normalizeForMatch(value)
+    .replace(/[()[\].,;:/\\|-]+/gu, " ")
+    .trim();
+  if (norm === "") return false;
+  if (norm.split(/\s+/).length > 4) return false;
+  if (CEFR_CODE.test(norm)) return true;
+  return [...LEVEL_WORDS, ...LEVEL_CONTEXT_WORDS].some((w) => hasTerm(norm, w));
+}
+
 interface LevelEvidence {
   /** Level written right after the language name, as written. */
   written: string | null;
@@ -506,11 +597,18 @@ function groundFluency(
   const fluency = str(entry.fluency);
   if (!language || !fluency) return;
   const { written, verbatim } = levelEvidence(src, language, fluency);
+  const levelLike = isLanguageLevel(fluency);
   if (written !== null) {
     const fluencyNorm = normalizeForMatch(fluency);
-    if (hasTerm(normalizeForMatch(written), fluencyNorm)) return;
+    if (levelLike && hasTerm(normalizeForMatch(written), fluencyNorm)) return;
     entry.fluency = written;
     warnings.push(`grounding: ${path} "${fluency}" replaced by "${written}" as written`);
+    return;
+  }
+  if (!levelLike) {
+    // "Certificación avalada por..." is text from the document, but not a level.
+    entry.fluency = null;
+    warnings.push(dropped(path, fluency, "not a language level"));
     return;
   }
   if (verbatim) return;
@@ -917,9 +1015,65 @@ function isPlaceName(norm: string): boolean {
   return Object.values(COUNTRY_NAMES).some((names) => names.includes(norm));
 }
 
+/** Function words a title or employer never starts with ("de Telecomunicación", "y Finanzas"). */
+const FRAGMENT_LEADERS = new Set([
+  "de",
+  "del",
+  "la",
+  "las",
+  "los",
+  "el",
+  "en",
+  "por",
+  "para",
+  "con",
+  "sin",
+  "a",
+  "al",
+  "y",
+  "e",
+  "o",
+  "u",
+  "ni",
+  "que",
+  "of",
+  "at",
+  "for",
+  "in",
+  "on",
+  "by",
+  "to",
+  "with",
+  "and",
+  "or",
+  "the",
+  "&",
+]);
+
+/**
+ * `true` when a part of a line recovered from the document can stand as a title or an employer.
+ * Rejects what the line splitter leaves behind: a fragment that starts with punctuation
+ * (". Moreno"), a label ("Categoría profesional:"), a preposition-led tail ("de
+ * Telecomunicación"), a sentence end ("Presidencia de la Nación."), anything shorter than 3 or
+ * longer than 120 characters, or with no token that starts with a letter.
+ */
+export function plausibleRecovered(part: string): boolean {
+  const text = part.trim();
+  if (text.length < 3 || text.length > 120) return false;
+  if (/^[\p{P}\p{S}]/u.test(text) || text.endsWith(":")) return false;
+  const tokens = text.split(/\s+/);
+  if (!tokens.some((t) => /^\p{L}/u.test(t))) return false;
+  if (FRAGMENT_LEADERS.has(normalizeForMatch(tokens[0] ?? ""))) return false;
+  // A word of 4+ letters followed by a period is a sentence end, not an abbreviation ("S.A.",
+  // "Inc.", "Sr.").
+  if (/\p{L}{4,}\.$/u.test(text) && !looksLikeOrganization(text)) return false;
+  return true;
+}
+
 /** A part of an entry line that can be a title: has letters, no digits, is not a date word or a place. */
 function titleCandidate(part: string, exclude: readonly string[]): boolean {
   if (!/\p{L}{2,}/u.test(part) || /\d/.test(part) || part.length > 100) return false;
+  if (!plausibleRecovered(part)) return false;
   // Acronyms are the organization's short name ("Universidad de Buenos Aires (UBA)").
   if (/^[\p{Lu}.&]{2,8}$/u.test(part)) return false;
   const norm = normalizeForMatch(part);
@@ -973,6 +1127,7 @@ export function recoverTitleNearOrg(
 /** A part of an entry line that can be an employer: like a title, but acronyms are fine. */
 function orgCandidate(part: string, exclude: readonly string[]): boolean {
   if (!/\p{L}{2,}/u.test(part) || /\d/.test(part) || part.length > 100) return false;
+  if (!plausibleRecovered(part)) return false;
   const norm = normalizeForMatch(part);
   if (exclude.includes(norm) || isPlaceName(norm) || WORK_MODES.has(norm)) return false;
   if (normalizeDate(part).current) return false;
@@ -1063,17 +1218,25 @@ function recoverEmployers(
   resume.work.forEach((entry, i) => {
     if (!isRecord(entry)) return;
     const name = str(entry.name);
-    if (!name) return;
     const position = str(entry.position);
-    if (position && normalizeForMatch(position) !== normalizeForMatch(name)) return;
-    const nameNorm = normalizeForMatch(name);
+    // The title to search next to: the name (position empty or equal to it), or the position
+    // when the employer is missing (the normalizer nulls a name that equals the position).
+    const title = name ?? position;
+    if (!title) return;
+    if (name && position && normalizeForMatch(position) !== normalizeForMatch(name)) return;
+    const titleNorm = normalizeForMatch(title);
     const titleLike =
-      looksLikeJobTitle(name) ||
-      (labelNorm !== "" && !looksLikeOrganization(name) && hasTerm(nameNorm, labelNorm));
+      looksLikeJobTitle(title) ||
+      (labelNorm !== "" && !looksLikeOrganization(title) && hasTerm(titleNorm, labelNorm));
     if (!titleLike) return;
-    const org = recoverOrgNearTitle(src.original, name, exclude, within);
-    if (!org || normalizeForMatch(org) === nameNorm) {
-      if (!position) {
+    const org = recoverOrgNearTitle(src.original, title, exclude, within);
+    // Without a name to replace, only a clear employer is taken: a short name, or one of up to
+    // 8 words with an organization marker (a sentence from the role's description is neither).
+    const orgWords = org?.split(/\s+/).length ?? 0;
+    const clearOrg =
+      org !== null && (orgWords <= 4 || (orgWords <= 8 && looksLikeOrganization(org)));
+    if (!org || normalizeForMatch(org) === titleNorm || (!name && !clearOrg)) {
+      if (name && !position) {
         warnings.push(
           `grounding: work[${i}].name "${name}" looks like a job title and position is empty; no employer found next to it (kept)`,
         );
@@ -1089,7 +1252,9 @@ function recoverEmployers(
       entry.location = rest.length > 0 ? rest.join(", ") : null;
     }
     warnings.push(
-      `grounding: work[${i}].name "${name}" is the job title; set position to it and name to the employer "${org}" as written`,
+      name
+        ? `grounding: work[${i}].name "${name}" is the job title; set position to it and name to the employer "${org}" as written`
+        : `grounding: work[${i}].name was empty; set it to the employer "${org}" written next to the position "${title}"`,
     );
   });
 }
@@ -1225,11 +1390,16 @@ function moveWarning(from: string, index: number, org: string, to: string, headi
  * the heading is Courses / Certifications (name = position, issuer = name); an `education[]` entry
  * whose institution only appears under an Experience heading becomes a `work[]` entry. Moved
  * entries fill an existing entry of the same organization (or an empty shell) instead of
- * duplicating it. Does nothing when the document has no recognizable headings.
+ * duplicating it. A section ends at the next heading, known or merely heading-like
+ * ({@link looksLikeHeadingLine}): an entry under "CARGOS EJERCIDOS" after "Educación" is not
+ * under Educación. Entries under a Projects heading are never moved. Does nothing when the
+ * document has no recognizable headings.
  */
 function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
-  const spans = detectSectionSpans(src.original);
-  if (spans.length === 0) return;
+  // Unknown heading-like lines end spans too: an entry under "CARGOS EJERCIDOS" written after
+  // the Education heading is not under Education, even if cvparse does not know that heading.
+  const spans = detectSectionSpans(src.original, { genericHeadings: true });
+  if (spans.length === 0 || spans.every((s) => s.key === "other")) return;
   const record = resume as Record<string, unknown>;
   const listOf = (key: PlacementTarget): unknown[] => {
     if (!Array.isArray(record[key])) record[key] = [];
@@ -1309,6 +1479,13 @@ function fixPlacement(resume: Resume, src: Source, warnings: string[]): void {
  * `placement:` warnings. Both sides are compared after NFKC, diacritic
  * stripping, lowercasing and whitespace collapsing.
  *
+ * Values recovered from the document (titles, employers) must pass {@link plausibleRecovered}:
+ * fragments left by the line splitter (". Moreno", "de Telecomunicación", "Categoría
+ * profesional:") are never written into the resume. A fluency that is not a language level
+ * ({@link isLanguageLevel}) is set to null even when the document writes it next to the language.
+ * Phones are compared on their main number, so an extension ("int 5045") written in the document
+ * or by the model does not drop them.
+ *
  * Only meaningful when the model saw the same text: skip it when the CV was sent as images.
  * Returns a new object; the input is not mutated.
  */
@@ -1367,12 +1544,27 @@ const HEADINGS: readonly HeadingRule[] = [
       "work history",
       "employment history",
       "employment",
+      "career",
+      "career history",
+      "professional background",
+      "positions held",
       "experiencia",
       "experiencia laboral",
       "experiencia profesional",
-      "antecedentes laborales",
-      "trayectoria profesional",
       "experiencia de trabajo",
+      "antecedentes laborales",
+      "antecedentes profesionales",
+      "trayectoria",
+      "trayectoria profesional",
+      "trayectoria laboral",
+      "historial laboral",
+      "actividad profesional",
+      "actividad laboral",
+      "actividades profesionales",
+      "funcion publica",
+      "cargos",
+      "cargos ejercidos",
+      "cargos desempenados",
     ],
   },
   {
@@ -1385,6 +1577,9 @@ const HEADINGS: readonly HeadingRule[] = [
       "formacion",
       "formacion academica",
       "estudios",
+      "antecedentes academicos",
+      "titulos",
+      "titulos obtenidos",
     ],
   },
   {
@@ -1425,24 +1620,14 @@ const HEADINGS: readonly HeadingRule[] = [
 /** Words a heading may start with ("Selected Projects", "Mis proyectos"). */
 const HEADING_PREFIX = String.raw`(?:(?:featured|selected|key|relevant|other|personal|professional|technical|academic|additional|recent|principales|otros|otras|mis)\s+)?`;
 /** Words a heading may end with ("Experiencia laboral", "Proyectos destacados"). */
-const HEADING_SUFFIX = String.raw`(?:\s+(?:laboral|laborales|profesional|profesionales|academica|academicos|tecnicas|tecnicos|tecnicas|personales|destacados|destacadas|relevante|relevantes|complementaria|complementarios|history|summary))?`;
-/** A second heading joined with "&", "and", "y", "e", "/" or "," ("Courses & Certifications"). */
-const HEADING_JOIN = String.raw`(?:\s*(?:&|and|y|e|/|,)\s*[\p{L} ]{2,30})?`;
-
-function headingRegex(keywords: readonly string[]): RegExp {
-  const words = keywords.map((k) => k.split("").map(escapeRegex).join("")).join("|");
-  return new RegExp(`^${HEADING_PREFIX}(?:${words})${HEADING_SUFFIX}${HEADING_JOIN}$`, "u");
-}
-
-const HEADING_REGEXES = HEADINGS.map((rule) => ({ rule, regex: headingRegex(rule.keywords) }));
-const INLINE_LANGUAGES = /^(?:languages|idiomas|lenguas)\s*:\s*\S/u;
+const HEADING_SUFFIX = String.raw`(?:\s+(?:laboral|laborales|profesional|profesionales|academica|academicos|tecnicas|tecnicos|tecnicas|personales|destacados|destacadas|relevante|relevantes|complementaria|complementarios|obtenidos|ejercidos|desempenados|publica|history|summary))?`;
 
 /**
  * Headings of sections cvparse does not check for coverage. They only end the span of the
  * previous section ({@link detectSectionSpans}), so that, e.g., a volunteering entry written after
  * "Education" is not taken for part of the education section.
  */
-const BOUNDARY_HEADING_REGEX = headingRegex([
+const BOUNDARY_KEYWORDS: readonly string[] = [
   "summary",
   "profile",
   "about",
@@ -1462,6 +1647,7 @@ const BOUNDARY_HEADING_REGEX = headingRegex([
   "honors",
   "premios",
   "reconocimientos",
+  "distinciones",
   "references",
   "referencias",
   "interests",
@@ -1474,7 +1660,162 @@ const BOUNDARY_HEADING_REGEX = headingRegex([
   "datos personales",
   "personal information",
   "informacion personal",
+  "informacion adicional",
+  "otros datos",
+  "datos de interes",
+];
+
+/**
+ * Words that may follow "&" / "y" / "," in a heading made of two sections ("Courses &
+ * Certifications", "Habilidades e Intereses", "Skills & Tools"): every known heading keyword plus
+ * a few that never head a section on their own. Anything else after the join is running text
+ * ("Formación Profesional, Universidad de Palermo" is an entry, not a heading).
+ */
+const JOIN_EXTRA_WORDS: readonly string[] = [
+  "tools",
+  "herramientas",
+  "tecnologias",
+  "technologies",
+  "logros",
+  "achievements",
+  "actividades",
+  "activities",
+  "training",
+  "capacitacion",
+  "capacitaciones",
+  "talleres",
+  "workshops",
+  "seminarios",
+  "congresos",
+  "menciones",
+  "otros",
+  "otras",
+  "mas",
+  "more",
+];
+
+function wordAlternatives(keywords: readonly string[]): string {
+  return [...keywords]
+    .sort((a, b) => b.length - a.length)
+    .map((k) => k.split("").map(escapeRegex).join(""))
+    .join("|");
+}
+
+/** A second heading joined with "&", "and", "y", "e", "/" or "," ("Courses & Certifications"). */
+const HEADING_JOIN = String.raw`(?:\s*(?:&|and|y|e|/|,)\s*${HEADING_PREFIX}(?:${wordAlternatives([
+  ...HEADINGS.flatMap((rule) => rule.keywords),
+  ...BOUNDARY_KEYWORDS,
+  ...JOIN_EXTRA_WORDS,
+])})${HEADING_SUFFIX})?`;
+
+function headingRegex(keywords: readonly string[]): RegExp {
+  return new RegExp(
+    `^${HEADING_PREFIX}(?:${wordAlternatives(keywords)})${HEADING_SUFFIX}${HEADING_JOIN}$`,
+    "u",
+  );
+}
+
+const HEADING_REGEXES = HEADINGS.map((rule) => ({ rule, regex: headingRegex(rule.keywords) }));
+const INLINE_LANGUAGES = /^(?:languages|idiomas|lenguas)\s*:\s*\S/u;
+
+const BOUNDARY_HEADING_REGEX = headingRegex(BOUNDARY_KEYWORDS);
+
+/** Lowercase connectors a Title Case heading may contain ("Datos de Interés"). */
+const TITLE_CONNECTORS = new Set([
+  "de",
+  "del",
+  "la",
+  "las",
+  "los",
+  "el",
+  "y",
+  "e",
+  "of",
+  "and",
+  "the",
+  "al",
 ]);
+
+/**
+ * Words (normalized) that make a Title Case line a heading rather than a name or an employer
+ * ("Datos Complementarios", "Otros Antecedentes", "Additional Information").
+ */
+const HEADING_VOCABULARY = new Set([
+  "datos",
+  "otros",
+  "otras",
+  "antecedentes",
+  "actividad",
+  "actividades",
+  "informacion",
+  "adicional",
+  "complementaria",
+  "complementarios",
+  "interes",
+  "anexos",
+  "docencia",
+  "cursos",
+  "formacion",
+  "cargos",
+  "funciones",
+  "varios",
+  "logros",
+  "distinciones",
+  "membresias",
+  "asociaciones",
+  "investigacion",
+  "becas",
+  "pasantias",
+  "practicas",
+  "capacitacion",
+  "capacitaciones",
+  "disponibilidad",
+  "observaciones",
+  "herramientas",
+  "additional",
+  "information",
+  "other",
+  "activities",
+  "memberships",
+  "affiliations",
+  "teaching",
+  "research",
+  "grants",
+  "training",
+  "availability",
+  "miscellaneous",
+  "background",
+]);
+
+/**
+ * `true` when a line is written like a section heading cvparse does not know: 2 to 6 words in
+ * all caps ("CARGOS EJERCIDOS"), or 2 to 4 words in Title Case with a heading word ("Datos
+ * Complementarios"; plain Title Case is also how names and employers are written), with no
+ * digits, no sentence or list punctuation and no trailing period, and not reading as an
+ * organization or a job title. A single word ("UBA", "ANEXOS") never counts: acronyms of
+ * institutions are written that way. Such a line ends the span of the previous section in
+ * {@link detectSectionSpans} when `genericHeadings` is set.
+ */
+export function looksLikeHeadingLine(rawLine: string): boolean {
+  const line = rawLine
+    .trim()
+    .replace(/^[^\p{L}\p{N}]+/u, "")
+    .replace(/[\s:|]+$/u, "");
+  if (line === "" || line.length > 40) return false;
+  if (/[\p{N}.,;()[\]{}—–|/@"“”«»]/u.test(line)) return false;
+  if ((line.match(/\p{L}/gu)?.length ?? 0) < 3) return false;
+  const words = line.split(/\s+/);
+  if (words.length < 2 || words.length > 6) return false;
+  // Only short tokens ("SAP FI", "AWS GCP") is a skill line, not a heading.
+  if (!words.some((w) => (w.match(/\p{L}/gu)?.length ?? 0) >= 4)) return false;
+  if (looksLikeOrganization(line) || looksLikeJobTitle(line)) return false;
+  if (!/\p{Ll}/u.test(line)) return true; // all caps
+  if (words.length > 4) return false;
+  if (!words.every((w, i) => /^\p{Lu}/u.test(w) || (i > 0 && TITLE_CONNECTORS.has(w)))) {
+    return false;
+  }
+  return words.some((w) => HEADING_VOCABULARY.has(normalizeForMatch(w)));
+}
 
 /** The line normalized for heading detection, or `null` when it is too long to be one. */
 function headingCandidate(rawLine: string): string | null {
@@ -1515,11 +1856,25 @@ export interface SectionSpan {
   end: number;
 }
 
+/** Options for {@link detectSectionSpans}. */
+export interface SectionSpanOptions {
+  /**
+   * Also end a span at any line written like a heading cvparse does not know
+   * ({@link looksLikeHeadingLine}); the line opens an `"other"` span. Used by the placement
+   * check, where an unknown heading between "Educación" and an entry means the entry is NOT under
+   * Educación ("CARGOS EJERCIDOS").
+   */
+  genericHeadings?: boolean | undefined;
+}
+
 /**
  * Splits the document into sections: each recognized heading line opens a span that runs until
  * the next heading. Lines before the first heading belong to no span.
  */
-export function detectSectionSpans(sourceText: string): SectionSpan[] {
+export function detectSectionSpans(
+  sourceText: string,
+  options: SectionSpanOptions = {},
+): SectionSpan[] {
   const rawLines = sourceText.split(/\r?\n/);
   const spans: SectionSpan[] = [];
   rawLines.forEach((rawLine, i) => {
@@ -1527,7 +1882,9 @@ export function detectSectionSpans(sourceText: string): SectionSpan[] {
     if (line === null) return;
     const keys = headingKeys(line);
     const isBoundary =
-      keys.length === 0 && BOUNDARY_HEADING_REGEX.test(line.replace(/[\s:.\-–—|]+$/u, ""));
+      keys.length === 0 &&
+      (BOUNDARY_HEADING_REGEX.test(line.replace(/[\s:.\-–—|]+$/u, "")) ||
+        (options.genericHeadings === true && looksLikeHeadingLine(rawLine)));
     if (keys.length === 0 && !isBoundary) return;
     const heading = rawLine
       .trim()

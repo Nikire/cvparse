@@ -13,6 +13,7 @@ import {
   parsePhone,
   phonesMatch,
   splitPhones,
+  stripPhoneExtension,
 } from "./normalize.js";
 import {
   aggregate,
@@ -505,5 +506,21 @@ describe("review fixes", () => {
     expect(scoreDates(course, { startDate: "2019" })).toEqual({ tp: 0, fp: 1, fn: 1 });
     // undated truth: predicted dates are FP
     expect(scoreDates({}, { startDate: "2019" })).toEqual({ tp: 0, fp: 1, fn: 0 });
+  });
+});
+
+describe("phones with an extension (review of real CVs)", () => {
+  it("compares the main number and ignores the extension", () => {
+    expect(stripPhoneExtension("+54 11 4127-7100 int 5045")).toBe("+54 11 4127-7100");
+    expect(stripPhoneExtension("+54 11 4127-7100 int. 5045")).toBe("+54 11 4127-7100");
+    expect(stripPhoneExtension("(011) 4127-7100 interno 5045")).toBe("(011) 4127-7100");
+    expect(stripPhoneExtension("+1 212 555 0100 ext. 12")).toBe("+1 212 555 0100");
+    expect(stripPhoneExtension("+1 212 555 0100 x12")).toBe("+1 212 555 0100");
+    expect(stripPhoneExtension("+54 11 4127-7100")).toBe("+54 11 4127-7100");
+    expect(normalizePhone("+54 11 4127-7100 int 5045")).toBe("41277100");
+    expect(phonesMatch("+54 11 4127-7100 int 5045", "+54 11 4127-7100")).toBe(true);
+    expect(phonesMatch("+54 11 4127-7100", "+54 11 4127-7100 interno 5045")).toBe(true);
+    expect(phonesMatch("11 4127-7100 int 5045", "+54 11 4127-7100")).toBe(true);
+    expect(phonesMatch("+54 11 4127-7100 int 5045", "+54 11 4127-7101")).toBe(false);
   });
 });

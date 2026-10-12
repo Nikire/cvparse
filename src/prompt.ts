@@ -30,6 +30,7 @@ export function buildSystemPrompt(options: {
 - Do not merge distinct entries or split a single entry. Preserve the CV's order (usually most recent first).
 - Extract every entry of every section, including the ones on the last pages; long CVs are common. Do not stop after the first few jobs.
 - Copy names, emails, URLs and phone numbers exactly; fix only obvious spacing/line-break artifacts.
+- Every value quoted in these instructions is illustrative only, to show a format: never output an example value that is not written in the CV.
 - ${languageLine}`,
 
     `## Dates
@@ -43,10 +44,10 @@ export function buildSystemPrompt(options: {
 
     `## Contact details and location
 - Never invent contact data. If the CV has no phone number, set basics.phone to null; the same goes for email, URLs and profiles. Never write placeholder or example values.
-- basics.phone: keep the number as written, cleaned of decoration. If the country is evident from the CV, prefix the international code (e.g. +54 for Argentina, +52 for Mexico, +57 for Colombia, +56 for Chile, +51 for Peru, +34 for Spain).
+- basics.phone: the phone exactly as written, cleaned of decoration, keeping its country code when the CV writes one and any extension ("int.", "ext.") that follows it. Do not add a country code the CV does not write, and never make up digits.
 - basics.email: the primary email address; lowercase.
 - basics.profiles: one entry per LinkedIn / GitHub / portfolio link, with network name and full URL.
-- basics.location and x_cvparse.location: split the written location into city, first-level region (state / provincia / departamento) and ISO 3166-1 alpha-2 country code. Latin American examples: "CABA" -> city "Ciudad Autónoma de Buenos Aires", region "Buenos Aires", countryCode "AR"; "CDMX" -> city "Ciudad de México", countryCode "MX"; "Medellín, Antioquia" -> countryCode "CO", adminRegion "Antioquia". Keep the raw text in x_cvparse.location.raw. Do not invent a country when it is not written and cannot be reliably inferred. If the CV states no location, leave both null.
+- basics.location and x_cvparse.location: split the written location into city, first-level region (state / provincia / departamento) and ISO 3166-1 alpha-2 country code. When the CV writes a well-known abbreviation of a city, use the city's full official name and fill the region and country only when they follow unambiguously from it. Keep the raw text in x_cvparse.location.raw. Do not invent a country when it is not written and cannot be reliably inferred. If the CV states no location, leave both null.
 - work[].location: only when that entry states a location. Do not copy the person's own location into work or education entries.`,
 
     `## Education and titles
@@ -59,14 +60,14 @@ export function buildSystemPrompt(options: {
 - work.position is the job title; work.name is the employer. "Freelance" / "Independiente" is a valid employer name.
 - Put bullet points about achievements into highlights; put the paragraph describing the role into summary.
 - Only list skills written in the CV. Do not add related or typical technologies the CV does not mention.
-- skills mirrors how the CV groups skills (e.g. name "Backend", keywords ["Node.js", "PostgreSQL"]). If the CV lists a flat list, use one entry per skill with keywords empty. Leave skills[].level null unless a level is written next to that skill.
+- skills mirrors how the CV groups skills: the group label the CV uses as name and its items as keywords. If the CV lists a flat list, use one entry per skill with keywords empty. Leave skills[].level null unless a level is written next to that skill.
 - Put each skill in its own keywords item; never join several skills into one string with commas.
 - Leave x_cvparse.normalizedSkills and x_cvparse.educationLevels null: cvparse computes them from skills and education.
-- languages: spoken languages only (Español, Inglés, Português), with fluency exactly as written next to the language ("C1", "Native", "avanzado"); null when no level is written. Programming languages are skills.
-- Languages often appear in a header or summary line (e.g. "Languages: English (C1), Spanish (Native)") rather than in their own section; extract them wherever they are.`,
+- languages: spoken languages only, with fluency exactly as the level is written next to the language (a CEFR code or a level word); null when no level is written. A sentence about a certificate or a course is not a level. Programming languages are skills.
+- Languages often appear in a header or summary line ("Languages:" / "Idiomas:" followed by the list) rather than in their own section; extract them wherever they are.`,
 
     `## Confidence
-- x_cvparse.confidenceNotes: short English notes about anything ambiguous, unreadable or that you had to interpret (e.g. "Two email addresses found; used the first one"). Leave it empty when the extraction was straightforward.`,
+- x_cvparse.confidenceNotes: short English notes about anything ambiguous, unreadable or that you had to interpret (two candidate values for a field, an unreadable date). Leave it empty when the extraction was straightforward.`,
   ];
 
   if (options.instructions?.trim()) {

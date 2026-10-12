@@ -773,12 +773,23 @@ export interface PrecisionReduction {
   reason: "month" | "day";
 }
 
+/** `true` when `day` is the last day of `year-month` ("2020-02-29", "2021-06-30", "2019-12-31"). */
+function isLastDayOfMonth(year: string, month: string, day: string): boolean {
+  const y = Number(year);
+  const m = Number(month);
+  if (m < 1 || m > 12) return false;
+  // Day 0 of the next month is the last day of this one.
+  return Number(day) === new Date(Date.UTC(y, m, 0)).getUTCDate();
+}
+
 /**
- * Undoes precision a model invented: models often pad "2020" to "2020-01" (or "2020-03" to
- * "2020-03-01"). When `iso` ends in `-01` and `sourceText` contains its year but never next to a
- * month (or day) expression — month names / abbreviations in Spanish, English and Portuguese,
- * seasons and quarters, `MM/YYYY`, `MM-YYYY`, `YYYY-MM` — the padded component is dropped:
- * "2020-01" -> "2020", "2020-03-01" -> "2020-03", "2020-01-01" -> "2020".
+ * Undoes precision a model invented: models pad "2020" to "2020-01" or "2020-12-31" (the first or
+ * last day of a year-only range), and "2020-03" to "2020-03-01" or "2020-03-31". When `iso` ends
+ * in such padding (`-01`, `-12`, the first or last day of its month) and `sourceText` contains its
+ * year but never next to a month (or day) expression — month names / abbreviations in Spanish,
+ * English and Portuguese, seasons and quarters, `MM/YYYY`, `MM-YYYY`, `YYYY-MM` — the padded
+ * component is dropped: "2020-01" -> "2020", "2020-12-31" -> "2020", "2020-03-01" -> "2020-03",
+ * "2020-06-30" -> "2020-06".
  *
  * Returns `null` when nothing changes, including when the year does not appear in the text at
  * all (nothing to compare against).
@@ -787,21 +798,23 @@ export function reduceDatePrecision(iso: string, sourceText: string): PrecisionR
   const m = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(iso);
   if (!m) return null;
   const [, year, month, day] = m as unknown as [string, string, string, string | undefined];
-  // Only trailing "-01" padding is suspicious: "2020-01-15" or "2020-03" stay as they are.
-  if (day !== undefined ? day !== "01" : month !== "01") return null;
+  // Only first/last padding is suspicious: "2020-01-15" or "2020-03" stay as they are.
+  const paddedDay = day !== undefined && (day === "01" || isLastDayOfMonth(year, month, day));
+  const paddedMonth = month === "01" || month === "12";
+  if (day !== undefined ? !paddedDay : !paddedMonth) return null;
 
   const contexts = yearContexts(foldSource(sourceText), year);
   if (contexts.length === 0) return null;
 
   let value = iso;
   let reason: PrecisionReduction["reason"] | null = null;
-  if (day === "01") {
+  if (paddedDay) {
     const hasDay = contexts.some((c) => DAY_BEFORE.test(c.before) || DAY_AFTER.test(c.after));
     if (hasDay) return null;
     value = `${year}-${month}`;
     reason = "day";
   }
-  if (month === "01") {
+  if (paddedMonth) {
     const hasMonth = contexts.some((c) => MONTH_BEFORE.test(c.before) || MONTH_AFTER.test(c.after));
     if (!hasMonth) {
       value = year;

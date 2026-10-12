@@ -4,6 +4,7 @@ import {
   splitOrgAndTitle,
   splitSkillList,
   splitTitleAndOrg,
+  splitTitleFromPhrase,
   stripTitleFromOrg,
 } from "../src/normalize/resume.js";
 import { looksLikeJobTitle, looksLikeOrganization } from "../src/normalize/titles.js";
@@ -461,12 +462,109 @@ describe("normalizeResume — organization and title copied into both fields", (
     );
   });
 
-  it("leaves equal values without a separator alone", () => {
+  it("nulls the copied field when equal values have no separator: the title, or the position for an employer word", () => {
     const { resume, warnings } = normalizeResume({
-      work: [{ name: "Freelance", position: "Freelance" }],
+      work: [
+        { name: "Freelance", position: "Freelance" },
+        { name: "Telecom S.A.", position: "Telecom S.A." },
+        { name: "Analista de Datos", position: "Analista de Datos" },
+        { name: "Globant", position: "Globant" },
+      ],
+      education: [{ institution: "UBA", studyType: "UBA" }],
     });
-    expect(resume.work?.[0]).toMatchObject({ name: "Freelance", position: "Freelance" });
-    expect(warnings).toEqual([]);
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Freelance", null],
+      ["Telecom S.A.", null],
+      [null, "Analista de Datos"],
+      [null, "Globant"],
+    ]);
+    // Education is left alone: a degree and an institution are never copies of each other.
+    expect(resume.education?.[0]).toMatchObject({ institution: "UBA", studyType: "UBA" });
+    expect(warnings).toContain(
+      'work[0].position: it was the same as the name ("Freelance"); set to null.',
+    );
+    expect(warnings).toContain(
+      'work[2].name: it was the same as the position ("Analista de Datos"); set to null.',
+    );
+  });
+});
+
+describe("normalizeResume — name is '<position> en <employer>' (review of real CVs)", () => {
+  it("keeps only the employer when the name starts with the position and a link word", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Analista de Sistemas en Telecom Argentina", position: "Analista de Sistemas" },
+        { name: "Jefe de Compras del Ministerio de Salud", position: "Jefe de Compras" },
+        { name: "Asesor de la Dirección Nacional", position: "Asesor" },
+        { name: "Backend Developer at Globex", position: "Backend Developer" },
+        { name: "Designer @ Studio Nine", position: "Designer" },
+        // The name does not start with the position: untouched.
+        { name: "Telecom Argentina", position: "Analista en Sistemas" },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Telecom Argentina", "Analista de Sistemas"],
+      ["Ministerio de Salud", "Jefe de Compras"],
+      ["Dirección Nacional", "Asesor"],
+      ["Globex", "Backend Developer"],
+      ["Studio Nine", "Designer"],
+      ["Telecom Argentina", "Analista en Sistemas"],
+    ]);
+    expect(warnings).toContain(
+      'work[0].name: "Analista de Sistemas en Telecom Argentina" starts with the position; kept "Telecom Argentina".',
+    );
+  });
+
+  it("splits 'Position en Employer' when the position is empty, by title words", () => {
+    const { resume, warnings } = normalizeResume({
+      work: [
+        { name: "Analista de Sistemas en Telecom Argentina", position: null },
+        { name: "Enfermera en Hospital Italiano", position: null },
+        // No title word on the left, or a title word on both sides: untouched.
+        { name: "Sucursal en Rosario", position: null },
+        { name: "Analista en Jefe", position: null },
+      ],
+    });
+    expect(resume.work?.map((w) => [w.name, w.position])).toEqual([
+      ["Telecom Argentina", "Analista de Sistemas"],
+      ["Hospital Italiano", "Enfermera"],
+      ["Sucursal en Rosario", null],
+      ["Analista en Jefe", null],
+    ]);
+    expect(warnings).toContain(
+      'work[0].name: "Analista de Sistemas en Telecom Argentina" holds the position too; split into name "Telecom Argentina" and position "Analista de Sistemas".',
+    );
+    expect(splitTitleFromPhrase("Analista de Sistemas en Telecom Argentina")).toEqual({
+      title: "Analista de Sistemas",
+      org: "Telecom Argentina",
+    });
+    expect(splitTitleFromPhrase("Analista de Sistemas en Telecom", "Analista")).toBeNull();
+  });
+});
+
+describe("normalizeResume — invented precision on end dates (review of real CVs)", () => {
+  it("reduces YYYY-12-31 / YYYY-12 / last-day-of-month paddings like -01", () => {
+    const sourceText = "Acme — Analista (2018 – 2020)\nGlobex — Jefe (marzo 2021 – junio 2022)";
+    const { resume, warnings } = normalizeResume(
+      {
+        work: [
+          { name: "Acme", position: "Analista", startDate: "2018-01-01", endDate: "2020-12-31" },
+          { name: "Globex", position: "Jefe", startDate: "2021-03-01", endDate: "2022-06-30" },
+        ],
+      },
+      undefined,
+      { sourceText },
+    );
+    expect(resume.work?.map((w) => [w.startDate, w.endDate])).toEqual([
+      ["2018", "2020"],
+      ["2021-03", "2022-06"],
+    ]);
+    expect(warnings).toContain(
+      'precision: work[0].endDate "2020-12-31" reduced to "2020" (no month in the document).',
+    );
+    expect(warnings).toContain(
+      'precision: work[1].endDate "2022-06-30" reduced to "2022-06" (no day in the document).',
+    );
   });
 });
 
@@ -568,12 +666,8 @@ describe("normalizeResume: repeated entries", () => {
     expect(resume.work?.[0]?.highlights).toEqual(["Reportes"]);
     expect(resume.work?.[0]?.startDate).toBe("2020-03");
     expect(resume.languages).toHaveLength(1);
-    expect(warnings).toContain(
-      "model: removed 2 repeated entries from work (the model repeated itself).",
-    );
-    expect(warnings).toContain(
-      "model: removed 1 repeated entry from languages (the model repeated itself).",
-    );
+    expect(warnings).toContain("model: removed 2 duplicate entries from work.");
+    expect(warnings).toContain("model: removed 1 duplicate entry from languages.");
     // Dates are normalized once per remaining entry, not once per repeat.
     expect(warnings.filter((w) => w.includes("startDate"))).toEqual([]);
   });

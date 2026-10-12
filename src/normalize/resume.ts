@@ -264,6 +264,55 @@ export function deriveNormalizedSkills(skills: unknown): string[] | null {
   return dedupeLowercase(items);
 }
 
+/**
+ * Words that join a title to its employer in one phrase: "Analista en Acme", "Jefe del Área",
+ * "Asesor de la Dirección", "Developer at Globex", "Designer @ Studio". Longest first.
+ */
+const TITLE_ORG_LINK = /\s+(?:de la|de los|de las|del|en|at|@)\s+/giu;
+
+/**
+ * Splits "Title en Employer" into `{ title, org }` when `title` is given (the phrase must start
+ * with it, compared after normalization) or, without it, when the left side reads as a job title
+ * ({@link looksLikeJobTitle}) and the right side does not. Returns `null` when unsure.
+ */
+export function splitTitleFromPhrase(
+  phrase: string,
+  title: string | null = null,
+): { title: string; org: string } | null {
+  const target = title ? normalizeForMatch(title) : null;
+  for (const match of phrase.matchAll(TITLE_ORG_LINK)) {
+    const before = phrase.slice(0, match.index).trim();
+    const after = phrase.slice(match.index + match[0].length).trim();
+    if (before === "" || after === "" || !/\p{L}/u.test(after)) continue;
+    if (target !== null) {
+      if (normalizeForMatch(before) === target) return { title: before, org: after };
+      continue;
+    }
+    if (looksLikeJobTitle(before) && !looksLikeJobTitle(after))
+      return { title: before, org: after };
+  }
+  return null;
+}
+
+/** Self-employment written where an employer goes: a valid `work[].name`, never a title. */
+const EMPLOYER_WORDS = new Set([
+  "freelance",
+  "freelancer",
+  "independiente",
+  "autonomo",
+  "autonoma",
+  "self-employed",
+  "self employed",
+  "cuenta propia",
+  "por cuenta propia",
+  "trabajador independiente",
+  "trabajadora independiente",
+]);
+
+function isEmployerWord(value: string): boolean {
+  return EMPLOYER_WORDS.has(normalizeForMatch(value));
+}
+
 /** Pairs (section, organization key, title key) whose organization may swallow the title. */
 const ORG_TITLE_PAIRS: ReadonlyArray<readonly [string, string, string]> = [
   ["work", "name", "position"],
@@ -280,9 +329,9 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
       const org = entry[orgKey];
       const title = entry[titleKey];
       if (section !== "education" && typeof org === "string" && (title ?? null) === null) {
-        // The model copied a whole "Científica de Datos, Telecom S.A." line into name and left
-        // position empty.
-        const parts = splitTitleAndOrg(org);
+        // The model copied a whole "Científica de Datos, Telecom S.A." (or "Analista en Acme")
+        // line into name and left position empty.
+        const parts = splitTitleAndOrg(org) ?? splitTitleFromPhrase(org);
         if (!parts) return;
         entry[orgKey] = parts.org;
         entry[titleKey] = parts.title;
@@ -295,10 +344,36 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
       if (normalizeForMatch(org) === normalizeForMatch(title)) {
         // The model copied "Freelance — Full-Stack Developer" into both fields.
         const parts = splitOrgAndTitle(org);
-        if (!parts) return;
-        [entry[orgKey], entry[titleKey]] = parts;
+        if (parts) {
+          [entry[orgKey], entry[titleKey]] = parts;
+          warnings.push(
+            `${section}[${i}]: ${orgKey} and ${titleKey} were both "${org}"; split into ${orgKey} "${parts[0]}" and ${titleKey} "${parts[1]}".`,
+          );
+          return;
+        }
+        if (section === "education") return;
+        // Nothing to split: one of the two fields is a copy. An employer-like value ("Freelance",
+        // "Acme S.A.") loses the position; anything else is taken as the title and loses the
+        // organization (grounding recovers it when it is written next to the title).
+        if (isEmployerWord(org) || looksLikeOrganization(org)) {
+          entry[titleKey] = null;
+          warnings.push(
+            `${section}[${i}].${titleKey}: it was the same as the ${orgKey} ("${org}"); set to null.`,
+          );
+          return;
+        }
+        entry[orgKey] = null;
         warnings.push(
-          `${section}[${i}]: ${orgKey} and ${titleKey} were both "${org}"; split into ${orgKey} "${parts[0]}" and ${titleKey} "${parts[1]}".`,
+          `${section}[${i}].${orgKey}: it was the same as the ${titleKey} ("${org}"); set to null.`,
+        );
+        return;
+      }
+      // "Analista en Acme" with position "Analista": the employer is what follows the title.
+      const phrase = splitTitleFromPhrase(org, title);
+      if (phrase) {
+        entry[orgKey] = phrase.org;
+        warnings.push(
+          `${section}[${i}].${orgKey}: "${org}" starts with the ${titleKey}; kept "${phrase.org}".`,
         );
         return;
       }
@@ -323,7 +398,12 @@ function stripTitlesFromOrgs(resume: Record<string, unknown>, warnings: string[]
  *   position "Developer" -> "Freelance"; same for `volunteer[]` and `education[].institution`),
  *   splits an organization and title that are the same "Org — Title" string
  *   ({@link splitOrgAndTitle}), and splits a `work[]`/`volunteer[]` organization that holds the
- *   whole "Title, Company" line while the position is empty ({@link splitTitleAndOrg});
+ *   whole "Title, Company" or "Title en Company" line while the position is empty
+ *   ({@link splitTitleAndOrg}, {@link splitTitleFromPhrase});
+ * - when `work[].name` equals the position with nothing to split, nulls the copy: the position
+ *   for an employer word ("Freelance", "Acme S.A."), the name otherwise (grounding then looks for
+ *   the employer next to the title); when the name is "<position> en <employer>", keeps the
+ *   employer;
  * - splits comma/semicolon-joined `skills[].keywords` and `skills[].name` values into separate
  *   items ({@link splitSkillList});
  * - derives `x_cvparse.normalizedSkills` from `skills` ({@link deriveNormalizedSkills}), ignoring

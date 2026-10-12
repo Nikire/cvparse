@@ -80,9 +80,22 @@ export function normalizeEmail(value: string | null | undefined): string {
   return normalizeText(value, "@.+_-").replace(/\s+/g, "");
 }
 
-/** Phone: digits only, last 8 digits (the fallback used when only one side has a country code). */
+/** An extension written after a phone number: "int 5045", "int. 5045", "interno 5045", "ext. 12", "x12". */
+const PHONE_EXTENSION =
+  /\s*(?:[,;(]\s*)?(?:int\.?|interno|ext\.?|extension|extensi[oó]n|x)\s*\.?\s*\d{1,6}\)?\s*$/iu;
+
+/** The phone without its extension ("+54 11 4127-7100 int 5045" -> "+54 11 4127-7100"). */
+export function stripPhoneExtension(value: string): string {
+  const main = value.replace(PHONE_EXTENSION, "").trim();
+  return main.replace(/\D/g, "").length >= 5 ? main : value.trim();
+}
+
+/**
+ * Phone: digits of the main number (extension stripped), last 8 digits (the fallback used when
+ * only one side has a country code).
+ */
 export function normalizePhone(value: string | null | undefined): string {
-  const digits = (value ?? "").replace(/\D/g, "");
+  const digits = stripPhoneExtension(value ?? "").replace(/\D/g, "");
   return digits.length > 8 ? digits.slice(-8) : digits;
 }
 
@@ -140,11 +153,14 @@ export function parsePhone(value: string): ParsedPhone {
   return { country, national };
 }
 
-/** One printed phone field may hold several numbers ("+56 9 1234 5678 / 2 2345 6789"). */
+/**
+ * One printed phone field may hold several numbers ("+56 9 1234 5678 / 2 2345 6789"). Each is
+ * returned without its extension: numbers are compared on the main number.
+ */
 export function splitPhones(value: string | null | undefined): string[] {
   return (value ?? "")
     .split(/[/,;|]/)
-    .map((s) => s.trim())
+    .map((s) => stripPhoneExtension(s.trim()))
     .filter((s) => s.replace(/\D/g, "").length >= 6);
 }
 

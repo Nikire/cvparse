@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderTextItems } from "../src/extract/layout.js";
+import { dehyphenate, orderTextItems } from "../src/extract/layout.js";
 import type { TextItem } from "../src/extract/types.js";
 
 const PAGE = { width: 612, height: 792 };
@@ -301,6 +301,122 @@ describe("orderTextItems", () => {
     });
   });
 
+  describe("side-by-side blocks under a single-column body", () => {
+    // Canva-style page: ten full-width lines, then "LANGUAGES" (3 lines, x 50–250) next to
+    // "TECHNICAL SKILLS" (6 lines, x 320–560), both blocks starting on the same baseline.
+    const body = Array.from(
+      { length: 10 },
+      (_, i) => `Línea ${i + 1} de la experiencia a todo el ancho de la página, sin cortes....`,
+    );
+    const languages = ["LANGUAGES", "English (C1)", "Spanish (native)"];
+    const skills = [
+      "TECHNICAL SKILLS",
+      "Python, Pandas",
+      "SQL, PostgreSQL",
+      "Docker, Kubernetes",
+      "Git, GitHub Actions",
+      "AWS (S3, Lambda)",
+    ];
+    const expected = [body.join("\n"), languages.join("\n"), skills.join("\n")].join("\n\n");
+
+    /** Body items followed by the two blocks, `gap` points below the last body line. */
+    function page(gap: number, order: "column-major" | "row-major"): TextItem[] {
+      const top = 700 - (body.length - 1) * 12 - gap;
+      const left = column(languages, 50, top);
+      const right = column(skills, 320, top);
+      const blocks: TextItem[] = [];
+      if (order === "column-major") {
+        blocks.push(...left, ...right);
+      } else {
+        for (let i = 0; i < right.length; i++) {
+          const l = left[i];
+          if (l) blocks.push(l);
+          blocks.push(right[i] as TextItem);
+        }
+      }
+      for (const b of body) expect(b.length * CHAR).toBeGreaterThan(320 - 50);
+      return [...column(body, 50, 700), ...blocks];
+    }
+
+    it("reads the blocks one after the other when no vertical gap separates them from the body", () => {
+      // Needs peeling the whole 10-line body off the top, beyond the 8-line / 40% cap.
+      const result = orderTextItems(page(12, "column-major"), PAGE);
+      expect(result.layout).toBe("multi-column");
+      expect(result.text).toBe(expected);
+    });
+
+    it("reads the blocks one after the other when the producer emitted them row by row", () => {
+      // The band is isolated by its gap, but the stream interleaves the sides: short lines and
+      // 3 vs 6 lines fail the free-text rule, so the side-by-side block rule has to decide.
+      for (const gap of [12, 30]) {
+        const result = orderTextItems(page(gap, "row-major"), PAGE);
+        expect(result.layout).toBe("multi-column");
+        expect(result.text).toBe(expected);
+      }
+    });
+
+    it("reads two headed blocks of equal length emitted row by row as blocks", () => {
+      const left = column(["IDIOMAS", "Inglés C1", "Portugués B2"], 50, 700);
+      const right = column(["HABILIDADES", "Node.js", "Docker"], 330, 700);
+      const items = [left[0], right[0], left[1], right[1], left[2], right[2]] as TextItem[];
+      const result = orderTextItems(items, PAGE);
+      expect(result.layout).toBe("multi-column");
+      expect(result.text).toBe("IDIOMAS\nInglés C1\nPortugués B2\n\nHABILIDADES\nNode.js\nDocker");
+    });
+
+    it("recognizes taller first lines as block headings when they are not all caps", () => {
+      const left = column(["Idiomas", "Inglés C1", "Portugués B2"], 50, 700);
+      const right = column(["Habilidades", "Node.js", "Docker"], 330, 700);
+      for (const heading of [left[0], right[0]] as TextItem[]) heading.height = 14;
+      const items = [left[0], right[0], left[1], right[1], left[2], right[2]] as TextItem[];
+      expect(orderTextItems(items, PAGE).text).toBe(
+        "Idiomas\nInglés C1\nPortugués B2\n\nHabilidades\nNode.js\nDocker",
+      );
+    });
+
+    it("still joins a row-major table whose last cell wraps to one extra line", () => {
+      const rows = [
+        [item("2020 – 2024", 50, 700), item("Licenciatura en Sistemas, UBA", 150, 700)],
+        [item("2018 – 2019", 50, 688), item("Curso de Python, Coderhouse", 150, 688)],
+        [item("Certificado con honores", 150, 676)],
+      ].flat();
+      const result = orderTextItems(rows, PAGE);
+      expect(result.layout).toBe("single-column");
+      expect(result.text).toBe(
+        "2020 – 2024 Licenciatura en Sistemas, UBA\n2018 – 2019 Curso de Python, Coderhouse\nCertificado con honores",
+      );
+    });
+
+    it("still joins a Europass table whose rows all have multi-line cells", () => {
+      // Unpaired right-side lines sit BETWEEN the left-side lines: not top-aligned blocks.
+      const rows = [
+        [item("2019 – actualidad", 50, 700), item("Tech Lead Backend, Fintonic Latam", 150, 700)],
+        [item("Lideré el equipo de pagos", 150, 688)],
+        [item("2015 – 2019", 50, 676), item("Desarrolladora Backend Ssr.", 150, 676)],
+        [item("Desarrollo de APIs REST", 150, 664)],
+        [item("2012 – 2015", 50, 652), item("Desarrolladora Full Stack", 150, 652)],
+        [item("Sitios para pymes", 150, 640)],
+      ].flat();
+      const result = orderTextItems(rows, PAGE);
+      expect(result.layout).toBe("single-column");
+      expect(result.text.split("\n")).toHaveLength(6);
+      expect(result.text).toContain("2015 – 2019 Desarrolladora Backend Ssr.");
+    });
+
+    it("does not peel a long table row by row looking for columns", () => {
+      // 30 rows emitted row by row: every suffix has the geometric hole; none is a column split.
+      const items: TextItem[] = [];
+      for (let r = 0; r < 30; r++) {
+        items.push(item(`Entrada ${r} de la tabla`, 50, 700 - r * 12));
+        items.push(item(`20${String(10 + (r % 15)).padStart(2, "0")}`, 400, 700 - r * 12));
+      }
+      const result = orderTextItems(items, PAGE);
+      expect(result.layout).toBe("single-column");
+      expect(result.text.split("\n")).toHaveLength(30);
+      expect(result.text).toContain("Entrada 29 de la tabla 2024");
+    });
+  });
+
   describe("overprinted text", () => {
     it("drops a duplicate of the same text at (almost) the same position", () => {
       const items = [
@@ -315,6 +431,69 @@ describe("orderTextItems", () => {
       // Same text one line below, and again on the first line one character to the right.
       const items = [item("2019", 50, 700), item("2019", 50, 688), item("2019", 72, 700)];
       expect(orderTextItems(items, PAGE).text).toBe("2019 2019\n2019");
+    });
+
+    it("drops a drop-shadow copy offset by up to 15% of the glyph height", () => {
+      // 28 pt name drawn twice, 1.5 pt down and right (the old 1 pt rule kept the copy).
+      const name = { height: 28 };
+      const items = [
+        item("LORENA", 50, 700, { ...name, width: 100 }),
+        item("LORENA", 51.5, 698.5, { ...name, width: 100 }),
+        item("FRANCO", 50, 668, { ...name, width: 100 }),
+        item("FRANCO", 51.5, 666.5, { ...name, width: 100 }),
+        item("Backend developer", 50, 640),
+      ];
+      expect(orderTextItems(items, PAGE).text).toBe("LORENA\nFRANCO\nBackend developer");
+    });
+
+    it("uses a 2 pt floor for small text and ignores trailing spaces in the comparison", () => {
+      const items = [
+        item("LORENA ", 50, 700),
+        item("LORENA", 51.5, 701.5),
+        item("Backend", 50, 688),
+      ];
+      expect(orderTextItems(items, PAGE).text).toBe("LORENA\nBackend");
+    });
+
+    it("drops a same-line copy whose vertical offset exceeds the overprint tolerance", () => {
+      // Shadow 3 pt below (same baseline line at 10 pt, tolerance 5) starting 0.5 pt right.
+      const items = [item("FRANCO", 50, 700), item("FRANCO", 50.5, 697), item("Dev", 50, 688)];
+      expect(orderTextItems(items, PAGE).text).toBe("FRANCO\nDev");
+    });
+
+    it("keeps genuinely repeated words on a line", () => {
+      const items = [item("muy", 50, 700), item("muy", 70, 700), item("bueno", 90, 700)];
+      expect(orderTextItems(items, PAGE).text).toBe("muy muy bueno");
+    });
+  });
+
+  describe("hyphenation at line breaks", () => {
+    it("joins a word hyphenated across lines when the continuation is lowercase", () => {
+      const items = column(["Habilidades de Comunica-", "ción efectiva y liderazgo"], 50, 700);
+      expect(orderTextItems(items, PAGE).text).toBe(
+        "Habilidades de Comunicación efectiva y liderazgo",
+      );
+    });
+
+    it("keeps the hyphen when the next line starts with a capital or a digit", () => {
+      expect(orderTextItems(column(["Desarrollador Full-", "Stack"], 50, 700), PAGE).text).toBe(
+        "Desarrollador Full-\nStack",
+      );
+      expect(orderTextItems(column(["Período 2019-", "2021"], 50, 700), PAGE).text).toBe(
+        "Período 2019-\n2021",
+      );
+    });
+
+    it("needs at least three letters on each side of the break", () => {
+      expect(dehyphenate(["co-", "fundador"])).toEqual(["co-", "fundador"]);
+      expect(dehyphenate(["Comunica-", "ción"])).toEqual(["Comunicación"]);
+      expect(dehyphenate(["Node.js -", "backend"])).toEqual(["Node.js -", "backend"]);
+      expect(dehyphenate(["una línea", "otra"])).toEqual(["una línea", "otra"]);
+    });
+
+    it("does not join across blocks", () => {
+      const items = [...column(["Comunica-"], 50, 700), ...column(["ción", "efectiva"], 50, 640)];
+      expect(orderTextItems(items, PAGE).text).toBe("Comunica-\n\nción\nefectiva");
     });
   });
 
