@@ -8,6 +8,8 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-13
+
 ### Fixed
 
 Findings from a private set of 23 real CVs (consented and public-record documents from Argentina, Mexico, Spain, Ecuador, Costa Rica and Uruguay). Numbers are in the README benchmark section.
@@ -148,7 +150,8 @@ Initial preview release. Plain-text input only.
 - ESM-only package targeting Node >= 22. Runtime dependencies: `ai`, `zod`, `@ai-sdk/openai-compatible`.
 - English README with Spanish mirror (`README.es.md`), contributing guide, code of conduct (Contributor Covenant 2.1), security policy, MIT license, roadmap.
 
-[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Nikire/cvparse/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/Nikire/cvparse/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Nikire/cvparse/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Nikire/cvparse/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Nikire/cvparse/compare/v0.1.1...v0.2.0
