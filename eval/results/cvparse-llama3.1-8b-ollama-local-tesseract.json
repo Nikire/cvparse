@@ -2731,9 +2731,7 @@
         }
       },
       "seconds": 12.013,
-      "warnings": [
-        "extract: text box content appended at the end"
-      ],
+      "warnings": ["extract: text box content appended at the end"],
       "usage": {
         "inputTokens": 1828,
         "outputTokens": 981,
@@ -3748,9 +3746,7 @@
         }
       },
       "seconds": 12.227,
-      "warnings": [
-        "extract: text box content appended at the end"
-      ],
+      "warnings": ["extract: text box content appended at the end"],
       "usage": {
         "inputTokens": 1802,
         "outputTokens": 1010,
