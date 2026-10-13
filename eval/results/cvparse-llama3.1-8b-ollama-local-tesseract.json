@@ -17,12 +17,13 @@
       "tesseract.js": "7.0.0",
       "datasetVersion": "1.0.0",
       "datasetHash": "76c69f1bbc2c5657",
-      "cvparseCommit": "a1b366a2c7b9d472c0729fa32c319c06eb00e5b8",
-      "cvparseSrcHash": "cc69c5e165216f3f"
+      "cvparseCommit": "7a6decf281456c6e556049ab7f7a6b348a3ddac4",
+      "cvparseSrcHash": "639f79deb5f60e05",
+      "contextLength": "16384"
     }
   },
-  "finishedAt": "2026-10-03T12:51:52.088Z",
-  "cvparseVersion": "0.3.0",
+  "finishedAt": "2026-10-13T00:12:12.224Z",
+  "cvparseVersion": "0.3.1",
   "datasetVersion": "1.0.0",
   "entries": [
     {
@@ -129,7 +130,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.196
+      "seconds": 11.458,
+      "usage": {
+        "inputTokens": 1770,
+        "outputTokens": 890,
+        "totalTokens": 2660
+      }
     },
     {
       "id": "es-ar-002",
@@ -200,12 +206,12 @@
         },
         "education.dates": {
           "precision": 1,
-          "recall": 1,
-          "f1": 1,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
           "support": 3,
-          "tp": 3,
+          "tp": 2,
           "fp": 0,
-          "fn": 0
+          "fn": 1
         },
         "education.level": {
           "precision": 0.5,
@@ -235,7 +241,12 @@
           "fn": 0
         }
       },
-      "seconds": 13.535
+      "seconds": 13.284,
+      "usage": {
+        "inputTokens": 1858,
+        "outputTokens": 1080,
+        "totalTokens": 2938
+      }
     },
     {
       "id": "es-ar-003",
@@ -341,7 +352,20 @@
           "fn": 0
         }
       },
-      "seconds": 11.181
+      "seconds": 12.311,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Supervisor de Enfermería\"); set to null.",
+        "work[1].name: it was the same as the position (\"Enfermero Asistencial\"); set to null.",
+        "work[2].name: it was the same as the position (\"Enfermero de Terapia Intensiva\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Clínica del Parque del Litoral\" written next to the position \"Supervisor de Enfermería\"",
+        "grounding: work[1].name was empty; set it to the employer \"Sanatorio del Sur\" written next to the position \"Enfermero Asistencial\"",
+        "grounding: work[2].name was empty; set it to the employer \"Hospital Privado del Sur\" written next to the position \"Enfermero de Terapia Intensiva\""
+      ],
+      "usage": {
+        "inputTokens": 1794,
+        "outputTokens": 1005,
+        "totalTokens": 2799
+      }
     },
     {
       "id": "es-ar-004",
@@ -447,7 +471,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.978
+      "seconds": 12.453,
+      "usage": {
+        "inputTokens": 1820,
+        "outputTokens": 1029,
+        "totalTokens": 2849
+      }
     },
     {
       "id": "es-ar-005",
@@ -553,7 +582,12 @@
           "fn": 0
         }
       },
-      "seconds": 14.702
+      "seconds": 12.955,
+      "usage": {
+        "inputTokens": 1864,
+        "outputTokens": 1060,
+        "totalTokens": 2924
+      }
     },
     {
       "id": "es-ar-006",
@@ -587,13 +621,13 @@
           "fn": 0
         },
         "basics.location": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 1,
-          "tp": 0,
-          "fp": 1,
-          "fn": 1
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
         },
         "work.entries": {
           "precision": 1,
@@ -659,7 +693,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.553
+      "seconds": 11.864,
+      "usage": {
+        "inputTokens": 1811,
+        "outputTokens": 952,
+        "totalTokens": 2763
+      }
     },
     {
       "id": "es-ar-007",
@@ -693,13 +732,13 @@
           "fn": 0
         },
         "basics.location": {
-          "precision": 0,
-          "recall": 0,
-          "f1": 0,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 1,
-          "tp": 0,
-          "fp": 1,
-          "fn": 1
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
         },
         "work.entries": {
           "precision": 1,
@@ -765,7 +804,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.381
+      "seconds": 13.283,
+      "usage": {
+        "inputTokens": 1858,
+        "outputTokens": 1091,
+        "totalTokens": 2949
+      }
     },
     {
       "id": "es-ar-008",
@@ -871,7 +915,18 @@
           "fn": 0
         }
       },
-      "seconds": 12.119
+      "seconds": 11.429,
+      "warnings": [
+        "work[0].name: \"Científica de Datos, Telecom de los Andes S.A.\" holds the position too; split into name \"Telecom de los Andes S.A.\" and position \"Científica de Datos\".",
+        "work[1].name: \"Analista de Datos Sr., Analítica de los Andes S.R.L.\" holds the position too; split into name \"Analítica de los Andes S.R.L.\" and position \"Analista de Datos Sr.\".",
+        "work[2].name: \"Analista de Datos, Datos del Litoral S.A.S.\" holds the position too; split into name \"Datos del Litoral S.A.S.\" and position \"Analista de Datos\".",
+        "work[3].name: \"Analista de Datos Jr., Retail del Sur S.R.L.\" holds the position too; split into name \"Retail del Sur S.R.L.\" and position \"Analista de Datos Jr.\"."
+      ],
+      "usage": {
+        "inputTokens": 1874,
+        "outputTokens": 920,
+        "totalTokens": 2794
+      }
     },
     {
       "id": "es-ar-009",
@@ -959,13 +1014,13 @@
           "fn": 0
         },
         "skills": {
-          "precision": 0.8,
-          "recall": 0.6666666666666666,
-          "f1": 0.7272727272727272,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 6,
-          "tp": 4,
-          "fp": 1,
-          "fn": 2
+          "tp": 6,
+          "fp": 0,
+          "fn": 0
         },
         "languages": {
           "precision": 1,
@@ -977,7 +1032,15 @@
           "fn": 0
         }
       },
-      "seconds": 10.444
+      "seconds": 10.127,
+      "warnings": [
+        "grounding: dropped education[0].studyType \"Grado\" (not found in the document)"
+      ],
+      "usage": {
+        "inputTokens": 1689,
+        "outputTokens": 753,
+        "totalTokens": 2442
+      }
     },
     {
       "id": "es-cl-001",
@@ -1083,7 +1146,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.993
+      "seconds": 12.04,
+      "usage": {
+        "inputTokens": 1795,
+        "outputTokens": 988,
+        "totalTokens": 2783
+      }
     },
     {
       "id": "es-cl-002",
@@ -1189,7 +1257,12 @@
           "fn": 0
         }
       },
-      "seconds": 10.12
+      "seconds": 11.281,
+      "usage": {
+        "inputTokens": 1775,
+        "outputTokens": 930,
+        "totalTokens": 2705
+      }
     },
     {
       "id": "es-cl-003",
@@ -1295,7 +1368,15 @@
           "fn": 0
         }
       },
-      "seconds": 11.016
+      "seconds": 10.836,
+      "warnings": [
+        "grounding: education[1].institution \"Consultivas\" replaced by \"Escuela de Negocios del Sur\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1791,
+        "outputTokens": 893,
+        "totalTokens": 2684
+      }
     },
     {
       "id": "es-cl-004",
@@ -1401,7 +1482,12 @@
           "fn": 0
         }
       },
-      "seconds": 10.308
+      "seconds": 10.156,
+      "usage": {
+        "inputTokens": 1715,
+        "outputTokens": 830,
+        "totalTokens": 2545
+      }
     },
     {
       "id": "es-cl-005",
@@ -1463,30 +1549,30 @@
         },
         "education.entries": {
           "precision": 1,
-          "recall": 0.5,
-          "f1": 0.6666666666666666,
+          "recall": 1,
+          "f1": 1,
           "support": 2,
-          "tp": 1,
+          "tp": 2,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "education.dates": {
           "precision": 1,
-          "recall": 0.5,
-          "f1": 0.6666666666666666,
+          "recall": 1,
+          "f1": 1,
           "support": 4,
-          "tp": 2,
+          "tp": 4,
           "fp": 0,
-          "fn": 2
+          "fn": 0
         },
         "education.level": {
           "precision": 1,
-          "recall": 0.5,
-          "f1": 0.6666666666666666,
+          "recall": 1,
+          "f1": 1,
           "support": 2,
-          "tp": 1,
+          "tp": 2,
           "fp": 0,
-          "fn": 1
+          "fn": 0
         },
         "skills": {
           "precision": 1,
@@ -1507,7 +1593,18 @@
           "fn": 0
         }
       },
-      "seconds": 115.698
+      "seconds": 13.235,
+      "warnings": [
+        "grounding: work[0].name \"Ingeniero de Software\" is the job title; set position to it and name to the employer \"Fintech del Norte Grande S.A.\" as written",
+        "grounding: work[1].name \"Tech Lead Backend\" is the job title; set position to it and name to the employer \"Código Abierto del Pacífico S.A.\" as written",
+        "grounding: work[2].name \"Desarrollador Backend Sr.\" is the job title; set position to it and name to the employer \"Pagos de los Andes Ltda.\" as written",
+        "grounding: work[3].name \"Desarrollador Backend\" is the job title; set position to it and name to the employer \"Logística Digital del Norte Grande SpA\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1831,
+        "outputTokens": 1088,
+        "totalTokens": 2919
+      }
     },
     {
       "id": "es-cl-006",
@@ -1613,7 +1710,18 @@
           "fn": 0
         }
       },
-      "seconds": 10.63
+      "seconds": 10.75,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Profesor de Matemática\"); set to null.",
+        "work[1].name: it was the same as the position (\"Docente de Nivel Secundario\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Universidad del Delta Austral\" written next to the position \"Profesor de Matemática\"",
+        "grounding: work[1].name was empty; set it to the employer \"Escuela Técnica Austral\" written next to the position \"Docente de Nivel Secundario\""
+      ],
+      "usage": {
+        "inputTokens": 1763,
+        "outputTokens": 875,
+        "totalTokens": 2638
+      }
     },
     {
       "id": "es-cl-007",
@@ -1719,7 +1827,18 @@
           "fn": 0
         }
       },
-      "seconds": 13.028
+      "seconds": 14.93,
+      "warnings": [
+        "work[0].name: removed the position from \"Supervisora de Enfermería, Clínica Santa Brígida del Norte Grande\"; kept \"Clínica Santa Brígida del Norte Grande\".",
+        "work[1].name: removed the position from \"Enfermera Asistencial, Clínica del Parque del Pacífico\"; kept \"Clínica del Parque del Pacífico\".",
+        "work[2].name: removed the position from \"Enfermera de Terapia Intensiva, Centro Médico de los Andes\"; kept \"Centro Médico de los Andes\".",
+        "work[3].name: removed the position from \"Enfermera, Sanatorio del Pacífico\"; kept \"Sanatorio del Pacífico\"."
+      ],
+      "usage": {
+        "inputTokens": 1926,
+        "outputTokens": 1227,
+        "totalTokens": 3153
+      }
     },
     {
       "id": "es-cl-008",
@@ -1825,7 +1944,12 @@
           "fn": 0
         }
       },
-      "seconds": 17.448
+      "seconds": 14.489,
+      "usage": {
+        "inputTokens": 1914,
+        "outputTokens": 1174,
+        "totalTokens": 3088
+      }
     },
     {
       "id": "es-co-001",
@@ -1931,7 +2055,17 @@
           "fn": 0
         }
       },
-      "seconds": 11.88
+      "seconds": 13.107,
+      "warnings": [
+        "education[0].startDate: could not normalize date \"2023-summer\"; set to null.",
+        "work[0].name: removed the position from \"Analista de Recursos Humanos — Grupo Industrial Paisa Ltda.\"; kept \"Grupo Industrial Paisa Ltda.\".",
+        "work[1].name: removed the position from \"Analista de Selección — Consultora del Valle S.A.\"; kept \"Consultora del Valle S.A.\"."
+      ],
+      "usage": {
+        "inputTokens": 1780,
+        "outputTokens": 1064,
+        "totalTokens": 2844
+      }
     },
     {
       "id": "es-co-002",
@@ -2037,7 +2171,12 @@
           "fn": 0
         }
       },
-      "seconds": 14.636
+      "seconds": 14.53,
+      "usage": {
+        "inputTokens": 1928,
+        "outputTokens": 1194,
+        "totalTokens": 3122
+      }
     },
     {
       "id": "es-co-003",
@@ -2143,7 +2282,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.094
+      "seconds": 11.993,
+      "usage": {
+        "inputTokens": 1774,
+        "outputTokens": 973,
+        "totalTokens": 2747
+      }
     },
     {
       "id": "es-co-004",
@@ -2249,7 +2393,12 @@
           "fn": 0
         }
       },
-      "seconds": 13.012
+      "seconds": 11.749,
+      "usage": {
+        "inputTokens": 1808,
+        "outputTokens": 965,
+        "totalTokens": 2773
+      }
     },
     {
       "id": "es-co-005",
@@ -2355,7 +2504,12 @@
           "fn": 0
         }
       },
-      "seconds": 16.345
+      "seconds": 16.337,
+      "usage": {
+        "inputTokens": 1920,
+        "outputTokens": 1349,
+        "totalTokens": 3269
+      }
     },
     {
       "id": "es-co-006",
@@ -2398,22 +2552,22 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0.5,
-          "recall": 0.5,
-          "f1": 0.5,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 2,
-          "tp": 1,
-          "fp": 1,
-          "fn": 1
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
         },
         "work.dates": {
           "precision": 1,
-          "recall": 0.5,
-          "f1": 0.6666666666666666,
+          "recall": 1,
+          "f1": 1,
           "support": 4,
-          "tp": 2,
+          "tp": 4,
           "fp": 0,
-          "fn": 2
+          "fn": 0
         },
         "education.entries": {
           "precision": 1,
@@ -2461,7 +2615,16 @@
           "fn": 0
         }
       },
-      "seconds": 11.444
+      "seconds": 12.375,
+      "warnings": [
+        "grounding: work[0].name \"Enfermero Asistencial\" is the job title; set position to it and name to the employer \"Clínica Santa Brígida del Valle\" as written",
+        "grounding: work[1].name \"Enfermero de Terapia Intensiva\" is the job title; set position to it and name to the employer \"Centro Médico de los Andes\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1792,
+        "outputTokens": 949,
+        "totalTokens": 2741
+      }
     },
     {
       "id": "es-co-007",
@@ -2567,7 +2730,15 @@
           "fn": 0
         }
       },
-      "seconds": 12.202
+      "seconds": 12.013,
+      "warnings": [
+        "extract: text box content appended at the end"
+      ],
+      "usage": {
+        "inputTokens": 1828,
+        "outputTokens": 981,
+        "totalTokens": 2809
+      }
     },
     {
       "id": "es-co-008",
@@ -2673,7 +2844,12 @@
           "fn": 0
         }
       },
-      "seconds": 15.55
+      "seconds": 15.403,
+      "usage": {
+        "inputTokens": 1952,
+        "outputTokens": 1261,
+        "totalTokens": 3213
+      }
     },
     {
       "id": "es-co-009",
@@ -2779,7 +2955,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.207
+      "seconds": 11.804,
+      "usage": {
+        "inputTokens": 1728,
+        "outputTokens": 857,
+        "totalTokens": 2585
+      }
     },
     {
       "id": "es-es-001",
@@ -2885,7 +3066,12 @@
           "fn": 0
         }
       },
-      "seconds": 13.469
+      "seconds": 14.039,
+      "usage": {
+        "inputTokens": 1872,
+        "outputTokens": 1153,
+        "totalTokens": 3025
+      }
     },
     {
       "id": "es-es-002",
@@ -2991,7 +3177,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.579
+      "seconds": 12.715,
+      "usage": {
+        "inputTokens": 1816,
+        "outputTokens": 1037,
+        "totalTokens": 2853
+      }
     },
     {
       "id": "es-es-003",
@@ -3097,7 +3288,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.952
+      "seconds": 11.676,
+      "usage": {
+        "inputTokens": 1813,
+        "outputTokens": 961,
+        "totalTokens": 2774
+      }
     },
     {
       "id": "es-es-004",
@@ -3203,7 +3399,17 @@
           "fn": 0
         }
       },
-      "seconds": 12.585
+      "seconds": 12.968,
+      "warnings": [
+        "work[0].name: removed the position from \"Profesora Adjunta — Colegio Santa Inés de Levante\"; kept \"Colegio Santa Inés de Levante\".",
+        "work[1].name: removed the position from \"Coordinadora Académica — Escuela Técnica del Ebro\"; kept \"Escuela Técnica del Ebro\".",
+        "work[2].name: removed the position from \"Profesora de Matemática — Universidad del Delta del Mediterráneo\"; kept \"Universidad del Delta del Mediterráneo\"."
+      ],
+      "usage": {
+        "inputTokens": 1828,
+        "outputTokens": 1072,
+        "totalTokens": 2900
+      }
     },
     {
       "id": "es-es-005",
@@ -3309,7 +3515,22 @@
           "fn": 0
         }
       },
-      "seconds": 15.131
+      "seconds": 15.083,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Supervisor de Enfermería\"); set to null.",
+        "work[1].name: it was the same as the position (\"Enfermero Asistencial\"); set to null.",
+        "work[2].name: it was the same as the position (\"Enfermero de Terapia Intensiva\"); set to null.",
+        "work[3].name: it was the same as the position (\"Enfermero\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Centro Médico del Ebro\" written next to the position \"Supervisor de Enfermería\"",
+        "grounding: work[1].name was empty; set it to the employer \"Hospital Privado del Ebro\" written next to the position \"Enfermero Asistencial\"",
+        "grounding: work[2].name was empty; set it to the employer \"Clínica del Parque del Mediterráneo\" written next to the position \"Enfermero de Terapia Intensiva\"",
+        "grounding: work[3].name was empty; set it to the employer \"Sanatorio del Ebro\" written next to the position \"Enfermero\""
+      ],
+      "usage": {
+        "inputTokens": 1858,
+        "outputTokens": 1245,
+        "totalTokens": 3103
+      }
     },
     {
       "id": "es-es-006",
@@ -3415,7 +3636,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.398
+      "seconds": 12.396,
+      "usage": {
+        "inputTokens": 1790,
+        "outputTokens": 1005,
+        "totalTokens": 2795
+      }
     },
     {
       "id": "es-es-007",
@@ -3521,7 +3747,15 @@
           "fn": 0
         }
       },
-      "seconds": 12.221
+      "seconds": 12.227,
+      "warnings": [
+        "extract: text box content appended at the end"
+      ],
+      "usage": {
+        "inputTokens": 1802,
+        "outputTokens": 1010,
+        "totalTokens": 2812
+      }
     },
     {
       "id": "es-es-008",
@@ -3627,7 +3861,12 @@
           "fn": 0
         }
       },
-      "seconds": 15.162
+      "seconds": 14.907,
+      "usage": {
+        "inputTokens": 1919,
+        "outputTokens": 1227,
+        "totalTokens": 3146
+      }
     },
     {
       "id": "es-es-009",
@@ -3733,7 +3972,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.896
+      "seconds": 11.506,
+      "usage": {
+        "inputTokens": 1711,
+        "outputTokens": 851,
+        "totalTokens": 2562
+      }
     },
     {
       "id": "es-mx-001",
@@ -3839,7 +4083,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.692
+      "seconds": 12.513,
+      "usage": {
+        "inputTokens": 1826,
+        "outputTokens": 1026,
+        "totalTokens": 2852
+      }
     },
     {
       "id": "es-mx-002",
@@ -3945,7 +4194,12 @@
           "fn": 0
         }
       },
-      "seconds": 14.27
+      "seconds": 13.735,
+      "usage": {
+        "inputTokens": 1848,
+        "outputTokens": 1130,
+        "totalTokens": 2978
+      }
     },
     {
       "id": "es-mx-003",
@@ -4051,7 +4305,12 @@
           "fn": 0
         }
       },
-      "seconds": 14.229
+      "seconds": 14.091,
+      "usage": {
+        "inputTokens": 1847,
+        "outputTokens": 1152,
+        "totalTokens": 2999
+      }
     },
     {
       "id": "es-mx-004",
@@ -4157,7 +4416,12 @@
           "fn": 0
         }
       },
-      "seconds": 9.845
+      "seconds": 9.901,
+      "usage": {
+        "inputTokens": 1757,
+        "outputTokens": 793,
+        "totalTokens": 2550
+      }
     },
     {
       "id": "es-mx-005",
@@ -4263,7 +4527,12 @@
           "fn": 0
         }
       },
-      "seconds": 14.376
+      "seconds": 14.523,
+      "usage": {
+        "inputTokens": 1870,
+        "outputTokens": 1199,
+        "totalTokens": 3069
+      }
     },
     {
       "id": "es-mx-006",
@@ -4369,7 +4638,17 @@
           "fn": 0
         }
       },
-      "seconds": 12.126
+      "seconds": 12.202,
+      "warnings": [
+        "grounding: work[0].name \"Product Designer\" is the job title; set position to it and name to the employer \"Apps Azteca S.A.P.I. de C.V.\" as written",
+        "grounding: work[1].name \"Diseñador UX/UI\" is the job title; set position to it and name to the employer \"Tienda Azteca S. de R.L. de C.V.\" as written",
+        "grounding: work[2].name \"Diseñador Gráfico\" is the job title; set position to it and name to the employer \"Estudio Creativo Azteca S. de R.L. de C.V.\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1834,
+        "outputTokens": 994,
+        "totalTokens": 2828
+      }
     },
     {
       "id": "es-mx-007",
@@ -4457,13 +4736,13 @@
           "fn": 0
         },
         "skills": {
-          "precision": 0.8571428571428571,
-          "recall": 0.8571428571428571,
-          "f1": 0.8571428571428571,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 7,
-          "tp": 6,
-          "fp": 1,
-          "fn": 1
+          "tp": 7,
+          "fp": 0,
+          "fn": 0
         },
         "languages": {
           "precision": 1,
@@ -4475,7 +4754,12 @@
           "fn": 0
         }
       },
-      "seconds": 13.785
+      "seconds": 14.143,
+      "usage": {
+        "inputTokens": 1891,
+        "outputTokens": 1168,
+        "totalTokens": 3059
+      }
     },
     {
       "id": "es-mx-008",
@@ -4581,7 +4865,12 @@
           "fn": 0
         }
       },
-      "seconds": 15.356
+      "seconds": 15.273,
+      "usage": {
+        "inputTokens": 1956,
+        "outputTokens": 1242,
+        "totalTokens": 3198
+      }
     },
     {
       "id": "es-mx-009",
@@ -4687,7 +4976,16 @@
           "fn": 1
         }
       },
-      "seconds": 10.903
+      "seconds": 11.065,
+      "warnings": [
+        "grounding: dropped education[0].studyType \"Bachillerato\" (not found in the document)",
+        "grounding: dropped 1 language not found in the document: Español"
+      ],
+      "usage": {
+        "inputTokens": 1709,
+        "outputTokens": 847,
+        "totalTokens": 2556
+      }
     },
     {
       "id": "es-pe-001",
@@ -4793,7 +5091,12 @@
           "fn": 0
         }
       },
-      "seconds": 15.078
+      "seconds": 16.709,
+      "usage": {
+        "inputTokens": 1959,
+        "outputTokens": 1377,
+        "totalTokens": 3336
+      }
     },
     {
       "id": "es-pe-002",
@@ -4899,7 +5202,12 @@
           "fn": 0
         }
       },
-      "seconds": 115.76
+      "seconds": 11.844,
+      "usage": {
+        "inputTokens": 1846,
+        "outputTokens": 964,
+        "totalTokens": 2810
+      }
     },
     {
       "id": "es-pe-003",
@@ -5005,7 +5313,12 @@
           "fn": 0
         }
       },
-      "seconds": 12.066
+      "seconds": 12.012,
+      "usage": {
+        "inputTokens": 1859,
+        "outputTokens": 986,
+        "totalTokens": 2845
+      }
     },
     {
       "id": "es-pe-004",
@@ -5048,22 +5361,22 @@
           "fn": 0
         },
         "work.entries": {
-          "precision": 0.5,
-          "recall": 0.5,
-          "f1": 0.5,
+          "precision": 1,
+          "recall": 1,
+          "f1": 1,
           "support": 2,
-          "tp": 1,
-          "fp": 1,
-          "fn": 1
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
         },
         "work.dates": {
           "precision": 1,
-          "recall": 0.5,
-          "f1": 0.6666666666666666,
+          "recall": 1,
+          "f1": 1,
           "support": 4,
-          "tp": 2,
+          "tp": 4,
           "fp": 0,
-          "fn": 2
+          "fn": 0
         },
         "education.entries": {
           "precision": 1,
@@ -5093,12 +5406,12 @@
           "fn": 0
         },
         "skills": {
-          "precision": 1,
+          "precision": 0.75,
           "recall": 1,
-          "f1": 1,
+          "f1": 0.8571428571428571,
           "support": 6,
           "tp": 6,
-          "fp": 0,
+          "fp": 2,
           "fn": 0
         },
         "languages": {
@@ -5111,7 +5424,16 @@
           "fn": 0
         }
       },
-      "seconds": 11.761
+      "seconds": 13.129,
+      "warnings": [
+        "work[0].name: \"Ejecutivo de Cuentas — Distribuidora de los Andes S.A.C.\" holds the position too; split into name \"Distribuidora de los Andes S.A.C.\" and position \"Ejecutivo de Cuentas\".",
+        "work[1].name: \"Asesor Comercial — Software Empresarial del Pacífico S.A.C.\" holds the position too; split into name \"Software Empresarial del Pacífico S.A.C.\" and position \"Asesor Comercial\"."
+      ],
+      "usage": {
+        "inputTokens": 1800,
+        "outputTokens": 1038,
+        "totalTokens": 2838
+      }
     },
     {
       "id": "es-pe-005",
@@ -5217,7 +5539,15 @@
           "fn": 0
         }
       },
-      "seconds": 13.279
+      "seconds": 13.516,
+      "warnings": [
+        "grounding: dropped basics.profiles[0].url \"mailto:renzo_huaman@example.com\" (not found in the document)"
+      ],
+      "usage": {
+        "inputTokens": 1852,
+        "outputTokens": 1107,
+        "totalTokens": 2959
+      }
     },
     {
       "id": "es-pe-006",
@@ -5323,7 +5653,20 @@
           "fn": 0
         }
       },
-      "seconds": 11.701
+      "seconds": 12.521,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Tech Lead Backend\"); set to null.",
+        "work[1].name: it was the same as the position (\"Desarrolladora Backend Sr.\"); set to null.",
+        "work[2].name: it was the same as the position (\"Desarrolladora Backend\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Pagos del Rímac S.A.\" written next to the position \"Tech Lead Backend\"",
+        "grounding: work[1].name was empty; set it to the employer \"Fintech del Pacífico S.A.\" written next to the position \"Desarrolladora Backend Sr.\"",
+        "grounding: work[2].name was empty; set it to the employer \"Datacenter del Pacífico S.A.C.\" written next to the position \"Desarrolladora Backend\""
+      ],
+      "usage": {
+        "inputTokens": 1818,
+        "outputTokens": 1020,
+        "totalTokens": 2838
+      }
     },
     {
       "id": "es-pe-007",
@@ -5393,12 +5736,12 @@
           "fn": 0
         },
         "education.dates": {
-          "precision": 0.8333333333333334,
+          "precision": 1,
           "recall": 1,
-          "f1": 0.9090909090909091,
+          "f1": 1,
           "support": 5,
           "tp": 5,
-          "fp": 1,
+          "fp": 0,
           "fn": 0
         },
         "education.level": {
@@ -5429,7 +5772,19 @@
           "fn": 0
         }
       },
-      "seconds": 13.988
+      "seconds": 13.971,
+      "warnings": [
+        "work[0].name: \"Investigador Asistente, Colegio Santa Inés de los Andes (Arequipa)\" holds the position too; split into name \"Colegio Santa Inés de los Andes (Arequipa)\" and position \"Investigador Asistente\".",
+        "work[1].name: \"Profesor Adjunto, Instituto Belgrano de los Andes (Arequipa)\" holds the position too; split into name \"Instituto Belgrano de los Andes (Arequipa)\" and position \"Profesor Adjunto\".",
+        "work[2].name: \"Coordinador Académico, Escuela Técnica del Pacífico (Arequipa)\" holds the position too; split into name \"Escuela Técnica del Pacífico (Arequipa)\" and position \"Coordinador Académico\".",
+        "grounding: work[3].name \"Profesor de Matemática, Liceo Inca (Remoto)\" looks like a job title and position is empty; no employer found next to it (kept)",
+        "grounding: dropped location \"Arequipa, Perú\" from 3 work entries (it appears fewer times in the document than entries claim it; probably copied from the candidate's address)"
+      ],
+      "usage": {
+        "inputTokens": 1951,
+        "outputTokens": 1149,
+        "totalTokens": 3100
+      }
     },
     {
       "id": "es-pe-008",
@@ -5535,7 +5890,19 @@
           "fn": 0
         }
       },
-      "seconds": 10.806
+      "seconds": 10.676,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Enfermero Asistencial\"); set to null.",
+        "work[1].name: it was the same as the position (\"Enfermero de Terapia Intensiva\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Clinica Santa Brígida del Rímac\" written next to the position \"Enfermero Asistencial\"",
+        "grounding: work[1].name was empty; set it to the employer \"Clínica del Parque del Pacífico\" written next to the position \"Enfermero de Terapia Intensiva\"",
+        "grounding: dropped basics.email \"jhon.ccori@example.com\" (not found in the document)"
+      ],
+      "usage": {
+        "inputTokens": 1703,
+        "outputTokens": 814,
+        "totalTokens": 2517
+      }
     },
     {
       "id": "es-uy-001",
@@ -5641,7 +6008,18 @@
           "fn": 0
         }
       },
-      "seconds": 13.862
+      "seconds": 13.615,
+      "warnings": [
+        "model: removed 1 repeated item inside work entries (highlights, keywords, courses or roles).",
+        "work[0].name: \"Supervisora de Enfermería — Centro Médico del Plata\" holds the position too; split into name \"Centro Médico del Plata\" and position \"Supervisora de Enfermería\".",
+        "work[1].name: \"Enfermera Asistencial — Hospital Privado Charrúa\" holds the position too; split into name \"Hospital Privado Charrúa\" and position \"Enfermera Asistencial\".",
+        "work[2].name: \"Enfermera de Terapia Intensiva — Sanatorio Oriental\" holds the position too; split into name \"Sanatorio Oriental\" and position \"Enfermera de Terapia Intensiva\"."
+      ],
+      "usage": {
+        "inputTokens": 1838,
+        "outputTokens": 1123,
+        "totalTokens": 2961
+      }
     },
     {
       "id": "es-uy-002",
@@ -5747,7 +6125,16 @@
           "fn": 0
         }
       },
-      "seconds": 10.134
+      "seconds": 10.318,
+      "warnings": [
+        "work[0].name: \"Contadora Senior — Estudio Contable del Este S.A.\" holds the position too; split into name \"Estudio Contable del Este S.A.\" and position \"Contadora Senior\".",
+        "work[1].name: \"Analista Contable — Constructora Charrúa S.R.L.\" holds the position too; split into name \"Constructora Charrúa S.R.L.\" and position \"Analista Contable\"."
+      ],
+      "usage": {
+        "inputTokens": 1748,
+        "outputTokens": 836,
+        "totalTokens": 2584
+      }
     },
     {
       "id": "es-uy-003",
@@ -5853,7 +6240,12 @@
           "fn": 0
         }
       },
-      "seconds": 11.001
+      "seconds": 10.831,
+      "usage": {
+        "inputTokens": 1741,
+        "outputTokens": 888,
+        "totalTokens": 2629
+      }
     },
     {
       "id": "es-uy-004",
@@ -5959,7 +6351,12 @@
           "fn": 0
         }
       },
-      "seconds": 10.969
+      "seconds": 10.964,
+      "usage": {
+        "inputTokens": 1784,
+        "outputTokens": 902,
+        "totalTokens": 2686
+      }
     },
     {
       "id": "es-uy-005",
@@ -6065,7 +6462,16 @@
           "fn": 0
         }
       },
-      "seconds": 11.317
+      "seconds": 11.332,
+      "warnings": [
+        "grounding: work[0].name \"Ejecutivo de Cuentas\" is the job title; set position to it and name to the employer \"Insumos Médicos del Este S.A.\" as written",
+        "grounding: work[1].name \"Asesor Comercial\" is the job title; set position to it and name to the employer \"Alimentos del Este S.A.\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1763,
+        "outputTokens": 936,
+        "totalTokens": 2699
+      }
     },
     {
       "id": "es-uy-006",
@@ -6171,7 +6577,15 @@
           "fn": 0
         }
       },
-      "seconds": 13.326
+      "seconds": 13.291,
+      "warnings": [
+        "grounding: dropped basics.profiles[0].url \"mailto:valentina.rodriguez@example.org\" (not found in the document)"
+      ],
+      "usage": {
+        "inputTokens": 1821,
+        "outputTokens": 1095,
+        "totalTokens": 2916
+      }
     },
     {
       "id": "es-uy-007",
@@ -6277,7 +6691,15 @@
           "fn": 0
         }
       },
-      "seconds": 12.879
+      "seconds": 12.951,
+      "warnings": [
+        "grounding: education[0].studyType \"Título\" replaced by \"Tecnólogo en Programación\" as written"
+      ],
+      "usage": {
+        "inputTokens": 1824,
+        "outputTokens": 1058,
+        "totalTokens": 2882
+      }
     },
     {
       "id": "es-uy-008",
@@ -6383,7 +6805,18 @@
           "fn": 0
         }
       },
-      "seconds": 9.96
+      "seconds": 9.936,
+      "warnings": [
+        "work[0].name: it was the same as the position (\"Coordinadora Académica\"); set to null.",
+        "work[1].name: it was the same as the position (\"Profesora de Matemática\"); set to null.",
+        "grounding: work[0].name was empty; set it to the employer \"Universidad del Delta Charrúa\" written next to the position \"Coordinadora Académica\"",
+        "grounding: work[1].name was empty; set it to the employer \"Liceo Charrúa\" written next to the position \"Profesora de Matemática\""
+      ],
+      "usage": {
+        "inputTokens": 1669,
+        "outputTokens": 766,
+        "totalTokens": 2435
+      }
     }
   ],
   "fields": {
@@ -6415,67 +6848,67 @@
       "fn": 0
     },
     "basics.location": {
-      "precision": 0.9666666666666667,
-      "recall": 0.9666666666666667,
-      "f1": 0.9666666666666667,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
       "support": 60,
-      "tp": 58,
-      "fp": 2,
-      "fn": 2
+      "tp": 60,
+      "fp": 0,
+      "fn": 0
     },
     "work.entries": {
-      "precision": 0.9813664596273292,
-      "recall": 0.9813664596273292,
-      "f1": 0.9813664596273292,
+      "precision": 0.9937888198757764,
+      "recall": 0.9937888198757764,
+      "f1": 0.9937888198757764,
       "support": 161,
-      "tp": 158,
-      "fp": 3,
-      "fn": 3
+      "tp": 160,
+      "fp": 1,
+      "fn": 1
     },
     "work.dates": {
       "precision": 1,
-      "recall": 0.9782608695652174,
-      "f1": 0.989010989010989,
+      "recall": 0.9906832298136646,
+      "f1": 0.9953198127925117,
       "support": 322,
-      "tp": 315,
+      "tp": 319,
       "fp": 0,
-      "fn": 7
+      "fn": 3
     },
     "education.entries": {
       "precision": 1,
-      "recall": 0.9911504424778761,
-      "f1": 0.9955555555555555,
+      "recall": 1,
+      "f1": 1,
       "support": 113,
-      "tp": 112,
+      "tp": 113,
       "fp": 0,
-      "fn": 1
+      "fn": 0
     },
     "education.dates": {
-      "precision": 0.9950248756218906,
-      "recall": 0.9852216748768473,
-      "f1": 0.9900990099009901,
+      "precision": 1,
+      "recall": 0.9901477832512315,
+      "f1": 0.995049504950495,
       "support": 203,
-      "tp": 200,
-      "fp": 1,
-      "fn": 3
-    },
-    "education.level": {
-      "precision": 0.9910714285714286,
-      "recall": 0.9823008849557522,
-      "f1": 0.9866666666666667,
-      "support": 113,
-      "tp": 111,
-      "fp": 1,
+      "tp": 201,
+      "fp": 0,
       "fn": 2
     },
+    "education.level": {
+      "precision": 0.9911504424778761,
+      "recall": 0.9911504424778761,
+      "f1": 0.9911504424778761,
+      "support": 113,
+      "tp": 112,
+      "fp": 1,
+      "fn": 1
+    },
     "skills": {
-      "precision": 0.9891067538126361,
-      "recall": 0.9869565217391304,
-      "f1": 0.9880304678998911,
+      "precision": 0.9891774891774892,
+      "recall": 0.9934782608695653,
+      "f1": 0.9913232104121475,
       "support": 460,
-      "tp": 454,
+      "tp": 457,
       "fp": 5,
-      "fn": 6
+      "fn": 3
     },
     "languages": {
       "precision": 1,
@@ -6487,7 +6920,7 @@
       "fn": 1
     }
   },
-  "overallF1": 0.9898841466759393,
+  "overallF1": 0.99635936661289,
   "attempted": 60,
   "byLayout": {
     "academic": {
@@ -6498,32 +6931,32 @@
     "functional": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.9858850574712644
+      "overallF1": 0.9898850574712643
     },
     "scanned": {
       "entries": 6,
       "attempted": 6,
-      "overallF1": 0.9834579323448018
+      "overallF1": 0.9876832844574782
     },
     "sidebar": {
       "entries": 8,
       "attempted": 8,
-      "overallF1": 0.9906501831501832
+      "overallF1": 0.9964912280701755
     },
     "single-column": {
       "entries": 17,
       "attempted": 17,
-      "overallF1": 0.9890323260406444
+      "overallF1": 0.9971492508504838
     },
     "table": {
       "entries": 6,
       "attempted": 6,
-      "overallF1": 0.9905241935483872
+      "overallF1": 1
     },
     "textbox": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.9719696969696969
+      "overallF1": 1
     },
     "two-column": {
       "entries": 11,
@@ -6535,18 +6968,19 @@
     "docx": {
       "entries": 16,
       "attempted": 16,
-      "overallF1": 0.9799461331320295
+      "overallF1": 1
     },
     "image": {
       "entries": 4,
       "attempted": 4,
-      "overallF1": 0.9745694022289767
+      "overallF1": 0.980952380952381
     },
     "pdf": {
       "entries": 40,
       "attempted": 40,
-      "overallF1": 0.9952252122535871
+      "overallF1": 0.996321658643428
     }
   },
-  "totalSeconds": 960.7
+  "cacheHits": 0,
+  "totalSeconds": 758.9
 }

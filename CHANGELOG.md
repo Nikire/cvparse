@@ -8,6 +8,27 @@ While the major version is 0, minor releases may contain breaking changes; they 
 
 ## [Unreleased]
 
+### Fixed
+
+Findings from a private set of 23 real CVs (consented and public-record documents from Argentina, Mexico, Spain, Ecuador, Costa Rica and Uruguay). Numbers are in the README benchmark section.
+
+- Reading order: side-by-side blocks at the bottom of a page (languages next to skills) are read block by block instead of line by line; text drawn twice as a shadow is no longer duplicated; words hyphenated across lines are joined.
+- Grounding: section spans end at any heading, not only known ones; non-standard work and education headings ("Función pública", "Cargos ejercidos", "Trayectoria", "Antecedentes laborales") are recognized; a recovered title or employer must look like one, so fragments such as ". Moreno" or "Categoría profesional:" are rejected; phones with an extension ("int 5045") are kept; a language fluency must be a level or CEFR code.
+- Employers: "Title en Organization" written as the employer is split into position and employer; an employer the model wrote in the location field is moved back; a work entry that duplicates a course or certificate is dropped.
+- Dates: invented end-of-year or end-of-month precision ("2020-12-31" for a plain "2020") is reduced like invented January dates; an end date that only appears as the next entry's start year is dropped.
+- Repetition-loop salvage drops entries with implausible dates or arithmetic date sequences and caps the output; duplicate-entry warnings no longer blame the model when the document itself repeats an entry.
+- The prompt carries no literal example values (phone, city, skills) that small models used to copy into the output.
+- A regex escape invalid under the `u` flag made grounding throw on terms with a dash next to punctuation.
+
+- Long CVs stay inside the model's context window: when the text exceeds the input budget (24k tokens by default, or what is left of a known context window), low-value sections such as publications and congresses are dropped before the tail is cut; an output cut caused by the window is retried with less input instead of a repetition penalty. The CLI reads the loaded Ollama context length. On the private set this cut total time from 34 to 7 minutes and the slowest CV from 8.5 minutes to under one.
+- Recovery rules: degree phrases are never split into a degree and an employer; recovered titles cannot be fragments or places; teaching jobs under an education heading stay in work; a single written year is an end date; Mexican legal suffixes (S.A.P.I. de C.V., S. de R.L.) mark organizations; a one-word institution that is a wrapped title tail is replaced by the school written next to it.
+
+### Added
+
+- `ParseOptions.inputBudgetTokens` and `ParseOptions.contextLengthTokens`.
+- `npm run eval:import`: imports CVs from an inbox into a private evaluation set (gitignored), extracts the text for review, drafts a ground truth with the configured model and records source, consent and PII flags; draft truths are skipped by the runner unless `--include-drafts` is passed; documents that do not look like a CV are flagged.
+- Scorer: identical truth entries (two terms at the same organization) are paired by date; a prediction with a null employer but the right position still matches; phone extensions are ignored.
+
 ## [0.3.1] - 2026-10-03
 
 Driven by a real 3-page CV, where llama3.1 8B invented a phone number, a city and three skills, rewrote degree names and put entries in the wrong sections. The benchmark was re-run with these changes; the numbers are in the README Benchmark section.

@@ -456,7 +456,7 @@ Dataset 1.0.0, 60 synthetic Spanish CVs.
 
 | System | Coverage | Overall | PDF only (40) | Name | Email | Phone | Location | Work entries | Work dates | Education | Education dates | Skills | Languages |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 60/60 | **99.0** | 99.5 | 100.0 | 99.2 | 100.0 | 96.7 | 98.1 | 98.9 | 99.6 | 99.0 | 98.8 | 99.7 |
+| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 60/60 | **99.6** | 99.6 | 100.0 | 99.2 | 100.0 | 100.0 | 99.4 | 99.5 | 100.0 | 99.5 | 99.1 | 99.7 |
 | open-resume (rules) | 40/60 | **17.2** | 17.2 | 17.7 | 91.9 | 43.1 | 13.3 | 0.0 | 0.0 | 0.0 | 0.0 | 5.7 | 0.0 |
 | resume-parser (regex) (2 failed) | 56/60 | **16.9** | 16.1 | 5.5 | 98.2 | 52.6 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 7.1 | 5.8 |
 
@@ -466,7 +466,7 @@ Overall is the mean F1 over the 10 fields above, computed on the CVs a system at
 
 | System | Education level F1 | P | R | support |
 | --- | ---: | ---: | ---: | ---: |
-| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 98.7 | 99.1 | 98.2 | 113 |
+| cvparse + llama3.1 8B (Ollama, local) + Tesseract | 99.1 | 99.1 | 99.1 | 113 |
 
 Not part of Overall. The dataset's degree vocabulary was written alongside cvparse's degree normalizer, so this is not an independent measure; baselines do not produce education levels.
 
@@ -475,17 +475,17 @@ Not part of Overall. The dataset's degree vocabulary was written alongside cvpar
 | Layout | cvparse + llama3.1 8B (Ollama, local) + Tesseract | open-resume (rules) | resume-parser (regex) |
 | --- | ---: | ---: | ---: |
 | academic (4) | 100.0 | 0.0 | 16.7 |
-| functional (4) | 98.6 | 14.0 | 14.0 |
-| scanned (6) | 98.3 | 0.0 | 0.0 |
-| sidebar (8) | 99.1 | 17.7 | 15.5 |
-| single-column (17) | 98.9 | 20.7 | 18.5 |
-| table (6) | 99.1 | n/a | 15.0 |
-| textbox (4) | 97.2 | n/a | 21.1 |
+| functional (4) | 99.0 | 14.0 | 14.0 |
+| scanned (6) | 98.8 | 0.0 | 0.0 |
+| sidebar (8) | 99.6 | 17.7 | 15.5 |
+| single-column (17) | 99.7 | 20.7 | 18.5 |
+| table (6) | 100.0 | n/a | 15.0 |
+| textbox (4) | 100.0 | n/a | 21.1 |
 | two-column (11) | 99.9 | 19.9 | 17.2 |
 
 ### Setup
 
-- **cvparse + llama3.1 8B (Ollama, local) + Tesseract**: cvparse 0.3.0; provider: ollama, model: llama3.1, ocr: tesseract, temperature: 0, language: es, referenceDate: 2026-10-01, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32; GPU: NVIDIA GeForce RTX 4070 SUPER; Ollama OLLAMA_CONTEXT_LENGTH=16384, node: v22.14.0, ollamaVersion: 0.35.0, modelDigest: sha256:46e0c10c039e, tesseract.js: 7.0.0, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657, cvparseCommit: a1b366a2c7b9d472c0729fa32c319c06eb00e5b8, cvparseSrcHash: cc69c5e165216f3f; 60 CVs in 961 s
+- **cvparse + llama3.1 8B (Ollama, local) + Tesseract**: cvparse 0.3.1; provider: ollama, model: llama3.1, ocr: tesseract, temperature: 0, language: es, referenceDate: 2026-10-01, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32; GPU: NVIDIA GeForce RTX 4070 SUPER; Ollama OLLAMA_CONTEXT_LENGTH=16384, node: v22.14.0, ollamaVersion: 0.35.0, modelDigest: sha256:46e0c10c039e, tesseract.js: 7.0.0, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657, cvparseCommit: 7a6decf281456c6e556049ab7f7a6b348a3ddac4, cvparseSrcHash: 639f79deb5f60e05, contextLength: 16384; 60 CVs in 759 s
 - **open-resume (rules)**: repo: github.com/xitanggg/open-resume, commit: 4f8255a2c763479837f69f1dccf2a3338730cd79, license: AGPL-3.0 (fetched at runtime, not vendored), pdfReader: Node port of read-pdf.ts on unpdf's pdf.js, dates: normalized with cvparse normalizeDate/splitDateRange, node: v22.14.0, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657; 40 CVs in 1 s
 - **resume-parser (regex)**: package: resume-parser@1.1.0, license: ISC, input: plain text from cvparse extractText (its textract/pdftotext reader is bypassed), dates: not extracted (sections are raw text), node: v22.14.0, hardware: 12th Gen Intel(R) Core(TM) i9-12900F, 30 GB RAM, win32, datasetVersion: 1.0.0, datasetHash: 76c69f1bbc2c5657; 56 CVs in 12 s
 
